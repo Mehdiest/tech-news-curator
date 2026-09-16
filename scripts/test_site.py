@@ -71,7 +71,11 @@ def test_templates():
     default = (ROOT / "_layouts" / "default.html").read_text(encoding="utf-8")
     assert "site-footer" in default and "site.author.name" in default
     assert 'rel="me"' in default
-    assert 'page.lang | default' in default and 'page.dir | default' in default
+    # html dir must be derived from page.lang: Jekyll's built-in page.dir (source
+    # directory path) shadows any front-matter "dir" value, so rtl never surfaced
+    assert 'page.lang | default' in default
+    assert 'page.dir' not in default, "page.dir is Jekyll's source dir path, not text direction"
+    assert "rtl_langs contains page.lang" in default and "'fa,ar,he,ur'" in default
 
     digest = (ROOT / "_layouts" / "digest.html").read_text(encoding="utf-8")
     assert '"@type": "TechArticle"' in digest
