@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<!-- lang/dir come from each page's front-matter; translated editions (fa) render RTL -->
-<html lang="{{ page.lang | default: 'en' }}" dir="{{ page.dir | default: 'ltr' }}">
+<!-- lang from front-matter; dir derived from lang (Jekyll's built-in page directory attribute
+     shadows front-matter "dir", so a lang->direction map is the only reliable source) -->
+{% assign rtl_langs = 'fa,ar,he,ur' | split: ',' %}
+<html lang="{{ page.lang | default: 'en' }}" dir="{% if rtl_langs contains page.lang %}rtl{% else %}ltr{% endif %}">
 <head>
   {% include head.html %}
 </head>
