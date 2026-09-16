@@ -1,0 +1,25 @@
+---
+layout: default
+---
+<!-- TechArticle schema: ties each daily digest to its author entity -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": {{ page.title | jsonify }},
+  "description": {{ page.description | jsonify }},
+  "datePublished": {{ page.date | date_to_xmlschema | jsonify }},
+  "mainEntityOfPage": {{ page.url | absolute_url | jsonify }},
+  "inLanguage": {{ page.lang | default: 'en' | jsonify }},
+  {% if page.cover %}"image": {{ page.cover | jsonify }},
+  {% endif %}"author": {
+    "@type": "Person",
+    "name": {{ site.author.name | jsonify }},
+    "sameAs": [{{ site.author.linkedin | jsonify }}, {{ site.author.github | jsonify }}]
+  }
+}
+</script>
+
+<article class="digest">
+  {{ content }}
+</article>

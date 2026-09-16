@@ -1,0 +1,33 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>{{ page.title | default: site.title }}</title>
+{% if page.description %}
+<meta name="description" content="{{ page.description }}">
+{% endif %}
+<meta name="author" content="{{ site.author.name }}">
+
+<!-- Open Graph / Twitter cards: digest pages carry their cover image -->
+<meta property="og:site_name" content="{{ site.title }}">
+<meta property="og:title" content="{{ page.title | default: site.title }}">
+<meta property="og:type" content="{% if page.date %}article{% else %}website{% endif %}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta property="og:locale" content="{{ page.og_locale | default: 'en_US' }}">
+{% if page.description %}<meta property="og:description" content="{{ page.description }}">{% endif %}
+{% if page.cover %}<meta property="og:image" content="{{ page.cover }}">{% endif %}
+<meta name="twitter:card" content="{% if page.cover %}summary_large_image{% else %}summary{% endif %}">
+
+<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ 'feed.xml' | absolute_url }}">
+
+<!-- Person entity: sameAs tells Google who curated every page on this site -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": {{ site.author.name | jsonify }},
+  "jobTitle": "Technology News Curator",
+  "sameAs": [{{ site.author.linkedin | jsonify }}, {{ site.author.github | jsonify }}]
+}
+</script>
+
+<link rel="stylesheet" href="{{ 'assets/css/style.css' | relative_url }}">

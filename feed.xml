@@ -1,0 +1,23 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>{{ site.title | xml_escape }}</title>
+    <link>{{ '' | absolute_url }}</link>
+    <description>{{ site.description | xml_escape }}</description>
+    <language>en</language>
+    <!-- English editions only: the translated siblings are linkable from the site -->
+    {% assign digests = site.pages | where_exp: "item", "item.path contains 'posts/'" | where_exp: "item", "item.lang == 'en'" | sort: "date" | reverse %}
+    {% for digest in digests limit: 20 %}
+    <item>
+      <title>{{ digest.title | xml_escape }}</title>
+      <link>{{ digest.url | absolute_url }}</link>
+      <guid isPermaLink="true">{{ digest.url | absolute_url }}</guid>
+      <pubDate>{{ digest.date | date_to_rfc822 }}</pubDate>
+      {% if digest.description %}<description>{{ digest.description | xml_escape }}</description>{% endif %}
+    </item>
+    {% endfor %}
+  </channel>
+</rss>

@@ -1,0 +1,92 @@
+name: daily-tech-digest
+
+# Full pipeline: ingest -> dedup -> rank -> LLM -> publish -> commit -> GitHub Pages.
+# 04:30 UTC == 08:00 Asia/Tehran (Iran has no DST), runs every morning.
+# Same-day re-runs are idempotent: when today's digest already exists the
+# publish step is a no-op (the LLM is non-deterministic, so a second run
+# would otherwise overwrite the day's post with different text). Manual
+# dispatches can set `force` to regenerate anyway.
+on:
+  schedule:
+    - cron: "30 4 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Regenerate today's digest even if it already exists"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # push the daily digest commit
+  pages: write      # deploy the site
+  id-token: write   # OIDC for deploy-pages
+
+concurrency:
+  group: daily-tech-digest
+  cancel-in-progress: false
+
+jobs:
+  publish-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Secrets never enter the repo: .env is generated at runtime and gitignored.
+      # LLM_MODEL is a repo *variable* (optional); default = a zero-balance model.
+      - name: Write .env from secrets
+        run: |
+          {
+            echo "LLM_PROVIDER=glm"
+            echo "LLM_API_KEY=${{ secrets.LLM_API_KEY }}"
+            echo "LLM_BASE_URL=https://api.b.ai/v1"
+            echo "LLM_MODEL=${{ vars.LLM_MODEL || 'qwen3.8-flash' }}"
+            echo "DIGEST_LANGUAGE=en"
+          } > .env
+
+      - name: Build the daily digest
+        # skips by itself when today's editions exist; --force only on demand
+        run: python -m src.main --publish ${{ github.event_name == 'workflow_dispatch' && inputs.force && '--force' || '' }}
+
+      - name: Commit the digest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain posts/)" ]; then
+            git add posts/
+            git commit -m "digest: daily tech digest $(date -u +%F)"
+            git push
+          else
+            echo "no new digest to commit"
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Build the Jekyll site
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+      - name: Upload the site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

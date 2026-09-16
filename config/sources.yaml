@@ -1,0 +1,93 @@
+# Source list - adding a new source is one line here, no code changes.
+# category: general | ai | dev | analysis
+
+# Curator identity - rendered on every digest page (front-matter author,
+# visible byline, footer links) so search engines associate the daily
+# content with its author.
+author:
+  name: Mehdi Esteghlal
+  linkedin: "https://ir.linkedin.com/in/mehdi-esteghlal-317a67100"
+  github: "https://github.com/Mehdiest"
+  repository: "https://github.com/Mehdiest/tech-news-curator"
+
+# Output editions (stage 7): the English digest is canonical; every extra
+# language code adds a translated sibling file posts/<day>-tech-digest-<code>.md
+# produced FROM the finished English text so the author's voice stays identical.
+# Localized labels + native language names live in config/i18n.yaml.
+languages: [fa, fr, de, es, zh]
+
+rss:
+  # --- General tech ---
+  - {name: TechCrunch,          url: "https://techcrunch.com/feed/",                     category: general}
+  - {name: The Verge,           url: "https://www.theverge.com/rss/index.xml",           category: general}
+  - {name: Ars Technica,        url: "https://feeds.arstechnica.com/arstechnica/index",  category: general}
+  - {name: Wired,               url: "https://www.wired.com/feed/rss",                   category: general}
+  - {name: Engadget,            url: "https://www.engadget.com/rss.xml",                 category: general}
+  - {name: ZDNet,               url: "https://www.zdnet.com/feed/",                      category: general}
+  # --- AI/ML (weighted higher by the stage-3 ranker) ---
+  - {name: MIT Tech Review,     url: "https://www.technologyreview.com/feed/",           category: ai}
+  - {name: VentureBeat AI,      url: "https://venturebeat.com/category/ai/feed/",        category: ai}
+  - {name: Google AI Blog,      url: "https://blog.google/technology/ai/rss/",           category: ai}
+  - {name: Hugging Face Blog,   url: "https://huggingface.co/blog/feed.xml",             category: ai}
+  - {name: OpenAI News,         url: "https://openai.com/news/rss.xml",                  category: ai}
+  - {name: Simon Willison,      url: "https://simonwillison.net/atom/everything/",       category: ai}   # strong LLM coverage
+  # Anthropic and The Batch have no RSS (404) - covered later via Reddit/NewsAPI
+  # --- Dev / Infrastructure ---
+  - {name: InfoQ,               url: "https://feed.infoq.com/",                          category: dev}
+  - {name: The New Stack,       url: "https://thenewstack.io/feed/",                     category: dev}
+  - {name: Dev.to,              url: "https://dev.to/feed/",                             category: dev}
+  - {name: Stack Overflow Blog, url: "https://stackoverflow.blog/feed/",                 category: dev}
+  # --- Analysis / newsletters ---
+  # Stratechery (403 bot-block; retry from GitHub Actions) and TLDR (404) temporarily disabled
+  # - {name: Stratechery,       url: "https://stratechery.com/feed/",                    category: analysis}
+  # - {name: TLDR Tech,         url: "https://tldr.tech/tech/rss.xml",                   category: analysis}
+
+hn:
+  mode: front_page        # front_page | top_day
+  min_points: 50
+  max_items: 30
+
+reddit:
+  # public JSON API, no auth for reading; a descriptive User-Agent is mandatory (429 otherwise)
+  listing: top            # top | hot
+  time_range: day         # hour | day | week (listing=top only)
+  min_score: 20
+  max_per_sub: 25
+  subreddits:
+    - {name: technology,  category: general}
+    - {name: programming, category: dev}
+    - {name: artificial,  category: ai}
+
+ranker:
+  # score = coverage + signal + comments + category + recency (see src/pipeline/ranker.py)
+  coverage_weight: 6.0           # x log2(1 + distinct sources covering the story)
+  signal_weight: 4.0             # x log1p(HN points / Reddit ups)
+  comments_weight: 1.0           # x log1p(num_comments)
+  recency_weight: 10.0           # x 0.5 ** (age_hours / half_life)
+  recency_half_life_hours: 24
+  category_weights:              # flat bonus per category
+    ai: 2.0
+    analysis: 1.0
+    dev: 0.5
+    general: 0.0
+  default_top_n: 8               # used by the publish stage; preview uses --limit
+
+pipeline:
+  max_per_feed: 15
+  request_timeout: 20
+  title_similarity: 0.85  # fuzzy title threshold for stage-2 dedup
+  # Images are a SECOND-OPTION feature, never critical: any item without a
+  # picture renders as clean text-only content, and image failures never
+  # break a publish run.
+  images: true            # use pictures the sources officially provide with the
+                          # story (RSS media tags, Reddit preview API)
+  enrich_images: false    # OPTIONAL fallback: fetch the publisher page and take
+                          # its og:image. Two known risks: publisher CDNs may
+                          # block hotlinking, and embedding a media outlet's
+                          # picture on your own domain is copyright gray area.
+                          # Leave off unless you accept both.
+  image_blocklist:        # image hosts that must NOT be embedded:
+    - redd.it             # Reddit is filtered in Iran -> its hosted images
+                          # render broken for Iranian readers. Empty the list
+                          # (image_blocklist: []) to keep them.
+  translations: true      # stage 7 - translate each digest into `languages` above

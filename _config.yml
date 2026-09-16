@@ -1,0 +1,43 @@
+# Jekyll configuration for GitHub Pages - consumed by actions/jekyll-build-pages.
+title: Tech Digest by Mehdi Esteghlal
+description: Daily tech news digest - top stories ranked and summarized with expert commentary, curated by Mehdi Esteghlal.
+timezone: UTC
+
+# Curator identity - drives the byline, footer links, and JSON-LD Person schema.
+author:
+  name: Mehdi Esteghlal
+  linkedin: https://ir.linkedin.com/in/mehdi-esteghlal-317a67100
+  github: https://github.com/Mehdiest
+repository: https://github.com/Mehdiest/tech-news-curator
+
+markdown: kramdown
+
+# jekyll-sitemap is whitelisted by GitHub Pages and emits sitemap.xml on build.
+plugins:
+  - jekyll-sitemap
+
+# Every digest page gets the article layout; index.md opts into home explicitly.
+defaults:
+  - scope:
+      path: "posts"
+    values:
+      layout: digest
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# The Pages site ships content only - no source code, no CI, no env files.
+exclude:
+  - src
+  - scripts
+  - config
+  - .github
+  - requirements.txt
+  - .env
+  - .env.example
+  - .gitignore
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
