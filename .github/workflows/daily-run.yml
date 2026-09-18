@@ -98,3 +98,17 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify a digest exists for today
+        # The publish step exits 0 even when the LLM yields nothing: every
+        # summarize/translate failure is isolated, and "no successfully
+        # summarized items" just logs an error. That made no-digest days look
+        # like green runs. Same-day no-op re-runs still pass here - the
+        # morning file already exists on disk.
+        run: |
+          today="$(date -u +%F)"
+          if ! ls posts/"$today"-tech-digest*.md >/dev/null 2>&1; then
+            echo "::error::no digest for $today - inspect the 'Build the daily digest' step log"
+            exit 1
+          fi
+          echo "digest for $today: $(ls posts/"$today"-tech-digest*.md | tr '\n' ' ')"

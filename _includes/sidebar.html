@@ -5,8 +5,9 @@
     {% if site.author.avatar and site.author.avatar != "" %}
     <img src="{{ site.author.avatar | relative_url }}" alt="{{ site.author.name }}">
     {% else %}
+    {% assign name_words = site.author.name | split: ' ' %}
     <span class="avatar-initials" aria-hidden="true">
-      {{ site.author.name | split: " " | map: "first" | join: "" }}
+      {{ name_words[0] | slice: 0, 1 | upcase }}{{ name_words[1] | slice: 0, 1 | upcase }}
     </span>
     {% endif %}
   </div>

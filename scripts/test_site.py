@@ -31,7 +31,10 @@ def test_workflow():
     wf = yaml.safe_load(
         (ROOT / ".github" / "workflows" / "daily-run.yml").read_text(encoding="utf-8")
     )
-    assert wf[True]["schedule"][0]["cron"] == "30 4 * * *"  # yaml parses `on:` as True
+    # two schedules on purpose: primary + same-day safety net (GitHub Actions
+    # cron is lossy at popular times; idempotency makes the retry free)
+    crons = [entry["cron"] for entry in wf[True]["schedule"]]
+    assert crons == ["37 4 * * *", "43 7 * * *"], crons
     assert "workflow_dispatch" in wf[True]  # empty value parses as None
     perms = wf["permissions"]
     assert perms["contents"] == "write" and perms["pages"] == "write"
@@ -53,9 +56,12 @@ def test_workflow():
     assert dispatch["inputs"]["force"]["default"] is False
     assert any("secrets.LLM_API_KEY" in r for r in runs), "API key must come from secrets"
     assert any("git status --porcelain posts/" in r for r in runs)
+    # a silent no-digest outcome must turn the run red; the guard sits after
+    # the deploy step so site fixes still ship on broken-LLM days
+    assert any("no digest for" in r for r in runs)
     # the free-tier default keeps the scheduled run working with zero balance
     assert any("qwen3.8-flash" in r for r in runs)
-    print("PASS workflow: cron + permissions + publish/commit/Pages deploy chain + secrets")
+    print("PASS workflow: dual cron + permissions + publish/commit/Pages deploy chain + secrets + no-digest guard")
 
 
 def test_templates():
@@ -76,6 +82,13 @@ def test_templates():
     assert 'page.lang | default' in default
     assert 'page.dir' not in default, "page.dir is Jekyll's source dir path, not text direction"
     assert "rtl_langs contains page.lang" in default and "'fa,ar,he,ur'" in default
+    # profile sidebar ships on every page and keeps author SEO links
+    assert "include sidebar.html" in default
+    sidebar = (ROOT / "_includes" / "sidebar.html").read_text(encoding="utf-8")
+    assert "site.author.name" in sidebar and 'rel="me"' in sidebar
+    # map:"first" over split strings renders empty - initials need slice
+    assert 'map: "first"' not in sidebar and "map: 'first'" not in sidebar
+    assert "name_words" in sidebar
 
     digest = (ROOT / "_layouts" / "digest.html").read_text(encoding="utf-8")
     assert '"@type": "TechArticle"' in digest
@@ -137,7 +150,7 @@ def test_i18n_yaml():
 def test_site_files_exist():
     for rel in (
         "_config.yml", "index.md", "feed.xml", "robots.txt",
-        "_includes/head.html", "_layouts/default.html",
+        "_includes/head.html", "_includes/sidebar.html", "_layouts/default.html",
         "_layouts/digest.html", "_layouts/home.html",
         "assets/css/style.css", ".github/workflows/daily-run.yml",
         "config/i18n.yaml",
