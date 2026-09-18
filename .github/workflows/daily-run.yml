@@ -25,6 +25,7 @@ permissions:
   contents: write   # push the daily digest commit
   pages: write      # deploy the site
   id-token: write   # OIDC for deploy-pages
+  actions: write    # delete stale github-pages artifacts on re-runs
 
 concurrency:
   group: daily-tech-digest
@@ -90,6 +91,18 @@ jobs:
         with:
           source: ./
           destination: ./_site
+
+      - name: Remove stale github-pages artifacts from earlier attempts
+        # Re-running a failed job keeps the previous attempt's upload, and
+        # deploy-pages aborts with "Multiple artifacts named github-pages".
+        # Delete them so every attempt ends with exactly one artifact.
+        run: |
+          for id in $(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" --jq '.artifacts[] | select(.name == "github-pages") | .id'); do
+            gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
+            echo "deleted stale artifact $id"
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Upload the site artifact
         uses: actions/upload-pages-artifact@v3
