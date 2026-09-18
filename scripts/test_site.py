@@ -39,6 +39,7 @@ def test_workflow():
     perms = wf["permissions"]
     assert perms["contents"] == "write" and perms["pages"] == "write"
     assert perms["id-token"] == "write"
+    assert perms["actions"] == "write"  # stale-artifact cleanup on re-runs
     steps = wf["jobs"]["publish-and-deploy"]["steps"]
     uses = [step.get("uses", "") for step in steps]
     for action in (
@@ -59,8 +60,23 @@ def test_workflow():
     # a silent no-digest outcome must turn the run red; the guard sits after
     # the deploy step so site fixes still ship on broken-LLM days
     assert any("no digest for" in r for r in runs)
+    # re-runs must not pile up duplicate github-pages artifacts (deploy-pages
+    # aborts on >1), so stale ones are deleted before each upload
+    assert any('select(.name == "github-pages")' in r for r in runs)
     # the free-tier default keeps the scheduled run working with zero balance
     assert any("qwen3.8-flash" in r for r in runs)
+    # preflight: a malformed secret must fail the run BEFORE ingestion, not
+    # only via the end-of-run digest guard; verdicts only, key never logged
+    names = [step.get("name", "") for step in steps]
+    assert "Validate LLM configuration" in names
+    validate_step = next(s for s in steps if s.get("name") == "Validate LLM configuration")
+    assert "secrets.LLM_API_KEY" in str(validate_step.get("env", {}))
+    validate = validate_step.get("run", "")
+    for needle in (
+        "LLM_API_KEY is empty", "'Bearer ' prefix",
+        "pasted env line", "internal whitespace",
+    ):
+        assert needle in validate, needle
     print("PASS workflow: dual cron + permissions + publish/commit/Pages deploy chain + secrets + no-digest guard")
 
 
@@ -147,6 +163,31 @@ def test_i18n_yaml():
     print("PASS i18n.yaml: six languages, complete label sets, RTL fa, config wiring")
 
 
+def test_llm_key_guardrails():
+    """The 401 'Invalid api_key format' preflight must live in the provider."""
+    src = (ROOT / "src" / "llm" / "glm_provider.py").read_text(encoding="utf-8")
+    assert "def _validate_api_key" in src
+    assert "_validate_api_key(api_key)" in src  # actually called in __init__
+    assert "bearer" in src.lower()  # 'Bearer ' prefix rejection
+    assert "LLM_API_KEY" in src and "isspace" in src
+    factory = (ROOT / "src" / "llm" / "factory.py").read_text(encoding="utf-8")
+    assert 'os.getenv("LLM_API_KEY", "")' in factory  # empty key still surfaces
+    print("PASS glm_provider: api-key preflight (edge cleaning + Bearer/assignment/whitespace rejection)")
+
+
+def test_ascii_sources():
+    """Source files stay pure ASCII English (i18n.yaml + posts/ are exempt)."""
+    for rel in (
+        "src/llm/glm_provider.py", "src/llm/factory.py", "src/llm/base.py",
+        ".github/workflows/daily-run.yml", "scripts/test_site.py",
+        "_includes/sidebar.html", "_layouts/default.html", "_config.yml",
+    ):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        bad = [(i, ch) for i, ch in enumerate(text) if ord(ch) > 127]
+        assert not bad, (rel, bad[:3])
+    print("PASS ascii: source/workflow/template files are pure ASCII")
+
+
 def test_site_files_exist():
     for rel in (
         "_config.yml", "index.md", "feed.xml", "robots.txt",
@@ -164,5 +205,7 @@ if __name__ == "__main__":
     test_workflow()
     test_templates()
     test_i18n_yaml()
+    test_llm_key_guardrails()
+    test_ascii_sources()
     test_site_files_exist()
     print("\nAll site tests passed.")

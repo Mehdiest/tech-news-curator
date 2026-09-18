@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 
 import aiohttp
 
@@ -16,6 +17,38 @@ logger = logging.getLogger(__name__)
 
 _RETRY_STATUS = {408, 429, 500, 502, 503, 504}
 _RETRY_DELAY_SECONDS = 2.0
+
+# 'export KEY=...' / 'KEY=...' / 'set KEY=...' pastes (word chars then '=')
+_ASSIGNMENT_PREFIX = re.compile(r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=")
+
+
+def _validate_api_key(api_key: str) -> str:
+    """Clean edge noise from a hand-pasted key; reject structural paste errors.
+
+    401 "Invalid api_key format" almost always means the secret holds anything
+    other than the raw key value. Edge whitespace/newlines and wrapping quotes
+    are cleaned automatically; a 'Bearer ' prefix, a pasted 'LLM_API_KEY=...'
+    line, or internal whitespace raises with an actionable message.
+    """
+    key = api_key.strip().strip('"').strip("'")
+    if not key:
+        raise ValueError("api_key is empty - set LLM_API_KEY")
+    if key.lower().startswith("bearer "):
+        raise ValueError(
+            "api_key has a 'Bearer ' prefix - paste ONLY the raw key value"
+        )
+    if "LLM_API_KEY" in key or _ASSIGNMENT_PREFIX.match(key):
+        raise ValueError(
+            "api_key is malformed - paste ONLY the raw key value into the "
+            "LLM_API_KEY secret: no 'LLM_API_KEY=' prefix, no quotes, no "
+            "spaces. Copy it again from the provider console."
+        )
+    if any(ch.isspace() for ch in key):
+        raise ValueError(
+            "api_key contains internal whitespace - paste the raw key value "
+            "as one contiguous string"
+        )
+    return key
 
 
 class GLMProvider:
@@ -34,25 +67,14 @@ class GLMProvider:
         language: str = "en",
         max_attempts: int = 2,
     ):
-        # Secrets are hand-pasted and 401 "Invalid api_key format" almost
-        # always means stray whitespace/quotes/newline around the value.
-        # Clean the edges automatically; only hard-fail on structural paste
-        # mistakes that cleaning cannot fix.
-        raw_key = api_key
-        api_key = api_key.strip().strip('"').strip("'")
-        if api_key != raw_key:
+        # Secrets are hand-pasted; the preflight cleans invisible edge noise
+        # and hard-fails on paste mistakes that cleaning cannot fix.
+        cleaned = _validate_api_key(api_key)
+        if cleaned != api_key:
             logger.warning(
                 "LLM_API_KEY had surrounding whitespace/quotes - cleaned automatically"
             )
-        if not api_key:
-            raise ValueError("api_key is empty - set LLM_API_KEY")
-        if "LLM_API_KEY" in api_key or any(ch.isspace() for ch in api_key):
-            raise ValueError(
-                "api_key is malformed - paste ONLY the raw key value into the "
-                "LLM_API_KEY secret: no 'LLM_API_KEY=' prefix, no quotes, no "
-                "spaces. Copy it again from the provider console."
-            )
-        self.api_key = api_key
+        self.api_key = cleaned
         self.model = model
         self.url = f"{base_url.rstrip('/')}/chat/completions"
         self.temperature = temperature

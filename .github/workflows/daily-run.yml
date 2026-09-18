@@ -62,6 +62,30 @@ jobs:
             echo "DIGEST_LANGUAGE=en"
           } > .env
 
+      # Fail fast on a malformed secret BEFORE ingesting hundreds of articles:
+      # with a bad key every summarize fails in isolation and the only signal
+      # used to be a red "no digest" guard at the very end of the run. Only
+      # verdicts are printed - the key value itself never reaches the logs.
+      - name: Validate LLM configuration
+        run: |
+          python - <<'PY'
+          import os, re
+
+          key = os.environ.get("LLM_API_KEY", "").strip().strip('"').strip("'")
+          if not key:
+              raise SystemExit("LLM_API_KEY is empty")
+          if key.lower().startswith("bearer "):
+              raise SystemExit("LLM_API_KEY must not include the 'Bearer ' prefix")
+          if "LLM_API_KEY" in key or re.match(r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=", key):
+              raise SystemExit("LLM_API_KEY looks like a pasted env line - store ONLY the raw key value")
+          if any(ch.isspace() for ch in key):
+              raise SystemExit("LLM_API_KEY contains internal whitespace")
+          print("LLM_API_KEY format looks valid; model =", os.environ.get("LLM_MODEL", "?"))
+          PY
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_MODEL: ${{ vars.LLM_MODEL || 'qwen3.8-flash' }}
+
       - name: Build the daily digest
         # skips by itself when today's editions exist; --force only on demand
         run: python -m src.main --publish ${{ github.event_name == 'workflow_dispatch' && inputs.force && '--force' || '' }}
