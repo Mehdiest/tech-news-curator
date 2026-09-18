@@ -7,8 +7,11 @@ description: "Daily tech news digest: top stories ranked across 16+ sources, sum
 <section class="hero">
   <h1>Tech Digest</h1>
   <p class="tagline">
-    Every morning, the loudest stories in tech - ranked across 16+ sources,
-    summarized factually, and commented by a veteran expert with a sense of humor.
+    An automated pipeline reads 16+ sources every morning - RSS feeds, Hacker News,
+    and Reddit - clusters the stories everyone is covering, and ranks them by real
+    signal: media coverage, community reaction, and how fresh they are. Each top
+    story gets a factual summary plus a short, opinionated take, so you get the
+    news and the "why it matters" in under two minutes.
   </p>
   <p class="langs-available">
     Read in your language:

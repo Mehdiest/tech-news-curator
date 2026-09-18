@@ -1,14 +1,19 @@
 name: daily-tech-digest
 
 # Full pipeline: ingest -> dedup -> rank -> LLM -> publish -> commit -> GitHub Pages.
-# 04:30 UTC == 08:00 Asia/Tehran (Iran has no DST), runs every morning.
 # Same-day re-runs are idempotent: when today's digest already exists the
 # publish step is a no-op (the LLM is non-deterministic, so a second run
 # would otherwise overwrite the day's post with different text). Manual
 # dispatches can set `force` to regenerate anyway.
+#
+# TWO cron schedules on purpose: GitHub Actions cron is notoriously lossy at
+# popular wall-clock times (runs get silently skipped under load). The second
+# slot is a same-day safety net - thanks to idempotency it either publishes
+# the missed digest or no-ops. Off-round minutes reduce contention further.
 on:
   schedule:
-    - cron: "30 4 * * *"
+    - cron: "37 4 * * *"   # primary: 08:07 Asia/Tehran
+    - cron: "43 7 * * *"   # safety net: 11:13 Asia/Tehran, no-ops if the morning run landed
   workflow_dispatch:
     inputs:
       force:

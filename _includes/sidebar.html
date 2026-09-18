@@ -1,0 +1,41 @@
+<!-- Profile sidebar: author photo + identity, shown on every page (see default.html).
+     Mirrors to the opposite side automatically on RTL pages via flexbox + html[dir]. -->
+<aside class="profile-sidebar">
+  <div class="profile-avatar">
+    {% if site.author.avatar and site.author.avatar != "" %}
+    <img src="{{ site.author.avatar | relative_url }}" alt="{{ site.author.name }}">
+    {% else %}
+    <span class="avatar-initials" aria-hidden="true">
+      {{ site.author.name | split: " " | map: "first" | join: "" }}
+    </span>
+    {% endif %}
+  </div>
+
+  <h2 class="profile-name">{{ site.author.name }}</h2>
+  {% if site.author.role %}<p class="profile-role">{{ site.author.role }}</p>{% endif %}
+
+  <ul class="profile-meta">
+    {% if site.author.location %}
+    <li class="profile-location">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+      <span>{{ site.author.location }}</span>
+    </li>
+    {% endif %}
+    {% if site.author.linkedin %}
+    <li>
+      <a href="{{ site.author.linkedin }}" rel="me" target="_blank">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        <span>LinkedIn</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if site.author.github %}
+    <li>
+      <a href="{{ site.author.github }}" rel="me" target="_blank">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.2c0 4.5 2.87 8.32 6.84 9.67.5.1.68-.22.68-.48 0-.24-.01-1.04-.01-1.88-2.78.62-3.37-1.22-3.37-1.22-.45-1.18-1.11-1.5-1.11-1.5-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.9 1.56 2.35 1.11 2.92.85.09-.66.35-1.11.64-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.73 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.9-1.33 2.74-1.05 2.74-1.05.56 1.42.21 2.47.1 2.73.65.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.48A10.02 10.02 0 0 0 22 12.2C22 6.58 17.52 2 12 2z"/></svg>
+        <span>GitHub</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</aside>

@@ -3,11 +3,16 @@ title: Tech Digest by Mehdi Esteghlal
 description: Daily tech news digest - top stories ranked and summarized with expert commentary, curated by Mehdi Esteghlal.
 timezone: UTC
 
-# Curator identity - drives the byline, footer links, and JSON-LD Person schema.
+# Curator identity - drives the byline, footer links, profile sidebar, and JSON-LD Person schema.
 author:
   name: Mehdi Esteghlal
+  role: "Independent Backend & AI Developer"
+  location: "Iran"
   linkedin: https://ir.linkedin.com/in/mehdi-esteghlal-317a67100
   github: https://github.com/Mehdiest
+  # Drop a square photo at assets/img/avatar.jpg (or .png) and set the path below;
+  # until then the sidebar falls back to initials.
+  avatar: ""
 repository: https://github.com/Mehdiest/tech-news-curator
 
 markdown: kramdown

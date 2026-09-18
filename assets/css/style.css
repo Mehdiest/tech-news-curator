@@ -13,23 +13,77 @@ body {
 a { color: #0969da; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* Two-column shell: profile sidebar + page content.
+   flex-direction row follows html[dir], so the sidebar mirrors to the
+   right automatically on RTL (Persian/Arabic) pages - no extra rules needed. */
+.page-shell {
+  display: flex;
+  align-items: flex-start;
+  gap: 36px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+/* Profile sidebar */
+.profile-sidebar {
+  flex: 0 0 220px;
+  position: sticky;
+  top: 24px;
+  background: #14161a;
+  color: #e6edf3;
+  border-radius: 14px;
+  padding: 28px 18px;
+  text-align: center;
+}
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #2a2f38;
+  border: 3px solid #3a3f4b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-initials { font-size: 1.6rem; font-weight: 700; color: #9aa4b2; }
+.profile-name { font-size: 1.1rem; margin: 0 0 4px; }
+.profile-role { font-size: 0.88rem; color: #9aa4b2; margin: 0 0 18px; line-height: 1.4; }
+.profile-meta { list-style: none; margin: 0; padding: 0; text-align: left; }
+[dir="rtl"] .profile-meta { text-align: right; }
+.profile-meta li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  border-top: 1px solid #262a31;
+  font-size: 0.9rem;
+}
+.profile-meta li:first-child { border-top: none; }
+.profile-meta li svg { flex: none; color: #9aa4b2; }
+.profile-meta li a { display: flex; align-items: center; gap: 8px; color: #e6edf3; }
+.profile-meta li a:hover { color: #58a6ff; text-decoration: none; }
+.profile-location span { color: #c9d1d9; }
+
+/* Page content column */
+.page-content { flex: 1; min-width: 0; max-width: 780px; }
+
 .site-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 18px 20px;
+  padding: 0 0 18px;
+  margin-bottom: 10px;
   border-bottom: 1px solid #e4e7ea;
 }
 .site-header .site-title { font-weight: 700; font-size: 1.05rem; color: #1f2328; }
 .site-header nav a { margin-left: 16px; font-size: 0.92rem; }
+[dir="rtl"] .site-header nav a { margin-left: 0; margin-right: 16px; }
 
-.site-main {
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 28px 20px 48px;
-}
+.site-main { padding: 8px 0 20px; }
 
 /* Hero (home page) */
 .hero h1 { font-size: 2.1rem; margin-bottom: 6px; }
@@ -76,18 +130,24 @@ a:hover { text-decoration: underline; }
 
 /* Site-wide footer: curator credit on every page */
 .site-footer {
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 22px 20px 34px;
+  padding: 22px 0 0;
+  margin-top: 12px;
   border-top: 1px solid #e4e7ea;
   color: #57606a;
   font-size: 0.9rem;
 }
 .site-footer p { margin: 4px 0; }
 
-/* Translated editions: Persian (fa) pages render right-to-left */
+/* Translated editions: Persian (fa) and other RTL pages render right-to-left */
 [dir="rtl"] .digest blockquote {
   border-left: 0;
   border-right: 4px solid #0969da;
   border-radius: 8px 0 0 8px;
+}
+[dir="rtl"] body { line-height: 1.9; }
+
+/* Small screens: stack the sidebar above the content instead of beside it */
+@media (max-width: 760px) {
+  .page-shell { flex-direction: column; padding: 20px 16px 40px; }
+  .profile-sidebar { position: static; width: 100%; flex: none; }
 }
