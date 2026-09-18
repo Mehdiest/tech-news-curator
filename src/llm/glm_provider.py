@@ -34,8 +34,24 @@ class GLMProvider:
         language: str = "en",
         max_attempts: int = 2,
     ):
+        # Secrets are hand-pasted and 401 "Invalid api_key format" almost
+        # always means stray whitespace/quotes/newline around the value.
+        # Clean the edges automatically; only hard-fail on structural paste
+        # mistakes that cleaning cannot fix.
+        raw_key = api_key
+        api_key = api_key.strip().strip('"').strip("'")
+        if api_key != raw_key:
+            logger.warning(
+                "LLM_API_KEY had surrounding whitespace/quotes - cleaned automatically"
+            )
         if not api_key:
             raise ValueError("api_key is empty - set LLM_API_KEY")
+        if "LLM_API_KEY" in api_key or any(ch.isspace() for ch in api_key):
+            raise ValueError(
+                "api_key is malformed - paste ONLY the raw key value into the "
+                "LLM_API_KEY secret: no 'LLM_API_KEY=' prefix, no quotes, no "
+                "spaces. Copy it again from the provider console."
+            )
         self.api_key = api_key
         self.model = model
         self.url = f"{base_url.rstrip('/')}/chat/completions"
