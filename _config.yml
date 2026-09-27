@@ -7,12 +7,12 @@ timezone: UTC
 author:
   name: Mehdi Esteghlal
   role: "Independent Backend & AI Developer"
-  location: "Iran"
-  linkedin: https://ir.linkedin.com/in/mehdi-esteghlal-317a67100
+  location: ""
+  linkedin: https://www.linkedin.com/in/mehdi-esteghlal-317a67100
   github: https://github.com/Mehdiest
   # Drop a square photo at assets/img/avatar.jpg (or .png) and set the path below;
   # until then the sidebar falls back to initials.
-  avatar: ""
+  avatar: "assets/img/avatar.jpg"
 repository: https://github.com/Mehdiest/tech-news-curator
 
 markdown: kramdown
