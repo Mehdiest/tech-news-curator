@@ -114,7 +114,7 @@ async def translate_batch(
     items: list[CuratedItem],
     targets: list[str],
     concurrency: int = 3,
-    max_tokens: int = 800,
+    max_tokens: int = 3000,
 ) -> int:
     """Translate summarized items into extra languages, in place.
 
