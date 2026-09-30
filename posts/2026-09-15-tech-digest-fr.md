@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-15 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-15 | Mehdi Esteghlal"
 date: 2026-09-15
 items: 4
 sources: [HackerNews]
@@ -8,23 +8,23 @@ lang: fr
 dir: ltr
 og_locale: fr_FR
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-15: 4 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - sélection quotidienne d'actualités tech pour le 2026-09-15 : les histoires à la une, résumées avec un avis d'expert, par Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-15
+# TechTally - 2026-09-15
 
-_4 histoires à la une issues de 1 sources, classées selon la couverture médiatique, l'écho communautaire et la fraîcheur._
+_4 histoires à la une provenant de 1 source - classement selon la couverture médiatique, l'écho communautaire et la fraîcheur._
 
 _Sélectionné par [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**Lisez cette édition en:** [English](2026-09-15-tech-digest.html) | [فارسی](2026-09-15-tech-digest-fa.html) | [Deutsch](2026-09-15-tech-digest-de.html) | [Español](2026-09-15-tech-digest-es.html) | [中文](2026-09-15-tech-digest-zh.html)
+**Lisez cette édition en:** <a class="lang-pill" href="2026-09-15-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-15-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-15-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-15-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-15-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-15-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-15-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-15-tech-digest-ar.html">العربية</a>
 
 ## 1. [Je ne cesse de penser à la Papouasie-Nouvelle-Guinée](https://notnottalmud.substack.com/p/why-i-cant-stop-thinking-about-papua)
 
 ![Je ne cesse de penser à la Papouasie-Nouvelle-Guinée](https://substackcdn.com/image/fetch/$s_!o2BG!,w_1200,h_675,c_fill,f_jpg,q_auto:good,fl_progressive:steep,g_auto/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F1cf2320c-0d17-4c36-bf55-4372c97e32e4_3099x3069.jpeg)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 44.4
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -40,7 +40,7 @@ Un essai Substack intitulé « Je ne cesse de penser à la Papouasie-Nouvelle-Gu
 
 ![iOS 27, iPadOS 27 et macOS 27](https://www.apple.com/newsroom/images/2026/09/major-updates-for-apples-software-platforms-are-now-available/tile/Apple-OS-availability-hero-lp.jpg.og.jpg)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 44.3
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -54,7 +54,7 @@ Apple a annoncé la disponibilité d'iOS 27, d'iPadOS 27 et de macOS 27, marquan
 
 ## 3. [Le service XCancel est suspendu jusqu'à nouvel ordre](https://xcancel.com/#)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 43.6
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -70,7 +70,7 @@ XCancel, une interface web tierce pour X, a suspendu son service jusqu'à nouvel
 
 ![Un sabotage présumé à l’origine d’une perturbation majeure du réseau ferroviaire néerlandais](https://ichef.bbci.co.uk/news/1024/branded_news/5666/live/b70fbd00-b109-11f1-a451-6b1ff10ed362.jpg)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 42.7
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -82,6 +82,6 @@ Une perturbation majeure des services ferroviaires néerlandais est attribuée �
 
 ---
 
-*Généré automatiquement par [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) le 2026-09-15 13:49 UTC.*
+*Généré automatiquement par [TechTally](https://github.com/Mehdiest/techtally) le 2026-09-30 12:52 UTC.*
 
 Sélectionné par : **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

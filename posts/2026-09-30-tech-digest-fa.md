@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-30 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-30 | Mehdi Esteghlal"
 date: 2026-09-30
 items: 7
 sources: [HackerNews]
@@ -7,17 +7,17 @@ lang: fa
 dir: rtl
 og_locale: fa_IR
 author: "Mehdi Esteghlal"
-description: "خلاصه‌ی روزانه‌ی اخبار تکنولوژی برای 2026-09-30: خبرهای برتر روز با خلاصه و نظر کارشناسانه، گردآوری توسط Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - خلاصه‌ی روزانه‌ی اخبار تکنولوژی برای 2026-09-30: خبرهای برتر روز با خلاصه و نظر کارشناسانه، گردآوری توسط Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-30
+# TechTally - 2026-09-30
 
 _7 خبر برتر از 1 منبع، رتبه‌بندی‌شده بر اساس پوشش رسانه‌ای، بازتاب جامعه و تازگی._
 
 _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**خواندن این شماره به:** [English](2026-09-30-tech-digest.html) | [Français](2026-09-30-tech-digest-fr.html) | [Deutsch](2026-09-30-tech-digest-de.html) | [Español](2026-09-30-tech-digest-es.html) | [中文](2026-09-30-tech-digest-zh.html)
+**خواندن این شماره به:** <a class="lang-pill" href="2026-09-30-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-30-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-30-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-30-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-30-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-30-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-30-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-30-tech-digest-ar.html">العربية</a>
 
 ## 1. [GPT 6.1 Sol: هوش نزدیک به Astra با یک‌پنجم قیمت](https://openai.com/index/introducing-gpt-6-1-sol/)
 
@@ -117,6 +117,6 @@ OpenAI انتشار GPT 6.1 Sol را اعلام کرد، یک مدل جدید ک
 
 ---
 
-*تولید خودکار توسط [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) در 2026-09-30 07:51 UTC.*
+*تولید خودکار توسط [TechTally](https://github.com/Mehdiest/techtally) در 2026-09-30 12:49 UTC.*
 
 گردآوری توسط: **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

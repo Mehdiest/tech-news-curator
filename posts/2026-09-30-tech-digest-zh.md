@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-30 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-30 | Mehdi Esteghlal"
 date: 2026-09-30
 items: 7
 sources: [HackerNews]
@@ -7,17 +7,17 @@ lang: zh
 dir: ltr
 og_locale: zh_CN
 author: "Mehdi Esteghlal"
-description: "2026-09-30 每日科技新闻精选：当日热点新闻摘要与专家点评，编辑：Mehdi Esteghlal。"
-generator: tech-news-curator
+description: "TechTally 每日科技新闻精选（2026-09-30）：当日热点新闻摘要与专家点评，编辑：Mehdi Esteghlal。"
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-30
+# TechTally - 2026-09-30
 
 _从 1 个来源 精选的 7 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
 
 _编辑 [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**以其他语言阅读本期:** [English](2026-09-30-tech-digest.html) | [فارسی](2026-09-30-tech-digest-fa.html) | [Français](2026-09-30-tech-digest-fr.html) | [Deutsch](2026-09-30-tech-digest-de.html) | [Español](2026-09-30-tech-digest-es.html)
+**以其他语言阅读本期:** <a class="lang-pill" href="2026-09-30-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-30-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-30-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-30-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-30-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-30-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-30-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-30-tech-digest-ar.html">العربية</a>
 
 ## 1. [GPT 6.1 Sol：接近 Astra 级智能，价格仅为五分之一](https://openai.com/index/introducing-gpt-6-1-sol/)
 
@@ -117,6 +117,6 @@ Tcl 核心团队发布了 Tcl/Tk 9.1，这是 9.x 系列的首个功能更新。
 
 ---
 
-*由 [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) 自动生成于 2026-09-30 07:51 UTC。*
+*由 [TechTally](https://github.com/Mehdiest/techtally) 自动生成于 2026-09-30 12:49 UTC。*
 
 编辑： **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

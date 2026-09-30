@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-29 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-29 | Mehdi Esteghlal"
 date: 2026-09-29
 items: 4
 sources: [HackerNews]
@@ -7,21 +7,21 @@ lang: fr
 dir: ltr
 og_locale: fr_FR
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-29: 4 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - sélection quotidienne d'actualités tech pour le 2026-09-29 : les histoires à la une, résumées avec un avis d'expert, par Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-29
+# TechTally - 2026-09-29
 
-_4 histoires à la une issues de 1 sources, classées selon la couverture médiatique, l'écho communautaire et la fraîcheur._
+_4 histoires à la une provenant de 1 source - classement selon la couverture médiatique, l'écho communautaire et la fraîcheur._
 
 _Sélectionné par [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**Lisez cette édition en:** [English](2026-09-29-tech-digest.html) | [فارسی](2026-09-29-tech-digest-fa.html) | [Deutsch](2026-09-29-tech-digest-de.html) | [Español](2026-09-29-tech-digest-es.html) | [中文](2026-09-29-tech-digest-zh.html)
+**Lisez cette édition en:** <a class="lang-pill" href="2026-09-29-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-29-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-29-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-29-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-29-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-29-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-29-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-29-tech-digest-ar.html">العربية</a>
 
 ## 1. [Google Maps mis à jour révèle la destruction de la ville de Rafah](https://twitter.com/AliAbunimah/status/2103890594137309425)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 43.2
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -35,7 +35,7 @@ Les images satellites mises à jour sur Google Maps révèlent une destruction �
 
 ## 2. [Pirating the Pirates](https://mubi.com/en/notebook/posts/pirating-the-pirates)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 43.1
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -49,7 +49,7 @@ Film streaming platform Mubi published an article titled "Pirating the Pirates" 
 
 ## 3. [It's Time to Investigate the AI Labs](https://calnewport.com/its-time-to-investigate-the-ai-labs/)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 42.8
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -63,7 +63,7 @@ Computer science professor and author Cal Newport publishes an essay arguing tha
 
 ## 4. [Les agriculteurs californiens peinent à écouler leurs raisins alors que la demande de vin chute](https://www.kqed.org/news/12101534/california-farmers-are-struggling-to-sell-grapes-as-demand-for-wine-drops)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 40.6
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -75,6 +75,6 @@ Les producteurs de raisins de cuvée californiens font face à une crise de surp
 
 ---
 
-*Généré automatiquement par [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) le 2026-09-29 10:58 UTC.*
+*Généré automatiquement par [TechTally](https://github.com/Mehdiest/techtally) le 2026-09-30 12:50 UTC.*
 
 Sélectionné par : **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

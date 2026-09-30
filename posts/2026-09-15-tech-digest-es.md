@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-15 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-15 | Mehdi Esteghlal"
 date: 2026-09-15
 items: 4
 sources: [HackerNews]
@@ -8,23 +8,23 @@ lang: es
 dir: ltr
 og_locale: es_ES
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-15: 4 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - resumen diario de noticias tech para 2026-09-15: las historias destacadas del día con comentarios de expertos, curado por Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-15
+# TechTally - 2026-09-15
 
-_4 noticias destacadas de 1 fuentes, clasificadas por cobertura mediática, repercusión comunitaria y actualidad._
+_4 historias destacadas de 1 fuente, según cobertura mediática, repercusión comunitaria y actualidad._
 
 _Curado por [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**Lee esta edición en:** [English](2026-09-15-tech-digest.html) | [فارسی](2026-09-15-tech-digest-fa.html) | [Français](2026-09-15-tech-digest-fr.html) | [Deutsch](2026-09-15-tech-digest-de.html) | [中文](2026-09-15-tech-digest-zh.html)
+**Lee esta edición en:** <a class="lang-pill" href="2026-09-15-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-15-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-15-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-15-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-15-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-15-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-15-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-15-tech-digest-ar.html">العربية</a>
 
 ## 1. [No puedo dejar de pensar en Papúa Nueva Guinea](https://notnottalmud.substack.com/p/why-i-cant-stop-thinking-about-papua)
 
 ![No puedo dejar de pensar en Papúa Nueva Guinea](https://substackcdn.com/image/fetch/$s_!o2BG!,w_1200,h_675,c_fill,f_jpg,q_auto:good,fl_progressive:steep,g_auto/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F1cf2320c-0d17-4c36-bf55-4372c97e32e4_3099x3069.jpeg)
 
-**Fuente:** HackerNews  |  **Tema:** hn  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 44.4
+**Fuente:** HackerNews  |  **Tema:** hn  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -40,7 +40,7 @@ Un ensayo de Substack titulado 'No puedo dejar de pensar en Papúa Nueva Guinea'
 
 ![iOS 27, iPadOS 27 y macOS 27](https://www.apple.com/newsroom/images/2026/09/major-updates-for-apples-software-platforms-are-now-available/tile/Apple-OS-availability-hero-lp.jpg.og.jpg)
 
-**Fuente:** HackerNews  |  **Tema:** hn  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 44.3
+**Fuente:** HackerNews  |  **Tema:** hn  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -54,7 +54,7 @@ Apple anunció la disponibilidad de iOS 27, iPadOS 27 y macOS 27, marcando el si
 
 ## 3. [El servicio de XCancel queda suspendido hasta nuevo aviso](https://xcancel.com/#)
 
-**Fuente:** HackerNews  |  **Tema:** hn  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 43.6
+**Fuente:** HackerNews  |  **Tema:** hn  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -70,7 +70,7 @@ XCancel, un frontend web de terceros para X, ha suspendido su servicio hasta nue
 
 ![Un presunto sabotaje provoca una grave interrupción del transporte ferroviario en los Países Bajos](https://ichef.bbci.co.uk/news/1024/branded_news/5666/live/b70fbd00-b109-11f1-a451-6b1ff10ed362.jpg)
 
-**Fuente:** HackerNews  |  **Tema:** hn  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 42.7
+**Fuente:** HackerNews  |  **Tema:** hn  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -82,6 +82,6 @@ Una grave interrupción de los servicios ferroviarios en los Países Bajos se ha
 
 ---
 
-*Generado automáticamente por [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) el 2026-09-15 13:49 UTC.*
+*Generado automáticamente por [TechTally](https://github.com/Mehdiest/techtally) el 2026-09-30 12:52 UTC.*
 
 Curado por: **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

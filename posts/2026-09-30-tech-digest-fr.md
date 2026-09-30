@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-30 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-30 | Mehdi Esteghlal"
 date: 2026-09-30
 items: 7
 sources: [HackerNews]
@@ -7,17 +7,17 @@ lang: fr
 dir: ltr
 og_locale: fr_FR
 author: "Mehdi Esteghlal"
-description: "Sélection quotidienne d'actualités tech pour le 2026-09-30 : les histoires à la une, résumées avec un avis d'expert, par Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - sélection quotidienne d'actualités tech pour le 2026-09-30 : les histoires à la une, résumées avec un avis d'expert, par Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-30
+# TechTally - 2026-09-30
 
 _7 histoires à la une provenant de 1 source - classement selon la couverture médiatique, l'écho communautaire et la fraîcheur._
 
 _Sélectionné par [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**Lisez cette édition en:** [English](2026-09-30-tech-digest.html) | [فارسی](2026-09-30-tech-digest-fa.html) | [Deutsch](2026-09-30-tech-digest-de.html) | [Español](2026-09-30-tech-digest-es.html) | [中文](2026-09-30-tech-digest-zh.html)
+**Lisez cette édition en:** <a class="lang-pill" href="2026-09-30-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-30-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-30-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-30-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-30-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-30-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-30-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-30-tech-digest-ar.html">العربية</a>
 
 ## 1. [GPT 6.1 Sol : une intelligence proche d'Astra pour un cinquième du prix](https://openai.com/index/introducing-gpt-6-1-sol/)
 
@@ -117,6 +117,6 @@ L'équipe centrale de Tcl a publié Tcl/Tk 9.1, la première mise à jour de fon
 
 ---
 
-*Généré automatiquement par [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) le 2026-09-30 07:51 UTC.*
+*Généré automatiquement par [TechTally](https://github.com/Mehdiest/techtally) le 2026-09-30 12:49 UTC.*
 
 Sélectionné par : **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

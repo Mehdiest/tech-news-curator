@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-27 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-27 | Mehdi Esteghlal"
 date: 2026-09-27
 items: 8
 sources: [Dev.to]
@@ -8,23 +8,23 @@ lang: es
 dir: ltr
 og_locale: es_ES
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-27: 8 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - resumen diario de noticias tech para 2026-09-27: las historias destacadas del día con comentarios de expertos, curado por Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-27
+# TechTally - 2026-09-27
 
-_8 noticias destacadas de 1 fuentes, clasificadas por cobertura mediática, repercusión comunitaria y actualidad._
+_8 historias destacadas de 1 fuente, según cobertura mediática, repercusión comunitaria y actualidad._
 
 _Curado por [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**Lee esta edición en:** [English](2026-09-27-tech-digest.html) | [فارسی](2026-09-27-tech-digest-fa.html) | [Français](2026-09-27-tech-digest-fr.html) | [Deutsch](2026-09-27-tech-digest-de.html) | [中文](2026-09-27-tech-digest-zh.html)
+**Lee esta edición en:** <a class="lang-pill" href="2026-09-27-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-27-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-27-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-27-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-27-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-27-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-27-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-27-tech-digest-ar.html">العربية</a>
 
 ## 1. [Desplegar un agente de revisión de código con IA serverless en AWS Lambda con PR-Agent y CDK](https://dev.to/naorpeled/running-a-serverless-ai-code-review-agent-on-aws-lambda-with-pr-agent-and-cdk-40gd)
 
 ![Desplegar un agente de revisión de código con IA serverless en AWS Lambda con PR-Agent y CDK](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fd6uc1opq3kmertbnvha9.png)
 
-**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 16.5
+**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -38,7 +38,7 @@ Naor Peled publicó un tutorial en Dev.to que muestra cómo desplegar PR-Agent, 
 
 ## 2. [Creé un agente de IA que soluciona problemas de contenedores Docker en lenguaje natural (así lo hice)](https://dev.to/nagarjuna155/i-built-an-ai-agent-that-troubleshoots-docker-containers-in-plain-english-heres-how-1c6p)
 
-**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 16.5
+**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -54,7 +54,7 @@ El autor de Dev.to Nagarjuna creó un agente de IA que automatiza la resolución
 
 ![Ejecutamos 100 microservicios en un portátil de 16 GB. Sin Kubernetes.](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fy0016tm6dlqjhc9a19jr.png)
 
-**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 16.5
+**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -70,7 +70,7 @@ Un equipo creó TDK (Tilt Development Kit) para probar la ejecución de 100 micr
 
 ![De filas desordenadas a decisiones de gestión: Creando una solución Power BI para JCars Logistics](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Ffazx9vo075kfd51j4qny.png)
 
-**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 16.5
+**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -86,7 +86,7 @@ Un desarrollador documenta el proceso de principio a fin para crear una solució
 
 ![Jev y el problema de la IA que siempre tiene una respuesta](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2F051cs2fef1kjqgbptwo3.png)
 
-**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 16.5
+**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -100,7 +100,7 @@ Los desarrolladores de Jev, una herramienta de revisión de currículums impulsa
 
 ## 6. [Desafío semanal: la longitud palindrómica](https://dev.to/simongreennet/weekly-challenge-the-palindromic-length-299i)
 
-**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 16.4
+**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -114,7 +114,7 @@ El colaborador de Dev.to Simon Green publicó sus soluciones para el Desafío Se
 
 ## 7. [Heap vs pila en C](https://dev.to/codemaster_121482/heap-vs-stack-memory-in-c-4enh)
 
-**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 16.4
+**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -128,7 +128,7 @@ Un autor de Dev.to bajo el seudónimo codemaster_121482 publicó una guía para 
 
 ## 8. [Cómo crear un marketplace personal de agentes para Claude Code](https://dev.to/teppana88/how-to-build-a-personal-agent-marketplace-for-claude-code-17fp)
 
-**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente(s)  |  **Puntuación:** 16.4
+**Fuente:** Dev.to  |  **Tema:** dev  |  **Cobertura:** 1 fuente
 
 **Resumen**
 
@@ -140,6 +140,6 @@ Un desarrollador comparte su enfoque para gestionar más de 40 agentes y habilid
 
 ---
 
-*Generado automáticamente por [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) el 2026-09-27 13:39 UTC.*
+*Generado automáticamente por [TechTally](https://github.com/Mehdiest/techtally) el 2026-09-30 12:52 UTC.*
 
 Curado por: **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

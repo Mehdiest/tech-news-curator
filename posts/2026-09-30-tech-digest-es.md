@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-30 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-30 | Mehdi Esteghlal"
 date: 2026-09-30
 items: 7
 sources: [HackerNews]
@@ -7,17 +7,17 @@ lang: es
 dir: ltr
 og_locale: es_ES
 author: "Mehdi Esteghlal"
-description: "Resumen diario de noticias tech para 2026-09-30: las historias destacadas del día con comentarios de expertos, curado por Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - resumen diario de noticias tech para 2026-09-30: las historias destacadas del día con comentarios de expertos, curado por Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-30
+# TechTally - 2026-09-30
 
 _7 historias destacadas de 1 fuente, según cobertura mediática, repercusión comunitaria y actualidad._
 
 _Curado por [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**Lee esta edición en:** [English](2026-09-30-tech-digest.html) | [فارسی](2026-09-30-tech-digest-fa.html) | [Français](2026-09-30-tech-digest-fr.html) | [Deutsch](2026-09-30-tech-digest-de.html) | [中文](2026-09-30-tech-digest-zh.html)
+**Lee esta edición en:** <a class="lang-pill" href="2026-09-30-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-30-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-30-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-30-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-30-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-30-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-30-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-30-tech-digest-ar.html">العربية</a>
 
 ## 1. [GPT 6.1 Sol: Inteligencia casi nivel Astra por una quinta parte del precio](https://openai.com/index/introducing-gpt-6-1-sol/)
 
@@ -117,6 +117,6 @@ El equipo central de Tcl ha lanzado Tcl/Tk 9.1, la primera actualización de car
 
 ---
 
-*Generado automáticamente por [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) el 2026-09-30 07:51 UTC.*
+*Generado automáticamente por [TechTally](https://github.com/Mehdiest/techtally) el 2026-09-30 12:49 UTC.*
 
 Curado por: **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

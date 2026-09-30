@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-28 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-28 | Mehdi Esteghlal"
 date: 2026-09-28
 items: 8
 sources: [HackerNews]
@@ -7,21 +7,21 @@ lang: fr
 dir: ltr
 og_locale: fr_FR
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-28: 8 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - sélection quotidienne d'actualités tech pour le 2026-09-28 : les histoires à la une, résumées avec un avis d'expert, par Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-28
+# TechTally - 2026-09-28
 
-_8 histoires à la une issues de 1 sources, classées selon la couverture médiatique, l'écho communautaire et la fraîcheur._
+_8 histoires à la une provenant de 1 source - classement selon la couverture médiatique, l'écho communautaire et la fraîcheur._
 
 _Sélectionné par [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**Lisez cette édition en:** [English](2026-09-28-tech-digest.html) | [فارسی](2026-09-28-tech-digest-fa.html) | [Deutsch](2026-09-28-tech-digest-de.html) | [Español](2026-09-28-tech-digest-es.html) | [中文](2026-09-28-tech-digest-zh.html)
+**Lisez cette édition en:** <a class="lang-pill" href="2026-09-28-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-28-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-28-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-28-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-28-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-28-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-28-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-28-tech-digest-ar.html">العربية</a>
 
 ## 1. [Depuis quand Google est-il devenu si bizarre ?](https://sancho.bearblog.dev/google-weird/)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 47.9
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -35,7 +35,7 @@ Un article de blog sur HackerNews intitulé « Depuis quand Google est-il devenu
 
 ## 2. [Un milliard de dollars en actions Nvidia à percevoir](https://colo.to/nvidia-stock-narrative.html)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 45.9
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -49,7 +49,7 @@ Un article de blog sur colo.to intitulé « Un milliard de dollars en actions Nv
 
 ## 3. [Ember-1](https://fireworks.ai/blog/ember-1)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 42.1
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -63,7 +63,7 @@ Fireworks AI a lancé Ember-1, un nouveau modèle de langage disponible via leur
 
 ## 4. [Show HN : Lofi Cities – Nuits de ville en pixel‑art avec lofi généré dans le navigateur](https://loficities.com/)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 39.1
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -77,7 +77,7 @@ Le développeur présente Lofi Cities, une expérience web côté navigateur qui
 
 ## 5. [Ne couplez pas votre code Go à GitHub](https://iain.rocks/blog/dont-couple-your-go-code-to-github)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 38.8
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -91,7 +91,7 @@ Un article de blog d'Iain soutient que les développeurs Go devraient éviter de
 
 ## 6. [Le prompting de Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 38.6
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -105,7 +105,7 @@ Anthropic a publié la documentation officielle d'ingénierie de prompt pour Cla
 
 ## 7. [Auto-hébergement sur le Dark Web](https://david.alvarezrosa.com/posts/self-hosting-on-the-dark-web/)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 38.3
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -119,7 +119,7 @@ David Alvarez Rosa a publié un guide technique sur l'auto-hébergement de servi
 
 ## 8. [Dans une chambre de motel à 80 $, une découverte qui éclaire les origines de la vie](https://www.nytimes.com/2026/09/26/science/motel-science-discovery.html)
 
-**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source(s)  |  **Score:** 38.2
+**Source:** HackerNews  |  **Sujet:** hn  |  **Couverture:** 1 source
 
 **Résumé**
 
@@ -131,6 +131,6 @@ Selon un rapport du New York Times, un chercheur a réalisé une découverte sci
 
 ---
 
-*Généré automatiquement par [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) le 2026-09-28 11:19 UTC.*
+*Généré automatiquement par [TechTally](https://github.com/Mehdiest/techtally) le 2026-09-30 12:51 UTC.*
 
 Sélectionné par : **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

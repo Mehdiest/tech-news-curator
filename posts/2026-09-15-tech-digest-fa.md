@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-15 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-15 | Mehdi Esteghlal"
 date: 2026-09-15
 items: 4
 sources: [HackerNews]
@@ -8,23 +8,23 @@ lang: fa
 dir: rtl
 og_locale: fa_IR
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-15: 4 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - خلاصه‌ی روزانه‌ی اخبار تکنولوژی برای 2026-09-15: خبرهای برتر روز با خلاصه و نظر کارشناسانه، گردآوری توسط Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-15
+# TechTally - 2026-09-15
 
 _4 خبر برتر از 1 منبع، رتبه‌بندی‌شده بر اساس پوشش رسانه‌ای، بازتاب جامعه و تازگی._
 
 _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**خواندن این شماره به:** [English](2026-09-15-tech-digest.html) | [Français](2026-09-15-tech-digest-fr.html) | [Deutsch](2026-09-15-tech-digest-de.html) | [Español](2026-09-15-tech-digest-es.html) | [中文](2026-09-15-tech-digest-zh.html)
+**خواندن این شماره به:** <a class="lang-pill" href="2026-09-15-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-15-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-15-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-15-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-15-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-15-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-15-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-15-tech-digest-ar.html">العربية</a>
 
 ## 1. [نمی‌توانم از فکر پاپوآ گینه نو بیرون بیایم](https://notnottalmud.substack.com/p/why-i-cant-stop-thinking-about-papua)
 
 ![نمی‌توانم از فکر پاپوآ گینه نو بیرون بیایم](https://substackcdn.com/image/fetch/$s_!o2BG!,w_1200,h_675,c_fill,f_jpg,q_auto:good,fl_progressive:steep,g_auto/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F1cf2320c-0d17-4c36-bf55-4372c97e32e4_3099x3069.jpeg)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 44.4
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -40,7 +40,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ![iOS 27، iPadOS 27 و macOS 27](https://www.apple.com/newsroom/images/2026/09/major-updates-for-apples-software-platforms-are-now-available/tile/Apple-OS-availability-hero-lp.jpg.og.jpg)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 44.3
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -54,7 +54,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 3. [سرویس XCancel تا اطلاع ثانوی متوقف شد](https://xcancel.com/#)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 43.6
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -70,7 +70,7 @@ XCancel، یک فرانت‌اند وب شخص ثالث برای X، سرویس 
 
 ![خرابکاری مشکوک باعث اختلال گسترده در ریل‌های هلند شد](https://ichef.bbci.co.uk/news/1024/branded_news/5666/live/b70fbd00-b109-11f1-a451-6b1ff10ed362.jpg)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 42.7
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -82,6 +82,6 @@ XCancel، یک فرانت‌اند وب شخص ثالث برای X، سرویس 
 
 ---
 
-*تولید خودکار توسط [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) در 2026-09-15 13:49 UTC.*
+*تولید خودکار توسط [TechTally](https://github.com/Mehdiest/techtally) در 2026-09-30 12:52 UTC.*
 
 گردآوری توسط: **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

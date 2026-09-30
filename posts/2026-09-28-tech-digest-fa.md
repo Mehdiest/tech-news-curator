@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-28 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-28 | Mehdi Esteghlal"
 date: 2026-09-28
 items: 8
 sources: [HackerNews]
@@ -7,21 +7,21 @@ lang: fa
 dir: rtl
 og_locale: fa_IR
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-28: 8 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - خلاصه‌ی روزانه‌ی اخبار تکنولوژی برای 2026-09-28: خبرهای برتر روز با خلاصه و نظر کارشناسانه، گردآوری توسط Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-28
+# TechTally - 2026-09-28
 
 _8 خبر برتر از 1 منبع، رتبه‌بندی‌شده بر اساس پوشش رسانه‌ای، بازتاب جامعه و تازگی._
 
 _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**خواندن این شماره به:** [English](2026-09-28-tech-digest.html) | [Français](2026-09-28-tech-digest-fr.html) | [Deutsch](2026-09-28-tech-digest-de.html) | [Español](2026-09-28-tech-digest-es.html) | [中文](2026-09-28-tech-digest-zh.html)
+**خواندن این شماره به:** <a class="lang-pill" href="2026-09-28-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-28-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-28-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-28-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-28-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-28-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-28-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-28-tech-digest-ar.html">العربية</a>
 
 ## 1. [گوگل کی این‌قدر عجیب شد؟](https://sancho.bearblog.dev/google-weird/)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 47.9
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -35,7 +35,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 2. [یک میلیارد دلار بابت سهام اینویدیا طلبکار است](https://colo.to/nvidia-stock-narrative.html)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 45.9
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -49,7 +49,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 3. [Ember-1](https://fireworks.ai/blog/ember-1)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 42.1
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -63,7 +63,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 4. [Show HN: Lofi Cities – شب‌های شهر پیکسل‌آرت با لو-فای تولید شده در مرورگر](https://loficities.com/)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 39.1
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -77,7 +77,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 5. [کد Go خود را به GitHub متصل نکنید](https://iain.rocks/blog/dont-couple-your-go-code-to-github)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 38.8
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -91,7 +91,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 6. [پرامپت‌نویسی برای کلاد اپوس ۵.۵](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 38.6
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -105,7 +105,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 7. [میزبانی خودمختار در وب تاریک](https://david.alvarezrosa.com/posts/self-hosting-on-the-dark-web/)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 38.3
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -119,7 +119,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 8. [کشفِ راز مبدأ حیات در یک اتاق مهمانپذیر ۸۰ دلاری](https://www.nytimes.com/2026/09/26/science/motel-science-discovery.html)
 
-**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع  |  **امتیاز:** 38.2
+**منبع:** HackerNews  |  **موضوع:** hn  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -131,6 +131,6 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ---
 
-*تولید خودکار توسط [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) در 2026-09-28 11:19 UTC.*
+*تولید خودکار توسط [TechTally](https://github.com/Mehdiest/techtally) در 2026-09-30 12:51 UTC.*
 
 گردآوری توسط: **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

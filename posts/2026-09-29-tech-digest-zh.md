@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-29 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-29 | Mehdi Esteghlal"
 date: 2026-09-29
 items: 4
 sources: [HackerNews]
@@ -7,21 +7,21 @@ lang: zh
 dir: ltr
 og_locale: zh_CN
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-29: 4 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally 每日科技新闻精选（2026-09-29）：当日热点新闻摘要与专家点评，编辑：Mehdi Esteghlal。"
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-29
+# TechTally - 2026-09-29
 
-_从 1 个来源精选的 4 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
+_从 1 个来源 精选的 4 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
 
 _编辑 [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**以其他语言阅读本期:** [English](2026-09-29-tech-digest.html) | [فارسی](2026-09-29-tech-digest-fa.html) | [Français](2026-09-29-tech-digest-fr.html) | [Deutsch](2026-09-29-tech-digest-de.html) | [Español](2026-09-29-tech-digest-es.html)
+**以其他语言阅读本期:** <a class="lang-pill" href="2026-09-29-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-29-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-29-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-29-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-29-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-29-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-29-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-29-tech-digest-ar.html">العربية</a>
 
 ## 1. [Updated Google Maps shows destruction of the city of Rafah](https://twitter.com/AliAbunimah/status/2103890594137309425)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 43.2
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -35,7 +35,7 @@ Updated satellite imagery on Google Maps reveals extensive destruction across Ra
 
 ## 2. [Pirating the Pirates](https://mubi.com/en/notebook/posts/pirating-the-pirates)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 43.1
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -49,7 +49,7 @@ Film streaming platform Mubi published an article titled "Pirating the Pirates" 
 
 ## 3. [It's Time to Investigate the AI Labs](https://calnewport.com/its-time-to-investigate-the-ai-labs/)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 42.8
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -63,7 +63,7 @@ Computer science professor and author Cal Newport publishes an essay arguing tha
 
 ## 4. [California farmers are struggling to sell grapes as demand for wine drops](https://www.kqed.org/news/12101534/california-farmers-are-struggling-to-sell-grapes-as-demand-for-wine-drops)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 40.6
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -75,6 +75,6 @@ California wine grape growers face a severe oversupply crisis as U.S. wine consu
 
 ---
 
-*由 [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) 自动生成于 2026-09-29 10:58 UTC。*
+*由 [TechTally](https://github.com/Mehdiest/techtally) 自动生成于 2026-09-30 12:50 UTC。*
 
 编辑： **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

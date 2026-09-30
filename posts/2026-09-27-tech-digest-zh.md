@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-27 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-27 | Mehdi Esteghlal"
 date: 2026-09-27
 items: 8
 sources: [Dev.to]
@@ -8,23 +8,23 @@ lang: zh
 dir: ltr
 og_locale: zh_CN
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-27: 8 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally 每日科技新闻精选（2026-09-27）：当日热点新闻摘要与专家点评，编辑：Mehdi Esteghlal。"
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-27
+# TechTally - 2026-09-27
 
-_从 1 个来源精选的 8 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
+_从 1 个来源 精选的 8 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
 
 _编辑 [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**以其他语言阅读本期:** [English](2026-09-27-tech-digest.html) | [فارسی](2026-09-27-tech-digest-fa.html) | [Français](2026-09-27-tech-digest-fr.html) | [Deutsch](2026-09-27-tech-digest-de.html) | [Español](2026-09-27-tech-digest-es.html)
+**以其他语言阅读本期:** <a class="lang-pill" href="2026-09-27-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-27-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-27-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-27-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-27-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-27-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-27-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-27-tech-digest-ar.html">العربية</a>
 
 ## 1. [在 AWS Lambda 上用 PR-Agent 和 CDK 运行无服务器 AI 代码审查代理](https://dev.to/naorpeled/running-a-serverless-ai-code-review-agent-on-aws-lambda-with-pr-agent-and-cdk-40gd)
 
 ![在 AWS Lambda 上用 PR-Agent 和 CDK 运行无服务器 AI 代码审查代理](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fd6uc1opq3kmertbnvha9.png)
 
-**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源  |  **评分:** 16.5
+**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -38,7 +38,7 @@ Naor Peled 在 Dev.to 上发布教程，演示如何利用 AWS CDK 将开源 AI 
 
 ## 2. [我构建了一个能用大白话排查 Docker 容器故障的 AI 智能体（附实现指南）](https://dev.to/nagarjuna155/i-built-an-ai-agent-that-troubleshoots-docker-containers-in-plain-english-heres-how-1c6p)
 
-**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源  |  **评分:** 16.5
+**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -54,7 +54,7 @@ Dev.to 作者 Nagarjuna 构建了一个 AI 智能体，能通过接收类似「�
 
 ![我们在一台 16GB 内存的笔记本上跑起了 100 个微服务。没用 Kubernetes。](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fy0016tm6dlqjhc9a19jr.png)
 
-**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源  |  **评分:** 16.5
+**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -70,7 +70,7 @@ Dev.to 作者 Nagarjuna 构建了一个 AI 智能体，能通过接收类似「�
 
 ![从杂乱数据到管理决策：为 JCars Logistics 构建 Power BI 解决方案](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Ffazx9vo075kfd51j4qny.png)
 
-**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源  |  **评分:** 16.5
+**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -86,7 +86,7 @@ Dev.to 作者 Nagarjuna 构建了一个 AI 智能体，能通过接收类似「�
 
 ![Jev 与总有答案的 AI 的难题](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2F051cs2fef1kjqgbptwo3.png)
 
-**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源  |  **评分:** 16.5
+**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -100,7 +100,7 @@ Jev 这款 AI 驱动的简历审查工具的开发者们发现，最大的挑战
 
 ## 6. [每周挑战：回文长度](https://dev.to/simongreennet/weekly-challenge-the-palindromic-length-299i)
 
-**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源  |  **评分:** 16.4
+**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -114,7 +114,7 @@ Dev.to 贡献者 Simon Green 发布了他对第 392 期每周挑战的解答，�
 
 ## 7. [C 语言中的堆与栈内存](https://dev.to/codemaster_121482/heap-vs-stack-memory-in-c-4enh)
 
-**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源  |  **评分:** 16.4
+**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -128,7 +128,7 @@ Dev.to 作者 codemaster_121482 发布了一篇适合初学者的解析文章，
 
 ## 8. [如何为 Claude Code 打造个人 Agent 市场](https://dev.to/teppana88/how-to-build-a-personal-agent-marketplace-for-claude-code-17fp)
 
-**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源  |  **评分:** 16.4
+**来源:** Dev.to  |  **主题:** dev  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -140,6 +140,6 @@ Dev.to 作者 codemaster_121482 发布了一篇适合初学者的解析文章，
 
 ---
 
-*由 [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) 自动生成于 2026-09-27 13:39 UTC。*
+*由 [TechTally](https://github.com/Mehdiest/techtally) 自动生成于 2026-09-30 12:52 UTC。*
 
 编辑： **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

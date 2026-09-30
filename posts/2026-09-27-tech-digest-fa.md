@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-27 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-27 | Mehdi Esteghlal"
 date: 2026-09-27
 items: 8
 sources: [Dev.to]
@@ -8,23 +8,23 @@ lang: fa
 dir: rtl
 og_locale: fa_IR
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-27: 8 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - خلاصه‌ی روزانه‌ی اخبار تکنولوژی برای 2026-09-27: خبرهای برتر روز با خلاصه و نظر کارشناسانه، گردآوری توسط Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-27
+# TechTally - 2026-09-27
 
 _8 خبر برتر از 1 منبع، رتبه‌بندی‌شده بر اساس پوشش رسانه‌ای، بازتاب جامعه و تازگی._
 
 _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**خواندن این شماره به:** [English](2026-09-27-tech-digest.html) | [Français](2026-09-27-tech-digest-fr.html) | [Deutsch](2026-09-27-tech-digest-de.html) | [Español](2026-09-27-tech-digest-es.html) | [中文](2026-09-27-tech-digest-zh.html)
+**خواندن این شماره به:** <a class="lang-pill" href="2026-09-27-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-27-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-27-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-27-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-27-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-27-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-27-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-27-tech-digest-ar.html">العربية</a>
 
 ## 1. [اجرای یک عامل بازبینی کد هوش مصنوعی بی‌سرور روی AWS Lambda با PR-Agent و CDK](https://dev.to/naorpeled/running-a-serverless-ai-code-review-agent-on-aws-lambda-with-pr-agent-and-cdk-40gd)
 
 ![اجرای یک عامل بازبینی کد هوش مصنوعی بی‌سرور روی AWS Lambda با PR-Agent و CDK](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fd6uc1opq3kmertbnvha9.png)
 
-**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع  |  **امتیاز:** 16.5
+**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -38,7 +38,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 2. [من یک عامل هوش مصنوعی ساختم که کانتینرهای Docker را به زبان ساده عیب‌یابی می‌کند (اینجا نحوه انجام آن را می‌خوانید)](https://dev.to/nagarjuna155/i-built-an-ai-agent-that-troubleshoots-docker-containers-in-plain-english-heres-how-1c6p)
 
-**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع  |  **امتیاز:** 16.5
+**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -54,7 +54,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ![ما ۱۰۰ میکروسرویس را روی یک لپ‌تاپ ۱۶ گیگابایتی اجرا کردیم. بدون کوبرنتیز.](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fy0016tm6dlqjhc9a19jr.png)
 
-**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع  |  **امتیاز:** 16.5
+**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -70,7 +70,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ![از ردیف‌های پراکنده تا تصمیمات مدیریتی: ساخت راه‌حل Power BI برای لجستیک JCars](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Ffazx9vo075kfd51j4qny.png)
 
-**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع  |  **امتیاز:** 16.5
+**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -86,7 +86,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ![Jev و مشکل هوش مصنوعی که همیشه پاسخی دارد](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2F051cs2fef1kjqgbptwo3.png)
 
-**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع  |  **امتیاز:** 16.5
+**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -100,7 +100,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 6. [چالش هفتگی: طول پالیندرومی](https://dev.to/simongreennet/weekly-challenge-the-palindromic-length-299i)
 
-**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع  |  **امتیاز:** 16.4
+**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -114,7 +114,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 7. [حافظه هیپ در برابر حافظه استک در سی](https://dev.to/codemaster_121482/heap-vs-stack-memory-in-c-4enh)
 
-**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع  |  **امتیاز:** 16.4
+**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -128,7 +128,7 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ## 8. [نحوه ساخت یک بازارچه عامل شخصی برای Claude Code](https://dev.to/teppana88/how-to-build-a-personal-agent-marketplace-for-claude-code-17fp)
 
-**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع  |  **امتیاز:** 16.4
+**منبع:** Dev.to  |  **موضوع:** dev  |  **پوشش:** 1 منبع
 
 **خلاصه**
 
@@ -140,6 +140,6 @@ _گردآوری توسط [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-este
 
 ---
 
-*تولید خودکار توسط [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) در 2026-09-27 13:39 UTC.*
+*تولید خودکار توسط [TechTally](https://github.com/Mehdiest/techtally) در 2026-09-30 12:52 UTC.*
 
 گردآوری توسط: **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

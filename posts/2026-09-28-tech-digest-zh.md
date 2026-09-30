@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-28 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-28 | Mehdi Esteghlal"
 date: 2026-09-28
 items: 8
 sources: [HackerNews]
@@ -7,21 +7,21 @@ lang: zh
 dir: ltr
 og_locale: zh_CN
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-28: 8 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally 每日科技新闻精选（2026-09-28）：当日热点新闻摘要与专家点评，编辑：Mehdi Esteghlal。"
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-28
+# TechTally - 2026-09-28
 
-_从 1 个来源精选的 8 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
+_从 1 个来源 精选的 8 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
 
 _编辑 [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**以其他语言阅读本期:** [English](2026-09-28-tech-digest.html) | [فارسی](2026-09-28-tech-digest-fa.html) | [Français](2026-09-28-tech-digest-fr.html) | [Deutsch](2026-09-28-tech-digest-de.html) | [Español](2026-09-28-tech-digest-es.html)
+**以其他语言阅读本期:** <a class="lang-pill" href="2026-09-28-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-28-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-28-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-28-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-28-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-28-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-28-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-28-tech-digest-ar.html">العربية</a>
 
 ## 1. [Google 究竟是从何时起变得如此诡异？](https://sancho.bearblog.dev/google-weird/)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 47.9
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -35,7 +35,7 @@ HackerNews 上一篇标题为《Google 究竟是从何时起变得如此诡异�
 
 ## 2. [被欠十亿美元英伟达股票](https://colo.to/nvidia-stock-narrative.html)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 45.9
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -49,7 +49,7 @@ colo.to 上一篇标题为《被欠十亿美元英伟达股票》的博文，探
 
 ## 3. [Ember-1](https://fireworks.ai/blog/ember-1)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 42.1
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -63,7 +63,7 @@ Fireworks AI 推出了 Ember-1，这是一个可通过其推理平台使用的�
 
 ## 4. [Show HN: Lofi Cities – 像素艺术城市夜景，浏览器生成的 lofi](https://loficities.com/)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 39.1
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -77,7 +77,7 @@ Fireworks AI 推出了 Ember-1，这是一个可通过其推理平台使用的�
 
 ## 5. [不要将你的 Go 代码耦合到 GitHub](https://iain.rocks/blog/dont-couple-your-go-code-to-github)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 38.8
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -91,7 +91,7 @@ Iain 的一篇博客文章指出，Go 开发者应避免在导入路径中硬编
 
 ## 6. [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 38.6
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -105,7 +105,7 @@ Anthropic has published official prompt engineering documentation for Claude Opu
 
 ## 7. [暗网自托管](https://david.alvarezrosa.com/posts/self-hosting-on-the-dark-web/)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 38.3
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -119,7 +119,7 @@ David Alvarez Rosa 发布了一份技术指南，介绍如何在 Tor 网络上�
 
 ## 8. [在一间 80 美元的汽车旅馆房间里，一项揭示生命起源的发现](https://www.nytimes.com/2026/09/26/science/motel-science-discovery.html)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 38.2
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -131,6 +131,6 @@ David Alvarez Rosa 发布了一份技术指南，介绍如何在 Tor 网络上�
 
 ---
 
-*由 [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) 自动生成于 2026-09-28 11:19 UTC。*
+*由 [TechTally](https://github.com/Mehdiest/techtally) 自动生成于 2026-09-30 12:51 UTC。*
 
 编辑： **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

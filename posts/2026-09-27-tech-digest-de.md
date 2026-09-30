@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-27 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-27 | Mehdi Esteghlal"
 date: 2026-09-27
 items: 8
 sources: [Dev.to]
@@ -8,23 +8,23 @@ lang: de
 dir: ltr
 og_locale: de_DE
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-27: 8 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally - täglicher Tech-News-Überblick für 2026-09-27: die Top-Storys des Tages, zusammengefasst mit Expertenkommentar, kuratiert von Mehdi Esteghlal."
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-27
+# TechTally - 2026-09-27
 
-_8 Top-Storys aus 1 Quellen, sortiert nach Berichterstattung, Community-Signal und Aktualität._
+_8 Top-Storys aus 1 Quelle, sortiert nach Berichterstattung, Community-Signal und Aktualität._
 
 _Kuratiert von [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**Diese Ausgabe lesen auf:** [English](2026-09-27-tech-digest.html) | [فارسی](2026-09-27-tech-digest-fa.html) | [Français](2026-09-27-tech-digest-fr.html) | [Español](2026-09-27-tech-digest-es.html) | [中文](2026-09-27-tech-digest-zh.html)
+**Diese Ausgabe lesen auf:** <a class="lang-pill" href="2026-09-27-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-27-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-27-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-27-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-27-tech-digest-zh.html">中文</a> <a class="lang-pill" href="2026-09-27-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-27-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-27-tech-digest-ar.html">العربية</a>
 
 ## 1. [Einen serverlosen KI-Code-Review-Agenten auf AWS Lambda mit PR-Agent und CDK betreiben](https://dev.to/naorpeled/running-a-serverless-ai-code-review-agent-on-aws-lambda-with-pr-agent-and-cdk-40gd)
 
 ![Einen serverlosen KI-Code-Review-Agenten auf AWS Lambda mit PR-Agent und CDK betreiben](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fd6uc1opq3kmertbnvha9.png)
 
-**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle(n)  |  **Score:** 16.5
+**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle
 
 **Zusammenfassung**
 
@@ -38,7 +38,7 @@ Naor Peled hat auf Dev.to ein Tutorial veröffentlicht, das zeigt, wie man PR-Ag
 
 ## 2. [Ich habe einen KI-Agenten gebaut, der Docker-Container in natürlicher Sprache debuggt (So geht's)](https://dev.to/nagarjuna155/i-built-an-ai-agent-that-troubleshoots-docker-containers-in-plain-english-heres-how-1c6p)
 
-**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle(n)  |  **Score:** 16.5
+**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle
 
 **Zusammenfassung**
 
@@ -54,7 +54,7 @@ Dev.to-Autor Nagarjuna hat einen KI-Agenten gebaut, der die Docker-Container-Feh
 
 ![Wir haben 100 Microservices auf einem 16-GB-Laptop laufen lassen. Ohne Kubernetes.](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fy0016tm6dlqjhc9a19jr.png)
 
-**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle(n)  |  **Score:** 16.5
+**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle
 
 **Zusammenfassung**
 
@@ -70,7 +70,7 @@ Ein Team hat TDK (Tilt Development Kit) entwickelt, um zu testen, 100 Microservi
 
 ![Vom Datenchaos zur Management-Entscheidung: Eine Power BI-Lösung für JCars Logistics erstellen](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Ffazx9vo075kfd51j4qny.png)
 
-**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle(n)  |  **Score:** 16.5
+**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle
 
 **Zusammenfassung**
 
@@ -86,7 +86,7 @@ Ein Entwickler dokumentiert den kompletten Prozess beim Aufbau einer Power BI-L�
 
 ![Jev und das Problem mit KI, die immer eine Antwort hat](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2F051cs2fef1kjqgbptwo3.png)
 
-**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle(n)  |  **Score:** 16.5
+**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle
 
 **Zusammenfassung**
 
@@ -100,7 +100,7 @@ Die Entwickler von Jev, einem KI-gestützten Tool zur Lebenslauf-Analyse, stellt
 
 ## 6. [Wöchentliche Challenge: Die palindromische Länge](https://dev.to/simongreennet/weekly-challenge-the-palindromic-length-299i)
 
-**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle(n)  |  **Score:** 16.4
+**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle
 
 **Zusammenfassung**
 
@@ -114,7 +114,7 @@ Dev.to-Autor Simon Green veröffentlichte seine Lösungen für die Weekly Challe
 
 ## 7. [Heap- vs. Stack-Speicher in C](https://dev.to/codemaster_121482/heap-vs-stack-memory-in-c-4enh)
 
-**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle(n)  |  **Score:** 16.4
+**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle
 
 **Zusammenfassung**
 
@@ -128,7 +128,7 @@ Ein Dev.to-Autor unter dem Handle codemaster_121482 hat eine einsteigerfreundlic
 
 ## 8. [Wie man einen persönlichen Agenten-Marktplatz für Claude Code baut](https://dev.to/teppana88/how-to-build-a-personal-agent-marketplace-for-claude-code-17fp)
 
-**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle(n)  |  **Score:** 16.4
+**Quelle:** Dev.to  |  **Thema:** dev  |  **Abdeckung:** 1 Quelle
 
 **Zusammenfassung**
 
@@ -140,6 +140,6 @@ Ein Entwickler teilt seinen Ansatz, über 40 KI-Agenten und Skills für Claude C
 
 ---
 
-*Automatisch erstellt von [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) am 2026-09-27 13:39 UTC.*
+*Automatisch erstellt von [TechTally](https://github.com/Mehdiest/techtally) am 2026-09-30 12:52 UTC.*
 
 Kuratiert von: **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)

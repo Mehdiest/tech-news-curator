@@ -1,5 +1,5 @@
 ---
-title: "Tech Digest - 2026-09-15 | Mehdi Esteghlal"
+title: "TechTally - 2026-09-15 | Mehdi Esteghlal"
 date: 2026-09-15
 items: 4
 sources: [HackerNews]
@@ -8,23 +8,23 @@ lang: zh
 dir: ltr
 og_locale: zh_CN
 author: "Mehdi Esteghlal"
-description: "Daily tech news digest for 2026-09-15: 4 top stories summarized with expert commentary, curated by Mehdi Esteghlal."
-generator: tech-news-curator
+description: "TechTally 每日科技新闻精选（2026-09-15）：当日热点新闻摘要与专家点评，编辑：Mehdi Esteghlal。"
+generator: techtally
 ---
 
-# Tech Digest - 2026-09-15
+# TechTally - 2026-09-15
 
-_从 1 个来源精选的 4 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
+_从 1 个来源 精选的 4 条热点新闻，按报道覆盖度、社区热度与时效性排序。_
 
 _编辑 [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
-**以其他语言阅读本期:** [English](2026-09-15-tech-digest.html) | [فارسی](2026-09-15-tech-digest-fa.html) | [Français](2026-09-15-tech-digest-fr.html) | [Deutsch](2026-09-15-tech-digest-de.html) | [Español](2026-09-15-tech-digest-es.html)
+**以其他语言阅读本期:** <a class="lang-pill" href="2026-09-15-tech-digest.html">English</a> <a class="lang-pill" href="2026-09-15-tech-digest-fa.html">فارسی</a> <a class="lang-pill" href="2026-09-15-tech-digest-fr.html">Français</a> <a class="lang-pill" href="2026-09-15-tech-digest-de.html">Deutsch</a> <a class="lang-pill" href="2026-09-15-tech-digest-es.html">Español</a> <a class="lang-pill" href="2026-09-15-tech-digest-hi.html">हिन्दी</a> <a class="lang-pill" href="2026-09-15-tech-digest-ru.html">Русский</a> <a class="lang-pill" href="2026-09-15-tech-digest-ar.html">العربية</a>
 
 ## 1. [我满脑子都是巴布亚新几内亚](https://notnottalmud.substack.com/p/why-i-cant-stop-thinking-about-papua)
 
 ![我满脑子都是巴布亚新几内亚](https://substackcdn.com/image/fetch/$s_!o2BG!,w_1200,h_675,c_fill,f_jpg,q_auto:good,fl_progressive:steep,g_auto/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F1cf2320c-0d17-4c36-bf55-4372c97e32e4_3099x3069.jpeg)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 44.4
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -40,7 +40,7 @@ _编辑 [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
 ![iOS 27、iPadOS 27 与 macOS 27](https://www.apple.com/newsroom/images/2026/09/major-updates-for-apples-software-platforms-are-now-available/tile/Apple-OS-availability-hero-lp.jpg.og.jpg)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 44.3
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -54,7 +54,7 @@ _编辑 [Mehdi Esteghlal](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)_
 
 ## 3. [XCancel 服务暂停，恢复时间另行通知](https://xcancel.com/#)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 43.6
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -70,7 +70,7 @@ XCancel 是 X 的第三方网页前端，现已暂停服务，恢复时间另行
 
 ![疑似蓄意破坏导致荷兰铁路大面积瘫痪](https://ichef.bbci.co.uk/news/1024/branded_news/5666/live/b70fbd00-b109-11f1-a451-6b1ff10ed362.jpg)
 
-**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源  |  **评分:** 42.7
+**来源:** HackerNews  |  **主题:** hn  |  **覆盖:** 1 个来源
 
 **摘要**
 
@@ -82,6 +82,6 @@ XCancel 是 X 的第三方网页前端，现已暂停服务，恢复时间另行
 
 ---
 
-*由 [tech-news-curator](https://github.com/Mehdiest/tech-news-curator) 自动生成于 2026-09-15 13:49 UTC。*
+*由 [TechTally](https://github.com/Mehdiest/techtally) 自动生成于 2026-09-30 12:52 UTC。*
 
 编辑： **Mehdi Esteghlal** | [LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100) | [GitHub](https://github.com/Mehdiest)
