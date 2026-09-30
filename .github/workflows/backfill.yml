@@ -7,6 +7,11 @@ name: backfill-translations
 #
 # Requires the same LLM_API_KEY secret as the daily workflow. A --dry-run
 # dispatch reports the gaps in the log without calling the LLM or writing.
+#
+# The repaired days are ALSO deployed to GitHub Pages right here. With the
+# Pages source set to "GitHub Actions" a plain push does NOT rebuild the
+# site, so without this deploy block the new editions (e.g. hi/ru/ar after
+# a languages-config change) would only go live with tomorrow's daily run.
 
 on:
   workflow_dispatch:
@@ -26,6 +31,9 @@ on:
 
 permissions:
   contents: write   # push the repair commit
+  pages: write      # deploy the repaired site
+  id-token: write   # OIDC for deploy-pages
+  actions: write    # delete stale github-pages artifacts on re-runs
 
 concurrency:
   group: backfill-translations
@@ -37,7 +45,10 @@ env:
 jobs:
   backfill:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -84,3 +95,39 @@ jobs:
           else
             echo "nothing to repair"
           fi
+
+      # Pages deploy, mirroring the daily workflow: a repaired (or newly
+      # added) edition only reaches https://.../techtally/ after a
+      # deploy-pages run, never through the bare `git push` above.
+      - name: Configure GitHub Pages
+        if: ${{ inputs.dry_run != true }}
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Build the Jekyll site
+        if: ${{ inputs.dry_run != true }}
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+      - name: Remove stale github-pages artifacts from earlier attempts
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          for id in $(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" --jq '.artifacts[] | select(.name == "github-pages") | .id'); do
+            gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
+            echo "deleted stale artifact $id"
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Upload the site artifact
+        if: ${{ inputs.dry_run != true }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+      - id: deployment
+        if: ${{ inputs.dry_run != true }}
+        uses: actions/deploy-pages@v4

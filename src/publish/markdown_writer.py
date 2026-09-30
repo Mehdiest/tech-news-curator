@@ -89,7 +89,9 @@ def _edition_filename(
     legacy -tech-digest slug and those files stay untouched on disk.
     When posts_dir is given, the slug family that actually exists for the
     day wins, so backfill re-renders of legacy days keep every sibling
-    and switcher link pointing at the real files. New days get -techtally.
+    and switcher link pointing at the real files. A language with no file
+    yet (hi/ru/ar on a legacy day) follows the day's English edition
+    family, so one day never mixes slug families. New days get -techtally.
     """
     suffix = "" if lang == "en" else f"-{lang}"
     if posts_dir is not None:
@@ -97,6 +99,15 @@ def _edition_filename(
         for base in ("techtally", "tech-digest"):
             if (posts_path / f"{day.isoformat()}-{base}{suffix}.md").exists():
                 return f"{day.isoformat()}-{base}{suffix}.{extension}"
+        # Brand-new sibling language on an existing day (e.g. hi/ru/ar on a
+        # legacy-slug day): no -<lang> file exists yet, so fall back to the
+        # slug family the day's English edition already uses. Keeps every
+        # edition of one day in ONE family instead of mixing
+        # -tech-digest-fa with -techtally-hi in the same switcher.
+        if lang != "en":
+            for base in ("techtally", "tech-digest"):
+                if (posts_path / f"{day.isoformat()}-{base}.md").exists():
+                    return f"{day.isoformat()}-{base}{suffix}.{extension}"
     return f"{day.isoformat()}-techtally{suffix}.{extension}"
 
 
