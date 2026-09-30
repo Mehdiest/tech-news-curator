@@ -80,7 +80,7 @@ techtally/
 - [x] Stage 5 - Publish: `posts/YYYY-MM-DD-techtally.md` writer (`src/publish/markdown_writer.py`)
 - [x] Stage 5b - Images: feed media tags + og:image enrichment + HEAD validation (`src/pipeline/images.py`)
 - [x] Stage 6 - Scheduler + Site: Actions cron -> commit posts/ -> Jekyll -> GitHub Pages, with sitemap/feed/JSON-LD/og SEO
-- [x] Stage 7 - Multilingual editions: fa/fr/de/es/zh siblings of every digest, voice-preserving translation, RTL fa, language switcher (`config/i18n.yaml`, `translate_batch`)
+- [x] Stage 7 - Multilingual editions: fa/fr/de/es/zh/hi/ru/ar siblings of every digest, voice-preserving translation, RTL fa + ar, language switcher (`config/i18n.yaml`, `translate_batch`)
 - [ ] Optional next - Telegram/Twitter forwarding, OAuth for Reddit, embedding-based dedup
 
 ## Quick Start
@@ -255,7 +255,7 @@ then `ranker.default_top_n` (8).
 ## Multilingual Editions (Stage 7)
 
 The English digest is the canonical edition. When `languages:` is set in
-`config/sources.yaml` (default `[fa, fr, de, es, zh]`), every publish also
+`config/sources.yaml` (currently `[fa, fr, de, es, zh, hi, ru, ar]`), every publish also
 writes a sibling file per language:
 
 ```text
@@ -265,6 +265,9 @@ posts/2026-09-15-techtally-fr.md    <- French
 posts/2026-09-15-techtally-de.md    <- German
 posts/2026-09-15-techtally-es.md    <- Spanish
 posts/2026-09-15-techtally-zh.md    <- Simplified Chinese
+posts/2026-09-15-techtally-hi.md    <- Hindi
+posts/2026-09-15-techtally-ru.md    <- Russian
+posts/2026-09-15-techtally-ar.md    <- Arabic, RTL
 ```
 
 > Slug note: editions published before the TechTally rebrand keep their legacy
@@ -289,7 +292,7 @@ How it works, and why the author's tone survives translation:
 4. The curator name stays `Mehdi Esteghlal` in Latin script in ALL editions
    so the SEO credit never splits across spellings.
 5. Each page gets a switcher line - `**Read this digest in:**` فارسی |
-   Français | Deutsch | Español | 中文 - linking to the sibling editions,
+   Français | Deutsch | Español | 中文 | हिन्दी | Русский | العربية - linking to the sibling editions,
    and the English edition's front-matter lists them (`translations:`) so
    the landing page archive renders a language link per digest. Persian
    pages ship `lang: fa` + `dir: rtl`, so Jekyll renders them right-to-left

@@ -38,6 +38,21 @@
 <meta property="og:type" content="{% if page.date %}article{% else %}website{% endif %}">
 <meta property="og:url" content="{{ page.url | absolute_url }}">
 <meta property="og:locale" content="{{ page.og_locale | default: 'en_US' }}">
+<!-- og:locale:alternate: one per sibling edition of the same day, so social
+     platforms and scrapers see every language variant of this article.
+     Same-day matching mirrors the hreflang block above; editions without
+     og_locale in their front matter (very old posts) are skipped safely. -->
+{% if page.date %}
+{% assign og_day = page.date | date: "%Y-%m-%d" %}
+{% for p in site.pages %}
+{% if p.path contains 'posts/' and p.lang and p.og_locale and p.lang != page.lang %}
+{% assign p_day = p.date | date: "%Y-%m-%d" %}
+{% if p_day == og_day %}
+<meta property="og:locale:alternate" content="{{ p.og_locale }}">
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
 {% if page.description %}<meta property="og:description" content="{{ page.description }}">{% endif %}
 {% if page.cover %}
 <meta property="og:image" content="{{ page.cover }}">

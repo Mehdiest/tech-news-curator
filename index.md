@@ -1,7 +1,7 @@
 ---
 layout: home
 title: "TechTally - Daily Tech News by Mehdi Esteghlal"
-description: "TechTally: the day's top tech stories, ranked every morning across 16+ sources, summarized with expert commentary, curated by Mehdi Esteghlal. Published in English, Persian, French, German, Spanish and Chinese."
+description: "TechTally: the day's top tech stories, ranked every morning across 16+ sources, summarized with expert commentary, curated by Mehdi Esteghlal. Published in English, Persian, French, German, Spanish, Chinese, Hindi, Russian and Arabic."
 ---
 
 <section class="hero">
@@ -21,8 +21,11 @@ description: "TechTally: the day's top tech stories, ranked every morning across
     <span class="lang-name">Français</span> &middot;
     <span class="lang-name">Deutsch</span> &middot;
     <span class="lang-name">Español</span> &middot;
-    <span class="lang-name">中文</span>
-    - every edition ships in all six.
+    <span class="lang-name">中文</span> &middot;
+    <span class="lang-name">हिन्दी</span> &middot;
+    <span class="lang-name">Русский</span> &middot;
+    <span class="lang-name">العربية</span>
+    - every edition ships in all nine.
   </p>
   <p class="byline">
     Curated by

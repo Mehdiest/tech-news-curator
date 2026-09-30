@@ -14,7 +14,7 @@ author:
 # language code adds a translated sibling file posts/<day>-techtally-<code>.md
 # produced FROM the finished English text so the author's voice stays identical.
 # Localized labels + native language names live in config/i18n.yaml.
-languages: [fa, fr, de, es, zh]
+languages: [fa, fr, de, es, zh, hi, ru, ar]
 
 rss:
   # --- General tech ---

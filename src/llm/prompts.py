@@ -19,6 +19,7 @@ _LANGUAGE_NAMES = {
     "fr": "French",
     "es": "Spanish",
     "zh": "Simplified Chinese",
+    "hi": "Hindi",
     "tr": "Turkish",
     "ar": "Arabic",
     "ru": "Russian",
