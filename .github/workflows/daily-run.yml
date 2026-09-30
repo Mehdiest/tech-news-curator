@@ -157,10 +157,19 @@ jobs:
         # summarized items" just logs an error. That made no-digest days look
         # like green runs. Same-day no-op re-runs still pass here - the
         # morning file already exists on disk.
+        #
+        # Checked with nullglob + a bash array, NOT `ls glob1 glob2`: when one
+        # slug family is absent (every pre-rebrand day uses -tech-digest),
+        # bash leaves that glob literal, ls cannot access it and exits 2 even
+        # though the other family matched - which failed this guard on every
+        # legacy-slug day.
         run: |
           today="$(date -u +%F)"
-          if ! ls posts/"$today"-techtally*.md posts/"$today"-tech-digest*.md >/dev/null 2>&1; then
+          shopt -s nullglob
+          files=(posts/"$today"-techtally*.md posts/"$today"-tech-digest*.md)
+          shopt -u nullglob
+          if [ ${#files[@]} -eq 0 ]; then
             echo "::error::no digest for $today - inspect the 'Build the daily digest' step log"
             exit 1
           fi
-          echo "digest for $today: $(ls posts/"$today"-techtally*.md posts/"$today"-tech-digest*.md 2>/dev/null | tr '\n' ' ')"
+          echo "digest for $today: ${files[*]}"
