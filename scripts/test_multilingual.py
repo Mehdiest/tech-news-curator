@@ -267,9 +267,10 @@ def test_writer_multilingual_editions():
     en = (SCRATCH / "2026-09-15-techtally.md").read_text(encoding="utf-8")
     # language switcher on the English page with native names + .html links
     assert "**Read this digest in:**" in en
-    assert f"[{FA_NATIVE}](2026-09-15-techtally-fa.html)" in en
-    assert f"[{ZH_NATIVE}](2026-09-15-techtally-zh.html)" in en
-    assert "[Deutsch](2026-09-15-techtally-de.html)" in en
+    # switcher ships raw-HTML pill links (styled by assets/css/style.css)
+    assert f'<a class="lang-pill" href="2026-09-15-techtally-fa.html">{FA_NATIVE}</a>' in en
+    assert f'<a class="lang-pill" href="2026-09-15-techtally-zh.html">{ZH_NATIVE}</a>' in en
+    assert '<a class="lang-pill" href="2026-09-15-techtally-de.html">Deutsch</a>' in en
     # front-matter carries the sibling map for the Jekyll index page; the
     # file path is the posts dir name + .html (in production: posts/...)
     assert "lang: en" in en and 'name: "' + FA_NATIVE + '"' in en
@@ -294,7 +295,7 @@ def test_writer_multilingual_editions():
     assert f"_{L_CURATED} [Mehdi Esteghlal]" in fa  # name stays Latin for SEO
     assert f"{L_GENERATED}" in fa and "Curated by:" not in fa
     # fa page links back to the other editions, never to itself
-    assert "[English](2026-09-15-techtally.html)" in fa
+    assert '<a class="lang-pill" href="2026-09-15-techtally.html">English</a>' in fa
     assert FA_NATIVE + "](" not in fa
 
     zh = (SCRATCH / "2026-09-15-techtally-zh.md").read_text(encoding="utf-8")

@@ -10,6 +10,28 @@
 {% endif %}
 <meta name="author" content="{{ site.author.name }}">
 
+<!-- Canonical: pins every URL to the current site path, so authority earned
+     by pre-rename /tech-news-curator pages transfers to /techtally pages. -->
+<link rel="canonical" href="{{ page.url | absolute_url }}">
+<!-- hreflang: tells Google which sibling edition serves which language.
+     Every digest page lists ALL editions of its own day (bidirectional,
+     self-reference included) by matching posts published on the same date.
+     x-default points at the English edition. -->
+{% if page.date %}
+{% assign page_day = page.date | date: "%Y-%m-%d" %}
+{% for p in site.pages %}
+{% if p.path contains 'posts/' and p.lang %}
+{% assign p_day = p.date | date: "%Y-%m-%d" %}
+{% if p_day == page_day %}
+<link rel="alternate" hreflang="{{ p.lang }}" href="{{ p.url | absolute_url }}">
+{% if p.lang == 'en' %}
+<link rel="alternate" hreflang="x-default" href="{{ p.url | absolute_url }}">
+{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
 <!-- Open Graph / Twitter cards: digest pages carry their cover image -->
 <meta property="og:site_name" content="{{ site.title }}">
 <meta property="og:title" content="{{ page.title | default: site.title }}">
@@ -17,14 +39,20 @@
 <meta property="og:url" content="{{ page.url | absolute_url }}">
 <meta property="og:locale" content="{{ page.og_locale | default: 'en_US' }}">
 {% if page.description %}<meta property="og:description" content="{{ page.description }}">{% endif %}
-{% if page.cover %}<meta property="og:image" content="{{ page.cover }}">{% endif %}
-<meta name="twitter:card" content="{% if page.cover %}summary_large_image{% else %}summary{% endif %}">
+{% if page.cover %}
+<meta property="og:image" content="{{ page.cover }}">
+{% else %}
+<!-- Branded fallback so image-less days still get a rich share preview -->
+<meta property="og:image" content="{{ '/assets/img/og-banner.png' | absolute_url }}">
+{% endif %}
+<meta name="twitter:card" content="summary_large_image">
 
 <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ 'feed.xml' | absolute_url }}">
 
 <!-- Favicon + browser chrome color -->
 <link rel="icon" type="image/svg+xml" href="{{ 'assets/img/favicon.svg' | relative_url }}">
-<meta name="theme-color" content="#0969da">
+<meta name="theme-color" content="#0969da" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
 
 <!-- Person entity: sameAs tells Google who curated every page on this site -->
 <script type="application/ld+json">

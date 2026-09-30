@@ -170,7 +170,9 @@ def test_i18n_yaml():
     # Reddit-hosted images are dropped (Reddit is filtered in Iran)
     pipeline = sources["pipeline"]
     assert pipeline["images"] is True
-    assert pipeline["enrich_images"] is False
+    # og:image enrichment stays on: image-less feeds otherwise win the top
+    # ranks and the day publishes with no pictures at all
+    assert pipeline["enrich_images"] is True
     assert "redd.it" in pipeline["image_blocklist"]
     print("PASS i18n.yaml: six languages, complete label sets, RTL fa, config wiring")
 

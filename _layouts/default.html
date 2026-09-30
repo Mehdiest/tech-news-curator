@@ -37,5 +37,15 @@
       </footer>
     </div>
   </div>
+
+  <script>
+    /* kramdown emits plain <img> tags; defer offscreen digest images so the
+       page paints first (Core Web Vitals). Images above the fold load
+       eagerly enough because lazy is applied after parse. */
+    document.querySelectorAll('.digest img, .latest-digest img').forEach(function (img) {
+      img.loading = 'lazy';
+      img.decoding = 'async';
+    });
+  </script>
 </body>
 </html>

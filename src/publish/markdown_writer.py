@@ -278,18 +278,26 @@ def _switcher(
     day: date, lang: str, languages: list[str], i18n: dict,
     posts_dir: Path | str | None = None,
 ) -> str:
-    """'Read this digest in: ...' cross-links between the editions of one day."""
+    """'Read this digest in: ...' cross-links between the editions of one day.
+
+    Links are emitted as raw inline HTML (kramdown and python-markdown both
+    pass <a> tags through untouched) so each one carries the .lang-pill class
+    the stylesheet turns into a rounded chip. Older pre-pill posts simply
+    keep their plain markdown switcher - no migration needed.
+    """
     codes = ["en"] + [code for code in languages if code != "en"]
     links = []
     for code in codes:
         if code == lang:
             continue
         native = _labels(code, i18n)["native_name"]
-        links.append(f"[{native}]({_edition_filename(day, code, 'html', posts_dir)})")
+        links.append(
+            f'<a class="lang-pill" href="{_edition_filename(day, code, "html", posts_dir)}">{native}</a>'
+        )
     if not links:
         return ""
     read_in = _labels(lang, i18n)["read_in"]
-    return f"**{read_in}:** " + " | ".join(links) + "\n\n"
+    return f"**{read_in}:** " + " ".join(links) + "\n\n"
 
 
 def _byline(name: str, linkedin: str, t: dict) -> str:
@@ -458,6 +466,8 @@ def write_latest_include(
         return None
     prefix = (baseurl or "").rstrip("/") + f"/{dir_name.strip('/')}/"
     html = _HREF_RE.sub(lambda match: f'href="{prefix}{match.group(1)}"', html)
+    # Offscreen publisher images must not block the homepage render.
+    html = html.replace("<img ", '<img loading="lazy" decoding="async" ')
     stamp = utc_now().strftime("%Y-%m-%d %H:%M UTC")
     include_path = Path(include_dir) / "latest_digest.html"
     include_path.parent.mkdir(parents=True, exist_ok=True)

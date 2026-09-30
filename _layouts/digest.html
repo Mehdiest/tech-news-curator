@@ -22,4 +22,18 @@ layout: default
 
 <article class="digest">
   {{ content }}
+
+  {% assign share_label = 'Share this digest' %}
+  {% if page.lang == 'fa' %}{% assign share_label = 'هم‌رسانی این شماره' %}{% endif %}
+  {% if page.lang == 'de' %}{% assign share_label = 'Diesen Digest teilen' %}{% endif %}
+  {% if page.lang == 'fr' %}{% assign share_label = 'Partager ce digest' %}{% endif %}
+  {% if page.lang == 'es' %}{% assign share_label = 'Compartir este resumen' %}{% endif %}
+  {% if page.lang == 'zh' %}{% assign share_label = '分享本期汇总' %}{% endif %}
+  <div class="share-row">
+    <span class="share-label">{{ share_label }}:</span>
+    <a class="share-btn share-tg" target="_blank" rel="noopener"
+       href="https://t.me/share/url?url={{ page.url | absolute_url | url_encode }}&text={{ page.title | url_encode }}">Telegram</a>
+    <a class="share-btn share-x" target="_blank" rel="noopener"
+       href="https://twitter.com/intent/tweet?url={{ page.url | absolute_url | url_encode }}&text={{ page.title | url_encode }}">X</a>
+  </div>
 </article>

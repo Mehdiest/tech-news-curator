@@ -44,9 +44,15 @@ description: "TechTally: the day's top tech stories, ranked every morning across
   <ul class="digest-list">
     {% assign digests = site.pages | where_exp: "item", "item.path contains 'posts/'" | where_exp: "item", "item.lang == 'en'" | sort: "date" | reverse %}
     {% assign latest_day = site.data.latest_digest.date | date: "%Y-%m-%d" %}
+    {% assign prev_month = "" %}
     {% for digest in digests %}
     {% assign digest_day = digest.date | date: "%Y-%m-%d" %}
     {% unless digest_day == latest_day %}
+    {% assign this_month = digest.date | date: "%B %Y" %}
+    {% if this_month != prev_month %}
+    <li class="month-sep"><span>{{ this_month }}</span></li>
+    {% assign prev_month = this_month %}
+    {% endif %}
     <li>
       <a href="{{ digest.url | relative_url }}">{{ digest.title }}</a>
       <time datetime="{{ digest.date | date_to_xmlschema }}">{{ digest.date | date: "%B %d, %Y" }}</time>
