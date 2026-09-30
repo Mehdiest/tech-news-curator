@@ -96,6 +96,9 @@ class RedditSource:
                 "num_comments": post.get("num_comments", 0),
                 "subreddit": sub["name"],
                 "category": sub.get("category", "general"),
+                # Thread permalink; for self posts the article URL IS the
+                # thread, and the writer skips duplicate discussion links.
+                "discussion_url": f"https://www.reddit.com{post.get('permalink', '')}".rstrip(),
             },
         )
 

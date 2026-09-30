@@ -17,7 +17,7 @@ def test_config_yml():
     cfg = yaml.safe_load((ROOT / "_config.yml").read_text(encoding="utf-8"))
     assert "Mehdi Esteghlal" in cfg["title"]
     assert "Mehdi Esteghlal" in cfg["description"]
-    assert cfg["author"]["linkedin"].startswith("https://ir.linkedin.com/in/")
+    assert cfg["author"]["linkedin"].startswith("https://www.linkedin.com/in/")
     assert cfg["author"]["github"] == "https://github.com/Mehdiest"
     assert "jekyll-sitemap" in cfg["plugins"]
     post_defaults = next(d for d in cfg["defaults"] if d["scope"]["path"] == "posts")
@@ -57,6 +57,15 @@ def test_workflow():
     assert dispatch["inputs"]["force"]["default"] is False
     assert any("secrets.LLM_API_KEY" in r for r in runs), "API key must come from secrets"
     assert any("git status --porcelain posts/" in r for r in runs)
+    # the commit step rebases before pushing (checkout uses full history)
+    assert any("git pull --rebase" in r for r in runs)
+    checkout = next(s for s in steps if "actions/checkout" in s.get("uses", ""))
+    assert checkout.get("with", {}).get("fetch-depth") == 0
+    # single source of truth for the model: job-level env feeds both the
+    # .env step and the validate step, so logs can never name another model
+    assert "vars.LLM_MODEL" in wf.get("env", {}).get("LLM_MODEL", "")
+    assert any("LLM_MODEL=${{ env.LLM_MODEL }}" in r for r in runs)
+    assert not any("qwen3.8-flash" in str(step) for step in steps), "stale model default"
     # a silent no-digest outcome must turn the run red; the guard sits after
     # the deploy step so site fixes still ship on broken-LLM days
     assert any("no digest for" in r for r in runs)
@@ -64,7 +73,7 @@ def test_workflow():
     # aborts on >1), so stale ones are deleted before each upload
     assert any('select(.name == "github-pages")' in r for r in runs)
     # the free-tier default keeps the scheduled run working with zero balance
-    assert any("qwen3.8-flash" in r for r in runs)
+    assert "nemotron" in wf["env"]["LLM_MODEL"], "free OpenRouter default expected"
     # preflight: a malformed secret must fail the run BEFORE ingestion, not
     # only via the end-of-run digest guard; verdicts only, key never logged
     names = [step.get("name", "") for step in steps]
@@ -137,13 +146,16 @@ def test_templates():
 def test_i18n_yaml():
     i18n = yaml.safe_load((ROOT / "config" / "i18n.yaml").read_text(encoding="utf-8"))
     required = {
-        "native_name", "dir", "og_locale", "intro", "read_in", "curated_by",
-        "footer_by", "generated", "source", "topic", "coverage",
-        "source_word", "score", "summary_h", "take_h",
+        "native_name", "dir", "og_locale", "meta_description", "meta_by",
+        "intro", "read_in", "curated_by", "footer_by", "generated",
+        "source", "topic", "coverage", "source_one", "source_many",
+        "story_one", "story_many", "discuss", "summary_h", "take_h",
     }
     assert set(i18n) == {"en", "fa", "fr", "de", "es", "zh"}
     for code, block in i18n.items():
         assert required <= set(block), (code, required - set(block))
+        # the removed debug-era labels must not come back
+        assert "score" not in block and "source_word" not in block
     assert i18n["en"]["dir"] == "ltr"
     assert i18n["fa"]["dir"] == "rtl"
     assert i18n["fa"]["native_name"] == "\u0641\u0627\u0631\u0633\u06cc"

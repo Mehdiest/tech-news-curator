@@ -15,10 +15,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import src.llm.base as llm_base
 from src.llm.base import LLMError, parse_translation_json, translate_batch
 from src.llm.prompts import build_translation_messages
 from src.models import Article, CuratedItem
 from src.publish.markdown_writer import _labels, load_i18n, write_digest
+
+# keep the batch-level retry tests fast: no real sleep between rounds
+llm_base._TRANSLATION_RETRY_DELAY_SECONDS = 0
 
 ROOT = Path(__file__).resolve().parent.parent
 SCRATCH = Path(__file__).resolve().parent / "scratch_multilingual_test"
@@ -108,6 +112,29 @@ class FakeProvider:
         return single_reply(code)
 
 
+class FlakyProvider(FakeProvider):
+    """Fails each language's first attempt, then answers normally.
+
+    Exercises the batch-level retry rounds: round 0 loses every pair,
+    the retry round must recover all of them.
+    """
+
+    def __init__(self):  # noqa: RSE102
+        super().__init__()
+        self.fail_counts: dict[str, int] = {}
+
+    async def chat(self, messages, max_tokens=None):
+        self.calls.append({"messages": messages, "max_tokens": max_tokens})
+        user = messages[1]["content"]
+        match = re.search(r"\(([a-z]{2})\)\.", user)
+        code = match.group(1) if match else ""
+        count = self.fail_counts.get(code, 0)
+        self.fail_counts[code] = count + 1
+        if count < 1:
+            raise LLMError("transient glitch")
+        return single_reply(code)
+
+
 def make_item(title, source, summary, take, score=42.0, topic="ai", coverage=2,
               image=None, translations=None):
     article = Article(
@@ -194,7 +221,7 @@ def test_translate_batch_success():
         assert set(item.translations) == set(TARGETS)
         assert item.translations["fa"]["summary"] == FA_SUMMARY
     assert len(provider.calls) == 10
-    assert provider.calls[0]["max_tokens"] == 800
+    assert provider.calls[0]["max_tokens"] == 3000  # translate_batch default
     print("PASS translate_batch fills every language via per-pair calls")
 
 
@@ -209,6 +236,17 @@ def test_translate_batch_isolation():
     done = asyncio.run(translate_batch(failing, [fresh], TARGETS))
     assert done == 0 and fresh.translations == {}  # no crash, English retained
     print("PASS translate_batch isolates per-language gaps and full failures")
+
+
+def test_translate_batch_retries_failures():
+    """Round 0 fails everywhere; the retry round must recover every pair."""
+    item = make_item("Retry Story", "HackerNews", "Summary.", "Take.")
+    provider = FlakyProvider()
+    done = asyncio.run(translate_batch(provider, [item], TARGETS))
+    assert done == 5 and set(item.translations) == set(TARGETS)
+    # each language took exactly two calls: one failed round + one success
+    assert len(provider.calls) == 10
+    print("PASS translate_batch retries failed pairs on a later round")
 
 
 def test_writer_multilingual_editions():
@@ -245,7 +283,11 @@ def test_writer_multilingual_editions():
     assert f"![{FA_TITLE}](https://cdn.example.com/one.jpg?w=800&h=400)" in fa
     assert f"**{L_SOURCE}:** HackerNews" in fa
     assert f"**{L_COVERAGE}:** 2 \u0645\u0646\u0628\u0639" in fa
-    assert f"**{L_SCORE}:** 42.0" in fa
+    assert "**Score:**" not in fa and L_SCORE not in fa  # reader-facing page, no raw score
+    # localized meta description (SEO): the fa page no longer ships English text
+    fa_desc = I18N["fa"]["meta_description"].replace("__DATE__", "2026-09-15")
+    assert f'description: "{fa_desc}' in fa
+    assert f"{I18N['fa']['meta_by'].replace('__NAME__', AUTHOR['name'])}" in fa
     assert f"**{L_SUMMARY_H}**" in fa and f"**{L_TAKE_H}**" in fa
     assert FA_SUMMARY in fa and FA_TAKE in fa
     assert f"_{L_CURATED} [Mehdi Esteghlal]" in fa  # name stays Latin for SEO
@@ -325,6 +367,7 @@ if __name__ == "__main__":
         test_parse_translation_json()
         test_build_translation_messages()
         test_translate_batch_success()
+        test_translate_batch_retries_failures()
         test_translate_batch_isolation()
         test_writer_multilingual_editions()
         test_writer_backward_compatible()

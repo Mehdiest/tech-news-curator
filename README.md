@@ -134,10 +134,14 @@ returns the per-component breakdown printed by `--preview` (`parts:` line).
 
 ## LLM Layer (Stage 4)
 
-One chat completion per article against any OpenAI-compatible endpoint
-(default: `https://api.b.ai/v1`, model `glm-5.3`, non-streaming). The model
-must answer with strict JSON `{"summary": ..., "take": ...}`; replies are
-tolerantly parsed (fences and stray prose are stripped).
+One chat completion per article against any OpenAI-compatible endpoint,
+non-streaming. The code default is `https://api.b.ai/v1` with model
+`glm-5.3`; the deployed daily workflow instead uses OpenRouter
+(`https://openrouter.ai/api/v1`) with the free
+`nvidia/nemotron-3-ultra-550b-a55b:free` - override with the `LLM_MODEL`
+repo variable. The model must answer with strict JSON
+`{"summary": ..., "take": ...}`; replies are tolerantly parsed (fences
+and stray prose are stripped).
 
 - **summary**: 2-4 factual sentences - what happened, who, why it matters.
 - **take**: comedic veteran-tech-expert commentary - jokes, analogies, hot
@@ -148,8 +152,8 @@ tolerantly parsed (fences and stray prose are stripped).
 |---------|---------|---------|
 | `LLM_PROVIDER` | `glm` | key into the provider registry (`src/llm/factory.py`) |
 | `LLM_API_KEY` | - | Bearer key; required |
-| `LLM_BASE_URL` | `https://api.b.ai/v1` | `/chat/completions` is appended |
-| `LLM_MODEL` | `glm-5.3` | model name |
+| `LLM_BASE_URL` | `https://api.b.ai/v1` (workflow: `https://openrouter.ai/api/v1`) | `/chat/completions` is appended |
+| `LLM_MODEL` | `glm-5.3` (workflow: `nvidia/nemotron-3-ultra-550b-a55b:free`) | model name |
 | `LLM_TEMPERATURE` | `0.7` | sampling temperature |
 | `LLM_MAX_TOKENS` | `700` | reply cap |
 | `LLM_TIMEOUT` | `60` | per-request seconds |
@@ -242,7 +246,8 @@ How it works, and why the author's tone survives translation:
    pins the persona: translate the jokes, never explain or flatten them.
    Short replies keep the strict-JSON contract reliable; a failing pair
    costs exactly one language of one item (that item falls back to its
-   English text there - no crash, no gap in the switcher).
+   English text there - no crash, no gap in the switcher), and failed
+   pairs are retried on two extra rounds before giving up.
 3. Every edition carries localized labels from `config/i18n.yaml` (UTF-8
    data file): headings like `**منبع:**` / `**来源:**`, the byline
    (`گردآوری توسط` / `Curado por`), the intro sentence, and the footer.
@@ -291,7 +296,10 @@ calls the publish step with `--force` when you really want a regen.
 One-time repo setup (after the first push):
 
 1. Settings > Secrets and variables > Actions > **New secret**: `LLM_API_KEY`.
-2. Optional *variable* `LLM_MODEL` (defaults to the zero-balance `qwen3.8-flash`).
+2. Optional *variable* `LLM_MODEL` (defaults to the free OpenRouter
+   `nvidia/nemotron-3-ultra-550b-a55b:free`; the workflow and its
+   validation step read the same job-level env, so logs always name the
+   model actually in use).
 3. Pages is enabled automatically by the workflow (`configure-pages` with
    `enablement: true`); the site lands at
    `https://<username>.github.io/tech-news-curator/`.
@@ -301,12 +309,16 @@ The deployed site includes, out of the box:
 - landing page (`index.md`) listing every digest newest first, with a
   language link row per digest (English, فارسی, Français, Deutsch,
   Español, 中文) and the language names in the hero;
-- site-wide footer + header with the curator profile links (rel="me");
-- per-page Open Graph/Twitter cards using the digest cover image;
+- site-wide footer + header with the curator profile links (rel="me"),
+  and an SVG favicon + `theme-color` on every page;
+- per-page Open Graph/Twitter cards using the digest cover image, with
+  the meta description localized per edition;
 - JSON-LD `Person` schema (sameAs -> LinkedIn/GitHub) on every page and
   `TechArticle` schema on each digest - the strongest author signal for Google;
 - `sitemap.xml` (jekyll-sitemap), `feed.xml` (hand-rolled Liquid RSS),
-  and `robots.txt` pointing at the sitemap.
+  and `robots.txt` pointing at the sitemap;
+- the sidebar avatar loads from an external URL (`github.com/<user>.png`
+  or any image CDN) so the curator's photo never has to live in the repo.
 
 The `.env` file is generated at runtime from secrets - it never enters the
 repository or the deployed site (`exclude` list in `_config.yml`).
@@ -341,6 +353,9 @@ Every item, regardless of source, is normalized into this shape (`src/models.py`
 - Images are policy-driven and optional (second-option, never critical): feed-provided media only by default, publisher-page og:image scraping strictly opt-in (`pipeline.enrich_images`, hotlink + copyright risk), and `pipeline.image_blocklist` (default `redd.it`) drops image hosts that are filtered for the audience (Reddit is filtered in Iran).
 - Publish days are idempotent: `existing_editions()` short-circuits a same-day re-run before any LLM call, so double triggers (cron + dispatch) can never replace the day's content with different LLM samples; `--force` (or the workflow `force` dispatch input) overrides.
 - Translations always translate the finished English text (never re-summarize from scratch), so all six editions carry the same facts, jokes, and emphasis; per-(item, language) calls keep each reply short enough that strict JSON parsing stays reliable.
+- Failed translation pairs get two extra batch-level retry rounds (growing delay, same bounded concurrency), so a transient model hiccup no longer strands one item in English on an otherwise translated page; a pair that succeeded once is never re-called.
+- Every edition's meta `description`/`og:description` is written in that edition's language (`meta_description` + `meta_by` labels in `config/i18n.yaml`) - non-English pages no longer ship an English SEO snippet.
+- The rendered meta line is reader-facing, not debug-facing: the raw rank score stays out of the page (it remains visible in `--preview`), `1 source` / `2 sources` is grammatical per language (`source_one`/`source_many`), and community-thread stories (and login-walled URLs like tweets) get a localized `Discussion` link from `meta['discussion_url']` (set by the HN and Reddit sources, skipped when it duplicates the story URL).
 - ASCII policy: all code/CI files are pure ASCII; the only UTF-8 files are content - `config/i18n.yaml`, `index.md` language names, and generated posts.
 
 ## Maintainer

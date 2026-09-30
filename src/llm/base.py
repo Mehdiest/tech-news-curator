@@ -13,6 +13,13 @@ from src.models import Article, CuratedItem
 
 logger = logging.getLogger(__name__)
 
+# Batch-level retry policy for translations: LLM sampling is random, so a
+# pair that failed once (bad JSON, hiccup, rate limit) often succeeds on a
+# later round. Failed pairs are retried retry_rounds extra times with a
+# growing delay; a pair that succeeded once is never called again.
+TRANSLATION_RETRY_ROUNDS = 2
+_TRANSLATION_RETRY_DELAY_SECONDS = 3.0
+
 
 class LLMError(Exception):
     """Any provider failure: HTTP, network, or malformed reply.
@@ -115,6 +122,7 @@ async def translate_batch(
     targets: list[str],
     concurrency: int = 3,
     max_tokens: int = 3000,
+    retry_rounds: int = TRANSLATION_RETRY_ROUNDS,
 ) -> int:
     """Translate summarized items into extra languages, in place.
 
@@ -122,8 +130,13 @@ async def translate_batch(
     strict-JSON contract reliable, and a failing pair costs exactly one
     language of one item - every other edition keeps its translation. The
     source text is always the finished English version, so the author's
-    voice lands identically in every edition. Returns how many
-    (item, language) pairs succeeded.
+    voice lands identically in every edition.
+
+    Failed pairs get retry_rounds extra rounds (same bounded concurrency,
+    growing delay) so a transient model hiccup does not leave a mixed-
+    language edition: without this, one dropped reply used to strand a
+    whole item in English on an otherwise translated page. Returns how
+    many (item, language) pairs succeeded.
     """
     semaphore = asyncio.Semaphore(max(1, concurrency))
     pairs = [(item, code) for item in items for code in targets]
@@ -153,7 +166,19 @@ async def translate_batch(
                 )
             return False
 
-    results = await asyncio.gather(*(_one(item, code) for item, code in pairs))
-    ok = sum(1 for done in results if done)
+    ok = 0
+    pending = pairs
+    for round_index in range(max(1, retry_rounds + 1)):
+        if not pending:
+            break
+        if round_index:
+            logger.info(
+                "translations: retry round %d for %d failed pair(s)",
+                round_index, len(pending),
+            )
+            await asyncio.sleep(_TRANSLATION_RETRY_DELAY_SECONDS * round_index)
+        results = await asyncio.gather(*(_one(item, code) for item, code in pending))
+        ok += sum(1 for done in results if done)
+        pending = [pair for pair, done in zip(pending, results) if not done]
     logger.info("translations: %d/%d (item, language) pairs succeeded", ok, len(pairs))
     return ok

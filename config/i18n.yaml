@@ -3,14 +3,21 @@
 # This file is intentionally UTF-8 DATA: native language names and labels.
 # All project CODE stays ASCII. Unknown language codes fall back to the
 # "en" block, which mirrors the built-in defaults in markdown_writer.py.
-# Placeholders (__N__, __S__, __REPO__, __STAMP__) are replaced at render
-# time; never use .format() on these strings.
+# Placeholders (__DATE__, __N__, __S__, __NWORD__, __SWORD__, __NAME__,
+# __REPO__, __STAMP__) are replaced at render time; never use .format().
+# __NWORD__/__SWORD__ resolve to story_one/story_many and
+# source_one/source_many, so "1 story from 1 source" and
+# "8 stories from 5 sources" stay grammatical in every language.
+# meta_description deliberately carries no item count (no agreement
+# problems, and it reads more naturally as an SEO snippet).
 
 en:
   native_name: English
   dir: ltr
   og_locale: en_US
-  intro: "__N__ stories from __S__ sources, ranked by coverage, community signal, and recency."
+  meta_description: "Daily tech news digest for __DATE__: the day's top stories summarized with expert commentary"
+  meta_by: ", curated by __NAME__."
+  intro: "__N__ __NWORD__ from __S__ __SWORD__, ranked by coverage, community signal, and recency."
   read_in: "Read this digest in"
   curated_by: "Curated by"
   footer_by: "Curated by:"
@@ -18,8 +25,11 @@ en:
   source: "Source"
   topic: "Topic"
   coverage: "Coverage"
-  source_word: "source(s)"
-  score: "Score"
+  source_one: "source"
+  source_many: "sources"
+  story_one: "story"
+  story_many: "stories"
+  discuss: "Discussion"
   summary_h: "Summary"
   take_h: "My Take"
 
@@ -27,7 +37,9 @@ fa:
   native_name: "فارسی"
   dir: rtl
   og_locale: fa_IR
-  intro: "__N__ خبر برتر از __S__ منبع، رتبه‌بندی‌شده بر اساس پوشش رسانه‌ای، بازتاب جامعه و تازگی."
+  meta_description: "خلاصه‌ی روزانه‌ی اخبار تکنولوژی برای __DATE__: خبرهای برتر روز با خلاصه و نظر کارشناسانه"
+  meta_by: "، گردآوری توسط __NAME__."
+  intro: "__N__ __NWORD__ برتر از __S__ __SWORD__، رتبه‌بندی‌شده بر اساس پوشش رسانه‌ای، بازتاب جامعه و تازگی."
   read_in: "خواندن این شماره به"
   curated_by: "گردآوری توسط"
   footer_by: "گردآوری توسط:"
@@ -35,8 +47,11 @@ fa:
   source: "منبع"
   topic: "موضوع"
   coverage: "پوشش"
-  source_word: "منبع"
-  score: "امتیاز"
+  source_one: "منبع"
+  source_many: "منبع"
+  story_one: "خبر"
+  story_many: "خبر"
+  discuss: "گفت‌وگو"
   summary_h: "خلاصه"
   take_h: "نظر من"
 
@@ -44,7 +59,9 @@ fr:
   native_name: "Français"
   dir: ltr
   og_locale: fr_FR
-  intro: "__N__ histoires à la une issues de __S__ sources, classées selon la couverture médiatique, l'écho communautaire et la fraîcheur."
+  meta_description: "Sélection quotidienne d'actualités tech pour le __DATE__ : les histoires à la une, résumées avec un avis d'expert"
+  meta_by: ", par __NAME__."
+  intro: "__N__ __NWORD__ à la une provenant de __S__ __SWORD__ - classement selon la couverture médiatique, l'écho communautaire et la fraîcheur."
   read_in: "Lisez cette édition en"
   curated_by: "Sélectionné par"
   footer_by: "Sélectionné par :"
@@ -52,8 +69,11 @@ fr:
   source: "Source"
   topic: "Sujet"
   coverage: "Couverture"
-  source_word: "source(s)"
-  score: "Score"
+  source_one: "source"
+  source_many: "sources"
+  story_one: "histoire"
+  story_many: "histoires"
+  discuss: "Discussion"
   summary_h: "Résumé"
   take_h: "Mon avis"
 
@@ -61,7 +81,9 @@ de:
   native_name: "Deutsch"
   dir: ltr
   og_locale: de_DE
-  intro: "__N__ Top-Storys aus __S__ Quellen, sortiert nach Berichterstattung, Community-Signal und Aktualität."
+  meta_description: "Täglicher Tech-News-Überblick für __DATE__: die Top-Storys des Tages, zusammengefasst mit Expertenkommentar"
+  meta_by: ", kuratiert von __NAME__."
+  intro: "__N__ __NWORD__ aus __S__ __SWORD__, sortiert nach Berichterstattung, Community-Signal und Aktualität."
   read_in: "Diese Ausgabe lesen auf"
   curated_by: "Kuratiert von"
   footer_by: "Kuratiert von:"
@@ -69,8 +91,11 @@ de:
   source: "Quelle"
   topic: "Thema"
   coverage: "Abdeckung"
-  source_word: "Quelle(n)"
-  score: "Score"
+  source_one: "Quelle"
+  source_many: "Quellen"
+  story_one: "Top-Story"
+  story_many: "Top-Storys"
+  discuss: "Diskussion"
   summary_h: "Zusammenfassung"
   take_h: "Mein Fazit"
 
@@ -78,7 +103,9 @@ es:
   native_name: "Español"
   dir: ltr
   og_locale: es_ES
-  intro: "__N__ noticias destacadas de __S__ fuentes, clasificadas por cobertura mediática, repercusión comunitaria y actualidad."
+  meta_description: "Resumen diario de noticias tech para __DATE__: las historias destacadas del día con comentarios de expertos"
+  meta_by: ", curado por __NAME__."
+  intro: "__N__ __NWORD__ de __S__ __SWORD__, según cobertura mediática, repercusión comunitaria y actualidad."
   read_in: "Lee esta edición en"
   curated_by: "Curado por"
   footer_by: "Curado por:"
@@ -86,8 +113,11 @@ es:
   source: "Fuente"
   topic: "Tema"
   coverage: "Cobertura"
-  source_word: "fuente(s)"
-  score: "Puntuación"
+  source_one: "fuente"
+  source_many: "fuentes"
+  story_one: "historia destacada"
+  story_many: "historias destacadas"
+  discuss: "Discusión"
   summary_h: "Resumen"
   take_h: "Mi opinión"
 
@@ -95,7 +125,9 @@ zh:
   native_name: "中文"
   dir: ltr
   og_locale: zh_CN
-  intro: "从 __S__ 个来源精选的 __N__ 条热点新闻，按报道覆盖度、社区热度与时效性排序。"
+  meta_description: "__DATE__ 每日科技新闻精选：当日热点新闻摘要与专家点评"
+  meta_by: "，编辑：__NAME__。"
+  intro: "从 __S__ __SWORD__ 精选的 __N__ __NWORD__，按报道覆盖度、社区热度与时效性排序。"
   read_in: "以其他语言阅读本期"
   curated_by: "编辑"
   footer_by: "编辑："
@@ -103,7 +135,10 @@ zh:
   source: "来源"
   topic: "主题"
   coverage: "覆盖"
-  source_word: "个来源"
-  score: "评分"
+  source_one: "个来源"
+  source_many: "个来源"
+  story_one: "条热点新闻"
+  story_many: "条热点新闻"
+  discuss: "讨论"
   summary_h: "摘要"
   take_h: "我的观点"

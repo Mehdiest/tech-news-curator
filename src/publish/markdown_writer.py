@@ -25,12 +25,22 @@ from src.models import CuratedItem, utc_now
 logger = logging.getLogger(__name__)
 
 # Built-in English labels: the baseline every i18n block overrides from.
+# Placeholders: __DATE__/__NAME__ in meta_description + meta_by,
+# __N__/__S__/__NWORD__/__SWORD__ in intro, __REPO__/__STAMP__ in generated.
+# __NWORD__/__SWORD__ resolve to the story_one/story_many and
+# source_one/source_many forms of the same language, so "1 story from
+# 1 source" and "8 stories from 5 sources" stay grammatical everywhere.
 _EN_DEFAULTS = {
     "native_name": "English",
     "dir": "ltr",
     "og_locale": "en_US",
+    "meta_description": (
+        "Daily tech news digest for __DATE__: the day's top stories "
+        "summarized with expert commentary"
+    ),
+    "meta_by": ", curated by __NAME__.",
     "intro": (
-        "__N__ stories from __S__ sources, ranked by coverage, "
+        "__N__ __NWORD__ from __S__ __SWORD__, ranked by coverage, "
         "community signal, and recency."
     ),
     "read_in": "Read this digest in",
@@ -40,8 +50,11 @@ _EN_DEFAULTS = {
     "source": "Source",
     "topic": "Topic",
     "coverage": "Coverage",
-    "source_word": "source(s)",
-    "score": "Score",
+    "source_one": "source",
+    "source_many": "sources",
+    "story_one": "story",
+    "story_many": "stories",
+    "discuss": "Discussion",
     "summary_h": "Summary",
     "take_h": "My Take",
 }
@@ -164,15 +177,25 @@ def _header(
     name = (author or {}).get("name") or ""
     linkedin = (author or {}).get("linkedin") or ""
     title = f"Tech Digest - {day.isoformat()}" + (f" | {name}" if name else "")
+    # Localized meta description (SEO): each i18n block carries its own
+    # wording, so the fa/de/es/zh pages no longer ship an English snippet.
     description = (
-        f"Daily tech news digest for {day.isoformat()}: {len(items)} top stories "
-        "summarized with expert commentary"
-        + (f", curated by {name}." if name else ".")
+        t["meta_description"]
+        .replace("__DATE__", day.isoformat())
+        + (t["meta_by"].replace("__NAME__", name) if name else ".")
     )
     author_line = f'author: "{name}"\n' if name else ""
     cover = next((item.article.image_url for item in items if item.article.image_url), None)
     cover_line = f'cover: "{cover}"\n' if cover else ""
-    intro = t["intro"].replace("__N__", str(len(items))).replace("__S__", str(len(sources)))
+    sword = t["source_one"] if len(sources) == 1 else t["source_many"]
+    nword = t["story_one"] if len(items) == 1 else t["story_many"]
+    intro = (
+        t["intro"]
+        .replace("__N__", str(len(items)))
+        .replace("__S__", str(len(sources)))
+        .replace("__SWORD__", sword)
+        .replace("__NWORD__", nword)
+    )
     return (
         "---\n"
         f'title: "{title}"\n'
@@ -242,12 +265,21 @@ def _item_block(index: int, item: CuratedItem, lang: str, t: dict) -> str:
     take = translation.get("take") or item.personal_take
     topic = article.meta.get("category", "general")
     coverage = article.meta.get("coverage", 1)
+    coverage_word = t["source_one"] if coverage == 1 else t["source_many"]
+    # Reader-friendly escape hatch for login-walled story URLs (tweets, etc.)
+    # and a general link to the community thread; hidden when it duplicates
+    # the story URL itself. The raw rank score stays out of the page: a bare
+    # number like 43.2 means nothing to visitors (it remains in --preview).
+    discussion = str(article.meta.get("discussion_url") or "")
+    discuss_link = ""
+    if discussion and discussion.rstrip("/") != article.url.rstrip("/"):
+        discuss_link = f"  |  [{t['discuss']}]({discussion})"
     parts = [
         f"## {index}. [{title}]({article.url})\n\n",
         _image_markdown(article, title),
         f"**{t['source']}:** {article.source}  |  **{t['topic']}:** {topic}  |  "
-        f"**{t['coverage']}:** {coverage} {t['source_word']}  |  "
-        f"**{t['score']}:** {item.rank_score:.1f}\n\n"
+        f"**{t['coverage']}:** {coverage} {coverage_word}"
+        f"{discuss_link}\n\n"
         f"**{t['summary_h']}**\n\n"
         f"{summary}\n\n"
         f"**{t['take_h']}**\n\n"

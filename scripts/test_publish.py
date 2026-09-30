@@ -22,15 +22,16 @@ AUTHOR = {
 
 
 def make_item(title, source, summary, take, score=42.0, topic="ai", coverage=2,
-              image=None):
+              image=None, url=None, discussion=None):
     article = Article(
         title=title,
-        url=f"https://example.com/{title.lower().replace(' ', '-')}",
+        url=url or f"https://example.com/{title.lower().replace(' ', '-')}",
         source=source,
         published_at=None,
         signal_score=100,
         image_url=image,
-        meta={"category": topic, "coverage": coverage, "num_comments": 10},
+        meta={"category": topic, "coverage": coverage, "num_comments": 10,
+              "discussion_url": discussion},
     )
     return CuratedItem(
         article=article, llm_summary=summary, personal_take=take, rank_score=score,
@@ -74,7 +75,10 @@ def test_write_and_template():
     assert "## 2. [Story Two](https://example.com/story-two)" in text
     assert "![Story One](https://cdn.example.com/one.jpg?w=800&h=400)" in text
     assert "**Source:** HackerNews" in text and "**Topic:** ai" in text
-    assert "**Coverage:** 2 source(s)" in text and "**Score:** 42.0" in text
+    # grammatical singular/plural per coverage, and no raw score for readers
+    assert "**Coverage:** 2 sources" in text
+    assert "**Coverage:** 1 source\n" in text
+    assert "**Score:**" not in text
     assert text.count("**Summary**") == 2 and text.count("**My Take**") == 2
     assert "> Funny expert take on story one" in text
     assert "> Witty commentary on story two" in text
@@ -92,6 +96,26 @@ def test_item_without_image_has_no_empty_gap():
     # linked title flows straight into the meta line
     assert "## 1. [Bare Story](https://example.com/bare-story)\n\n**Source:**" in text
     print("PASS item without image renders cleanly (no image, no cover)")
+
+
+def test_discussion_link_rendering():
+    """Community-thread stories get a Discussion link; duplicates are skipped."""
+    item = make_item(
+        "Tweet Story", "HackerNews", "Summary.", "Take.",
+        url="https://twitter.com/someone/status/123",
+        discussion="https://news.ycombinator.com/item?id=999",
+    )
+    text = write_digest([item], day=DAY, posts_dir=SCRATCH).read_text(encoding="utf-8")
+    assert "[Discussion](https://news.ycombinator.com/item?id=999)" in text
+
+    same = make_item(
+        "Thread Story", "HackerNews", "Summary.", "Take.",
+        url="https://news.ycombinator.com/item?id=123",
+        discussion="https://news.ycombinator.com/item?id=123",
+    )
+    text = write_digest([same], day=DAY, posts_dir=SCRATCH).read_text(encoding="utf-8")
+    assert "Discussion" not in text
+    print("PASS discussion link renders for thread stories and skips duplicates")
 
 
 def test_tricky_urls_and_titles_still_link():
@@ -113,8 +137,8 @@ def test_author_attribution_and_seo():
     assert 'author: "Mehdi Esteghlal"' in text
     assert 'title: "Tech Digest - 2026-09-15 | Mehdi Esteghlal"' in text
     assert (
-        'description: "Daily tech news digest for 2026-09-15: 2 top stories '
-        'summarized with expert commentary, curated by Mehdi Esteghlal."'
+        'description: "Daily tech news digest for 2026-09-15: the day\'s '
+        'top stories summarized with expert commentary, curated by Mehdi Esteghlal."'
     ) in text
 
     # visible byline near the top, linked to LinkedIn
@@ -183,6 +207,7 @@ if __name__ == "__main__":
     try:
         test_write_and_template()
         test_item_without_image_has_no_empty_gap()
+        test_discussion_link_rendering()
         test_tricky_urls_and_titles_still_link()
         test_author_attribution_and_seo()
         test_without_author_stays_clean()

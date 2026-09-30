@@ -72,6 +72,9 @@ class HNSource:
                 "num_comments": hit.get("num_comments", 0),
                 "hn_id": hit.get("objectID"),
                 "category": "hn",
+                # Community thread; rendered as the Discussion link so readers
+                # can escape login-walled story URLs (tweets, etc.)
+                "discussion_url": f"https://news.ycombinator.com/item?id={hit.get('objectID')}",
             },
         )
 

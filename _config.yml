@@ -10,9 +10,20 @@ author:
   location: ""
   linkedin: https://www.linkedin.com/in/mehdi-esteghlal-317a67100
   github: https://github.com/Mehdiest
-  # Drop a square photo at assets/img/avatar.jpg (or .png) and set the path below;
-  # until then the sidebar falls back to initials.
-  avatar: "assets/img/avatar.jpg"
+  # Avatar WITHOUT shipping the photo inside this repository.
+  # How it works: GitHub serves any user's public profile picture at
+  # https://github.com/<username>.png - set your photo as your GitHub
+  # profile image once and the sidebar shows it automatically (and stays
+  # in sync when you ever change it). Prefer a different picture? Paste
+  # any direct image-CDN URL instead (Cloudinary, imgbb, postimages, ...).
+  # Then remove the local copy from the repo:
+  #   git rm assets/img/avatar.jpg
+  # And to also scrub it from ALL past commits (it stays visible in
+  # history otherwise - SHAs get rewritten, so expect a force push):
+  #   pip install git-filter-repo
+  #   git filter-repo --path assets/img/avatar.jpg --invert-paths --force
+  #   git push --force origin main
+  avatar: "https://github.com/Mehdiest.png"
 repository: https://github.com/Mehdiest/tech-news-curator
 
 markdown: kramdown

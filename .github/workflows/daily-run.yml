@@ -27,6 +27,12 @@ permissions:
   id-token: write   # OIDC for deploy-pages
   actions: write    # delete stale github-pages artifacts on re-runs
 
+# Single source of truth for the model: both the .env step and the validate
+# step read this, so the log can never name a different model than the one
+# the run actually uses (they used to drift).
+env:
+  LLM_MODEL: ${{ vars.LLM_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
+
 concurrency:
   group: daily-tech-digest
   cancel-in-progress: false
@@ -39,7 +45,12 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Full history so the commit step can safely `git pull --rebase` if
+      # something landed on main between checkout and push (the safety-net
+      # cron run vs a manually triggered run, for example).
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v6
         with:
@@ -51,14 +62,15 @@ jobs:
         run: pip install -r requirements.txt
 
       # Secrets never enter the repo: .env is generated at runtime and gitignored.
-      # LLM_MODEL is a repo *variable* (optional); default = a zero-balance model.
+      # The model comes from the job-level env (vars.LLM_MODEL with a free
+      # OpenRouter default), identical to what the validate step prints.
       - name: Write .env from secrets
         run: |
           {
             echo "LLM_PROVIDER=glm"
             echo "LLM_API_KEY=${{ secrets.LLM_API_KEY }}"
             echo "LLM_BASE_URL=https://openrouter.ai/api/v1"
-            echo "LLM_MODEL=${{ vars.LLM_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}"
+            echo "LLM_MODEL=${{ env.LLM_MODEL }}"
             echo "DIGEST_LANGUAGE=en"
           } > .env
 
@@ -84,7 +96,7 @@ jobs:
           PY
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_MODEL: ${{ vars.LLM_MODEL || 'qwen3.8-flash' }}
+          # LLM_MODEL is inherited from the job-level env
 
       - name: Build the daily digest
         # skips by itself when today's editions exist; --force only on demand
@@ -97,6 +109,8 @@ jobs:
           if [ -n "$(git status --porcelain posts/)" ]; then
             git add posts/
             git commit -m "digest: daily tech digest $(date -u +%F)"
+            # rebase in case anything landed on main after this run's checkout
+            git pull --rebase origin ${GITHUB_REF_NAME:-main}
             git push
           else
             echo "no new digest to commit"
