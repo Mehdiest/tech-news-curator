@@ -1,6 +1,8 @@
 # Jekyll configuration for GitHub Pages - consumed by actions/jekyll-build-pages.
 title: TechTally - Tech News by Mehdi Esteghlal
 description: "TechTally - the day's top tech stories, ranked and summarized with expert commentary. A daily tech tally curated by Mehdi Esteghlal."
+# One-line brand tagline - rendered in the homepage hero (index.md).
+tagline: "Counting what matters in tech, every day."
 timezone: UTC
 
 # Curator identity - drives the byline, footer links, profile sidebar, and JSON-LD Person schema.

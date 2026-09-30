@@ -6,6 +6,7 @@ description: "TechTally: the day's top tech stories, ranked every morning across
 
 <section class="hero">
   <h1>TechTally</h1>
+  <p class="tagline"><strong>{{ site.tagline }}</strong></p>
   <p class="tagline">
     An automated pipeline reads 16+ sources every morning - RSS feeds, Hacker News,
     and Reddit - clusters the stories everyone is covering, and ranks them by real
