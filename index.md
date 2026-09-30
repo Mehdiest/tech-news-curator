@@ -35,6 +35,19 @@ description: "TechTally: the day's top tech stories, ranked every morning across
   {% include latest_digest.html %}
 </section>
 
+<!-- Share the latest digest straight from the home page.
+     Same .share-row styling the digest layout uses. -->
+{% assign latest_post = site.pages | where_exp: "item", "item.path contains 'posts/'" | where_exp: "item", "item.lang == 'en'" | sort: "date" | reverse | first %}
+{% if latest_post %}
+<div class="share-row home-share-row">
+  <span class="share-label">Share today's digest:</span>
+  <a class="share-btn share-tg" target="_blank" rel="noopener"
+     href="https://t.me/share/url?url={{ latest_post.url | absolute_url | url_encode }}&text={{ latest_post.title | url_encode }}">Telegram</a>
+  <a class="share-btn share-x" target="_blank" rel="noopener"
+     href="https://twitter.com/intent/tweet?url={{ latest_post.url | absolute_url | url_encode }}&text={{ latest_post.title | url_encode }}">X</a>
+</div>
+{% endif %}
+
 <section class="digest-archive" id="digest-archive">
   <h2>Digest archive</h2>
   <p class="archive-note">
