@@ -236,3 +236,36 @@ a.lang-pill:hover {
   .page-shell { flex-direction: column; padding: 20px 16px 40px; }
   .profile-sidebar { position: static; width: 100%; flex: none; }
 }
+
+/* Home page "latest digest" teaser card: compact, clickable, replaces the
+   old full-content inline render. Uses theme variables so it follows
+   light/dark automatically. */
+.latest-card {
+  margin: 4px 0 46px;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--soft-bg);
+}
+.latest-card .latest-kicker {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.latest-card h2 { margin: 0 0 10px; font-size: 1.45rem; line-height: 1.3; }
+.latest-card .latest-desc { margin: 0 0 18px; color: var(--muted); }
+.latest-card .latest-cta { margin: 0 0 4px; }
+.read-btn {
+  display: inline-block;
+  padding: 9px 22px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.read-btn:hover { background: var(--accent-hover); text-decoration: none; color: #fff; }
+.latest-card .share-row { margin-top: 18px; padding-top: 14px; }
+.latest-card .share-label { color: var(--muted); }

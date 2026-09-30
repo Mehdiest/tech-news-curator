@@ -31,36 +31,42 @@ description: "TechTally: the day's top tech stories, ranked every morning across
   </p>
 </section>
 
-<section class="latest-digest" id="today">
-  {% include latest_digest.html %}
-</section>
-
-<!-- Share the latest digest straight from the home page.
-     Same .share-row styling the digest layout uses. -->
+<!-- Compact teaser card for the newest digest. Clicking opens the standalone
+     post page (where the share buttons and all six editions live). The old
+     full-content inline render made the home page enormous and hid the
+     archive, so it is replaced by this card. -->
 {% assign latest_post = site.pages | where_exp: "item", "item.path contains 'posts/'" | where_exp: "item", "item.lang == 'en'" | sort: "date" | reverse | first %}
 {% if latest_post %}
-<div class="share-row home-share-row">
-  <span class="share-label">Share today's digest:</span>
-  <a class="share-btn share-tg" target="_blank" rel="noopener"
-     href="https://t.me/share/url?url={{ latest_post.url | absolute_url | url_encode }}&text={{ latest_post.title | url_encode }}">Telegram</a>
-  <a class="share-btn share-x" target="_blank" rel="noopener"
-     href="https://twitter.com/intent/tweet?url={{ latest_post.url | absolute_url | url_encode }}&text={{ latest_post.title | url_encode }}">X</a>
-</div>
+<section class="latest-digest" id="today">
+  <div class="latest-card">
+    <p class="latest-kicker">Latest digest &middot; {{ latest_post.date | date: "%B %d, %Y" }}</p>
+    <h2><a href="{{ latest_post.url | relative_url }}">{{ latest_post.title }}</a></h2>
+    {% if latest_post.description %}
+    <p class="latest-desc">{{ latest_post.description | truncatewords: 45 }}</p>
+    {% endif %}
+    <p class="latest-cta"><a class="read-btn" href="{{ latest_post.url | relative_url }}">Read the full digest &rarr;</a></p>
+    <div class="share-row">
+      <span class="share-label">Share this digest:</span>
+      <a class="share-btn share-tg" target="_blank" rel="noopener"
+         href="https://t.me/share/url?url={{ latest_post.url | absolute_url | url_encode }}&text={{ latest_post.title | url_encode }}">Telegram</a>
+      <a class="share-btn share-x" target="_blank" rel="noopener"
+         href="https://twitter.com/intent/tweet?url={{ latest_post.url | absolute_url | url_encode }}&text={{ latest_post.title | url_encode }}">X</a>
+    </div>
+  </div>
+</section>
 {% endif %}
 
 <section class="digest-archive" id="digest-archive">
-  <h2>Digest archive</h2>
+  <h2>All digests</h2>
   <p class="archive-note">
-    The newest edition is shown above. Every past edition stays online -
-    pick any date to read it.
+    Every edition, newest first. Click any title to open that day's digest -
+    each one is also available in five more languages on its page.
   </p>
   <ul class="digest-list">
     {% assign digests = site.pages | where_exp: "item", "item.path contains 'posts/'" | where_exp: "item", "item.lang == 'en'" | sort: "date" | reverse %}
-    {% assign latest_day = site.data.latest_digest.date | date: "%Y-%m-%d" %}
     {% assign prev_month = "" %}
     {% for digest in digests %}
-    {% assign digest_day = digest.date | date: "%Y-%m-%d" %}
-    {% unless digest_day == latest_day %}
+    {% unless forloop.first %}
     {% assign this_month = digest.date | date: "%B %Y" %}
     {% if this_month != prev_month %}
     <li class="month-sep"><span>{{ this_month }}</span></li>
