@@ -51,16 +51,20 @@ tech-news-curator/
 |   |   |-- glm_provider.py    # OpenAI-compatible client (api.b.ai/v1) with retries
 |   |   `-- factory.py         # provider selection from env vars
 |   |-- publish/
-|   |   `-- markdown_writer.py # daily digest: en edition + translated siblings
+|   |   `-- markdown_writer.py # daily digest: en edition + translated siblings + home-page include
 |   `-- main.py                # orchestration + CLI
 |-- _config.yml                # Jekyll: title/author/sitemap plugin/excludes
 |-- _layouts/                  # default + digest + home (og tags, JSON-LD, RTL)
 |-- _includes/head.html        # meta, Open Graph, Person schema, css
-|-- index.md                   # landing page: digest archive + language links
+|-- _includes/latest_digest.html # GENERATED: newest edition as inline HTML for the home page
+|-- _data/latest_digest.yml      # GENERATED: which day the include shows
+|-- index.md                   # landing page: newest digest inline + archive
 |-- feed.xml                   # Liquid-rendered RSS of recent digests (en)
 |-- robots.txt                 # points crawlers at sitemap.xml
 |-- assets/css/style.css       # clean image-friendly styling + RTL support
 |-- .github/workflows/daily-run.yml
+|-- .github/workflows/backfill.yml  # one-click repair of translation gaps in old digests
+|-- scripts/backfill_translations.py
 |-- config/sources.yaml        # feed list and settings - no code changes needed
 |-- config/i18n.yaml           # localized labels/native names per language (UTF-8 data)
 |-- .env.example
@@ -106,7 +110,32 @@ python -m src.main --preview --source reddit --limit 5
 
 # Verbose logging for feed debugging
 python -m src.main --preview -v
+
+# Repair translation gaps in ALREADY-published digests (see below)
+python scripts/backfill_translations.py --dry-run
+python scripts/backfill_translations.py
 ```
+
+### Backfilling translation gaps in older digests
+
+The daily pipeline never rewrites an existing day, so translated editions
+published before the retry fix may keep some items in English. The backfill
+script repairs that in place: it salvages every translation that already
+exists, LLM-translates only the missing pairs, and rewrites the day with the
+current renderer (localized meta description, no raw score line). It never
+touches pairs that are already translated.
+
+```bash
+python scripts/backfill_translations.py --dry-run    # report the gaps only
+python scripts/backfill_translations.py              # repair every day
+python scripts/backfill_translations.py --days 2     # newest two days
+python scripts/backfill_translations.py --langs fa   # fill Persian only
+```
+
+The same repair is available as a one-click GitHub Actions run:
+**Actions -> backfill-translations -> Run workflow** (`dry_run` first is
+recommended). Both paths also refresh `_includes/latest_digest.html`, the
+inline digest shown on the home page.
 
 ## Adding a New Source
 

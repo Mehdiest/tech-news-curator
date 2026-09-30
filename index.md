@@ -21,7 +21,7 @@ description: "Daily tech news digest: top stories ranked across 16+ sources, sum
     <span class="lang-name">Deutsch</span> &middot;
     <span class="lang-name">Español</span> &middot;
     <span class="lang-name">中文</span>
-    - every edition below ships in all six.
+    - every edition ships in all six.
   </p>
   <p class="byline">
     Curated by
@@ -30,11 +30,22 @@ description: "Daily tech news digest: top stories ranked across 16+ sources, sum
   </p>
 </section>
 
-<section class="digest-archive" id="latest-digests">
-  <h2>Latest digests</h2>
+<section class="latest-digest" id="today">
+  {% include latest_digest.html %}
+</section>
+
+<section class="digest-archive" id="digest-archive">
+  <h2>Digest archive</h2>
+  <p class="archive-note">
+    The newest edition is shown above. Every past edition stays online -
+    pick any date to read it.
+  </p>
   <ul class="digest-list">
     {% assign digests = site.pages | where_exp: "item", "item.path contains 'posts/'" | where_exp: "item", "item.lang == 'en'" | sort: "date" | reverse %}
+    {% assign latest_day = site.data.latest_digest.date | date: "%Y-%m-%d" %}
     {% for digest in digests %}
+    {% assign digest_day = digest.date | date: "%Y-%m-%d" %}
+    {% unless digest_day == latest_day %}
     <li>
       <a href="{{ digest.url | relative_url }}">{{ digest.title }}</a>
       <time datetime="{{ digest.date | date_to_xmlschema }}">{{ digest.date | date: "%B %d, %Y" }}</time>
@@ -47,6 +58,7 @@ description: "Daily tech news digest: top stories ranked across 16+ sources, sum
       </p>
       {% endif %}
     </li>
+    {% endunless %}
     {% endfor %}
   </ul>
   <p class="subscribe">

@@ -15,6 +15,7 @@ readers - and search engines - can move between the editions of one day.
 from __future__ import annotations
 
 import logging
+import re
 from datetime import date
 from pathlib import Path
 
@@ -153,11 +154,15 @@ def _render(
     i18n: dict,
     languages: list[str],
     dir_name: str,
+    with_front_matter: bool = True,
 ) -> str:
     """Full document for one language: front-matter, header, items, footer."""
     t = _labels(lang, i18n)
     sources = sorted({item.article.source for item in items})
-    header = _header(items, day, sources, author, lang, t, i18n, languages, dir_name)
+    header = _header(
+        items, day, sources, author, lang, t, i18n, languages, dir_name,
+        with_front_matter,
+    )
     blocks = [_item_block(index, item, lang, t) for index, item in enumerate(items, 1)]
     return header + ("\n---\n\n".join(blocks)) + "\n" + _footer(author, t)
 
@@ -172,8 +177,14 @@ def _header(
     i18n: dict,
     languages: list[str],
     dir_name: str,
+    with_front_matter: bool = True,
 ) -> str:
-    """YAML front-matter (SEO fields + cover + lang) plus H1, byline, switcher."""
+    """YAML front-matter (SEO fields + cover + lang) plus H1, byline, switcher.
+
+    with_front_matter=False renders the body only (H1, intro, byline,
+    switcher) - used by the home-page include, which is plain HTML and
+    must not carry YAML front-matter.
+    """
     name = (author or {}).get("name") or ""
     linkedin = (author or {}).get("linkedin") or ""
     title = f"Tech Digest - {day.isoformat()}" + (f" | {name}" if name else "")
@@ -196,22 +207,27 @@ def _header(
         .replace("__SWORD__", sword)
         .replace("__NWORD__", nword)
     )
+    front_matter = ""
+    if with_front_matter:
+        front_matter = (
+            "---\n"
+            f'title: "{title}"\n'
+            f"date: {day.isoformat()}\n"
+            f"items: {len(items)}\n"
+            f"sources: [{', '.join(sources)}]\n"
+            f"{cover_line}"
+            f"lang: {lang}\n"
+            f"dir: {t['dir']}\n"
+            f"og_locale: {t['og_locale']}\n"
+            f"{_translations_front_matter(day, lang, languages, i18n, dir_name)}"
+            f"{author_line}"
+            f'description: "{description}"\n'
+            "generator: tech-news-curator\n"
+            "---\n\n"
+        )
     return (
-        "---\n"
-        f'title: "{title}"\n'
-        f"date: {day.isoformat()}\n"
-        f"items: {len(items)}\n"
-        f"sources: [{', '.join(sources)}]\n"
-        f"{cover_line}"
-        f"lang: {lang}\n"
-        f"dir: {t['dir']}\n"
-        f"og_locale: {t['og_locale']}\n"
-        f"{_translations_front_matter(day, lang, languages, i18n, dir_name)}"
-        f"{author_line}"
-        f'description: "{description}"\n'
-        "generator: tech-news-curator\n"
-        "---\n\n"
-        f"# Tech Digest - {day.isoformat()}\n\n"
+        front_matter
+        + f"# Tech Digest - {day.isoformat()}\n\n"
         f"_{intro}_\n\n"
         + _byline(name, linkedin, t)
         + _switcher(day, lang, languages, i18n)
@@ -334,3 +350,103 @@ def _footer(author: dict | None, t: dict) -> str:
         attribution = f"**{name}**" + (f" | {profile_links}" if profile_links else "")
         lines.append(f"{t['footer_by']} {attribution}")
     return "---\n\n" + "\n\n".join(lines) + "\n"
+
+
+# --- Home-page include (stage 5c) -------------------------------------------
+#
+# The home page shows the newest English edition INLINE (visitors read the
+# day's digest the moment they land, instead of clicking a link first).
+# Jekyll cannot reliably render one page's markdown inside another page, so
+# the pipeline converts the edition itself and drops it into
+# _includes/latest_digest.html (+ _data/latest_digest.yml, the shown day).
+# Relative links inside the include are rewritten to baseurl-absolute so
+# they work from the home URL, not just from /posts/.
+
+_HREF_RE = re.compile(r'href="(?!https?://|#|/|data:|mailto:)([^"]+)"')
+
+
+def read_baseurl(config_yml: Path | str, repository: str = "") -> str:
+    """Best-effort site baseurl for the include's baseurl-absolute links.
+
+    Order: an explicit baseurl in Jekyll's config wins. Otherwise it is
+    derived from the repository URL: GitHub Pages project sites serve
+    under /<repo>/ (the Pages build injects that baseurl even when the
+    config omits it), while a user site (<user>.github.io) serves from
+    the root.
+    """
+    try:
+        with open(config_yml, encoding="utf-8") as stream:
+            data = yaml.safe_load(stream) or {}
+        explicit = str(data.get("baseurl") or "").rstrip("/")
+        if explicit:
+            return explicit
+    except OSError:
+        pass
+    match = re.search(r"github\.com/[^/]+/([^/?#]+)/?$", (repository or "").rstrip("/"))
+    if match:
+        name = match.group(1)
+        return "" if name.endswith(".github.io") else f"/{name}"
+    return ""
+
+
+def _markdown_to_html(text: str) -> str | None:
+    """Markdown -> HTML via python-markdown; None when the package is absent."""
+    try:
+        import markdown
+    except ImportError:
+        logger.warning(
+            "package 'markdown' not installed - latest-digest include skipped"
+        )
+        return None
+    return markdown.markdown(text)
+
+
+def write_latest_include(
+    items: list[CuratedItem],
+    day: date,
+    author: dict | None,
+    i18n: dict,
+    languages: list[str],
+    dir_name: str,
+    baseurl: str,
+    include_dir: Path | str,
+    data_dir: Path | str,
+) -> Path | None:
+    """Write _includes/latest_digest.html + _data/latest_digest.yml.
+
+    The include is the English edition rendered as standalone HTML; the
+    data file records which day it shows so the home template can keep
+    that one edition out of the archive list. Returns the include path,
+    or None when the optional 'markdown' package is missing.
+    """
+    body = _render(
+        items, day, author, "en", i18n, languages, dir_name,
+        with_front_matter=False,
+    )
+    html = _markdown_to_html(body)
+    if html is None:
+        return None
+    prefix = (baseurl or "").rstrip("/") + f"/{dir_name.strip('/')}/"
+    html = _HREF_RE.sub(lambda match: f'href="{prefix}{match.group(1)}"', html)
+    stamp = utc_now().strftime("%Y-%m-%d %H:%M UTC")
+    include_path = Path(include_dir) / "latest_digest.html"
+    include_path.parent.mkdir(parents=True, exist_ok=True)
+    include_path.write_text(
+        '<article class="digest" lang="en" dir="ltr">\n'
+        f"<!-- generated by tech-news-curator on {stamp}; "
+        "regenerated on every publish -->\n"
+        f"{html}\n"
+        "</article>\n",
+        encoding="utf-8",
+    )
+    data_path = Path(data_dir) / "latest_digest.yml"
+    data_path.parent.mkdir(parents=True, exist_ok=True)
+    data_path.write_text(
+        f'date: "{day.isoformat()}"\n'
+        f'file: "{dir_name.strip("/")}/{_edition_filename(day, "en", "html")}"\n',
+        encoding="utf-8",
+    )
+    logger.info(
+        "latest-digest include written: %s (+ %s)", include_path, data_path,
+    )
+    return include_path

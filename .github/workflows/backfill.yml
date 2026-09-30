@@ -1,0 +1,86 @@
+name: backfill-translations
+
+# One-click repair for already-published digests: fills the (item, language)
+# pairs that fell back to English (LLM hiccups before the retry fix existed)
+# and rewrites the affected days with the current renderer. Idempotent by
+# design - pairs that are already translated are never re-translated.
+#
+# Requires the same LLM_API_KEY secret as the daily workflow. A --dry-run
+# dispatch reports the gaps in the log without calling the LLM or writing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Repair only the N newest days (empty = all days)"
+        type: string
+        default: ""
+      langs:
+        description: "Comma-separated language codes to fill (empty = all, e.g. fa)"
+        type: string
+        default: ""
+      dry_run:
+        description: "Report only - no LLM calls, no writes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # push the repair commit
+
+concurrency:
+  group: backfill-translations
+  cancel-in-progress: false
+
+env:
+  LLM_MODEL: ${{ vars.LLM_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write .env from secrets
+        run: |
+          {
+            echo "LLM_PROVIDER=glm"
+            echo "LLM_API_KEY=${{ secrets.LLM_API_KEY }}"
+            echo "LLM_BASE_URL=https://openrouter.ai/api/v1"
+            echo "LLM_MODEL=${{ env.LLM_MODEL }}"
+            echo "DIGEST_LANGUAGE=en"
+          } > .env
+
+      - name: Backfill translations
+        run: |
+          args=""
+          if [ -n "${{ inputs.days }}" ]; then args="$args --days ${{ inputs.days }}"; fi
+          if [ -n "${{ inputs.langs }}" ]; then args="$args --langs ${{ inputs.langs }}"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then args="$args --dry-run"; fi
+          python scripts/backfill_translations.py $args
+
+      - name: Commit the repaired digests
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          changed="$(git status --porcelain posts/ _includes/latest_digest.html _data/latest_digest.yml)"
+          if [ -n "$changed" ]; then
+            git add posts/ _includes/latest_digest.html _data/latest_digest.yml
+            git commit -m "backfill: repair translations $(date -u +%F)"
+            git pull --rebase origin ${GITHUB_REF_NAME:-main}
+            git push
+          else
+            echo "nothing to repair"
+          fi

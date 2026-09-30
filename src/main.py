@@ -16,16 +16,23 @@ from src.ingestion.reddit_source import RedditSource
 from src.ingestion.rss_source import RSSSource
 from src.llm.base import summarize_batch, translate_batch
 from src.llm.factory import make_provider
-from src.models import Article, CuratedItem
+from src.models import Article, CuratedItem, utc_now
 from src.pipeline.dedup import dedupe
 from src.pipeline.images import drop_blocked_images, enrich_images
 from src.pipeline.ranker import Ranker, RankerConfig
-from src.publish.markdown_writer import existing_editions, load_i18n, write_digest
+from src.publish.markdown_writer import (
+    existing_editions,
+    load_i18n,
+    read_baseurl,
+    write_digest,
+    write_latest_include,
+)
 
 logger = logging.getLogger(__name__)
 
 CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "sources.yaml"
 I18N_PATH = Path(__file__).resolve().parent.parent / "config" / "i18n.yaml"
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def load_config(path: Path = CONFIG_PATH) -> dict:
@@ -229,6 +236,22 @@ async def run_publish(cfg: dict, only: str | None, limit: int, force: bool = Fal
         author=cfg.get("author"),
         languages=languages,
         i18n=load_i18n(I18N_PATH),
+    )
+    # Stage 5c: refresh the home-page include so visitors landing on the
+    # site read the newest edition inline instead of clicking a link.
+    write_latest_include(
+        items,
+        utc_now().date(),
+        cfg.get("author"),
+        load_i18n(I18N_PATH),
+        languages,
+        posts_dir.name,
+        read_baseurl(
+            REPO_ROOT / "_config.yml",
+            (cfg.get("author") or {}).get("repository", ""),
+        ),
+        REPO_ROOT / "_includes",
+        REPO_ROOT / "_data",
     )
     _print_summaries(pairs)
     print(f"Digest file: {digest_path}")

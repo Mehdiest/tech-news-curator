@@ -106,8 +106,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain posts/)" ]; then
-            git add posts/
+          changed="$(git status --porcelain posts/ _includes/latest_digest.html _data/latest_digest.yml)"
+          if [ -n "$changed" ]; then
+            git add posts/ _includes/latest_digest.html _data/latest_digest.yml
             git commit -m "digest: daily tech digest $(date -u +%F)"
             # rebase in case anything landed on main after this run's checkout
             git pull --rebase origin ${GITHUB_REF_NAME:-main}

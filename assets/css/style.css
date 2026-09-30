@@ -105,6 +105,12 @@ a:hover { text-decoration: underline; }
   white-space: nowrap;
 }
 
+/* Latest digest embedded on the home page (pipeline-generated include) */
+.latest-digest { margin: 4px 0 46px; }
+.latest-digest .digest h1 { margin-top: 0; }
+.digest-archive h2 { font-size: 1.3rem; margin: 0 0 6px; }
+.archive-note { color: #57606a; font-size: 0.95rem; margin: 0 0 20px; }
+
 /* Daily digest articles */
 .digest h1 { font-size: 1.9rem; line-height: 1.25; }
 .digest h2 {
