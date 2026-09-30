@@ -67,6 +67,14 @@ logger = logging.getLogger("backfill")
 I18N_PATH = PROJECT_ROOT / "config" / "i18n.yaml"
 CONFIG_PATH = PROJECT_ROOT / "config" / "sources.yaml"
 
+# Token cap for one translation reply. The daily pipeline (translate_batch)
+# passes max_tokens=3000; backfill calls provider.chat() directly and used to
+# inherit the provider default (700), which truncates long / non-Latin replies
+# mid-JSON - every (item, language) pair then failed to parse ("invalid JSON
+# from model") and the rewritten editions kept their English text. Pin the
+# same cap as the daily path so hi/ru/ar replies survive intact.
+TRANSLATION_MAX_TOKENS = 3000
+
 _ITEM_RE = re.compile(r"^##\s*(\d+)\.\s*\[(.*)\]\((.*)\)\s*$")
 _IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)\s*$")
 _META_SCORE_RE = re.compile(r"\*\*Score:\*\*\s*([0-9.]+)")
@@ -254,7 +262,10 @@ async def fill_missing(
                 "take": item.personal_take,
             }
             try:
-                reply = await provider.chat(build_translation_messages(entry, [code]))
+                reply = await provider.chat(
+                    build_translation_messages(entry, [code]),
+                    max_tokens=TRANSLATION_MAX_TOKENS,
+                )
                 item.translations.update(parse_translation_json(reply, [code]))
                 logger.info(
                     "translated %r -> %s", item.article.title[:50], code,
