@@ -81,7 +81,7 @@ pipeline:
   # break a publish run.
   images: true            # use pictures the sources officially provide with the
                           # story (RSS media tags, Reddit preview API)
-  enrich_images: false    # OPTIONAL fallback: fetch the publisher page and take
+  enrich_images: true    # OPTIONAL fallback: fetch the publisher page and take
                           # its og:image. Two known risks: publisher CDNs may
                           # block hotlinking, and embedding a media outlet's
                           # picture on your own domain is copyright gray area.
