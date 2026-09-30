@@ -16,7 +16,7 @@ from src.models import Article, is_valid_image_url, looks_like_image_url, strip_
 
 logger = logging.getLogger(__name__)
 
-USER_AGENT = "tech-news-curator/0.1 (+https://github.com/Mehdiest/tech-news-curator)"
+USER_AGENT = "techtally/0.1 (+https://github.com/Mehdiest/techtally)"
 
 _IMG_SRC_RE = re.compile(r"<img\b[^>]*?\bsrc=[\"\']([^\"\']+)[\"\']", re.IGNORECASE)
 

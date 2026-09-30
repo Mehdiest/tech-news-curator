@@ -34,7 +34,7 @@ AUTHOR = {
     "name": "Mehdi Esteghlal",
     "linkedin": "https://ir.linkedin.com/in/mehdi-esteghlal-317a67100",
     "github": "https://github.com/Mehdiest",
-    "repository": "https://github.com/Mehdiest/tech-news-curator",
+    "repository": "https://github.com/Mehdiest/techtally",
 }
 
 # --- localized literals (\\u escapes, resolved at import time) -------------
@@ -250,34 +250,35 @@ def test_translate_batch_retries_failures():
 
 
 def test_writer_multilingual_editions():
+    _reset_scratch()
     items = build_items()
     path = write_digest(
         items, day=DAY, posts_dir=SCRATCH, author=AUTHOR,
         languages=TARGETS, i18n=I18N,
     )
-    assert path.name == "2026-09-15-tech-digest.md"
+    assert path.name == "2026-09-15-techtally.md"
     names = sorted(p.name for p in SCRATCH.glob("*.md"))
     assert names == sorted([
-        "2026-09-15-tech-digest.md", "2026-09-15-tech-digest-fa.md",
-        "2026-09-15-tech-digest-fr.md", "2026-09-15-tech-digest-de.md",
-        "2026-09-15-tech-digest-es.md", "2026-09-15-tech-digest-zh.md",
+        "2026-09-15-techtally.md", "2026-09-15-techtally-fa.md",
+        "2026-09-15-techtally-fr.md", "2026-09-15-techtally-de.md",
+        "2026-09-15-techtally-es.md", "2026-09-15-techtally-zh.md",
     ]), names
 
-    en = (SCRATCH / "2026-09-15-tech-digest.md").read_text(encoding="utf-8")
+    en = (SCRATCH / "2026-09-15-techtally.md").read_text(encoding="utf-8")
     # language switcher on the English page with native names + .html links
     assert "**Read this digest in:**" in en
-    assert f"[{FA_NATIVE}](2026-09-15-tech-digest-fa.html)" in en
-    assert f"[{ZH_NATIVE}](2026-09-15-tech-digest-zh.html)" in en
-    assert "[Deutsch](2026-09-15-tech-digest-de.html)" in en
+    assert f"[{FA_NATIVE}](2026-09-15-techtally-fa.html)" in en
+    assert f"[{ZH_NATIVE}](2026-09-15-techtally-zh.html)" in en
+    assert "[Deutsch](2026-09-15-techtally-de.html)" in en
     # front-matter carries the sibling map for the Jekyll index page; the
     # file path is the posts dir name + .html (in production: posts/...)
     assert "lang: en" in en and 'name: "' + FA_NATIVE + '"' in en
-    assert f'file: "{SCRATCH.name}/2026-09-15-tech-digest-fa.html"' in en
+    assert f'file: "{SCRATCH.name}/2026-09-15-techtally-fa.html"' in en
     # English labels and attribution untouched
     assert "**Source:** HackerNews" in en and "**My Take**" in en
     assert "_Curated by [Mehdi Esteghlal]" in en
 
-    fa = (SCRATCH / "2026-09-15-tech-digest-fa.md").read_text(encoding="utf-8")
+    fa = (SCRATCH / "2026-09-15-techtally-fa.md").read_text(encoding="utf-8")
     assert "lang: fa" in fa and "dir: rtl" in fa and "og_locale: fa_IR" in fa
     assert f"## 1. [{FA_TITLE}](https://example.com/story-one)" in fa
     assert f"![{FA_TITLE}](https://cdn.example.com/one.jpg?w=800&h=400)" in fa
@@ -293,17 +294,17 @@ def test_writer_multilingual_editions():
     assert f"_{L_CURATED} [Mehdi Esteghlal]" in fa  # name stays Latin for SEO
     assert f"{L_GENERATED}" in fa and "Curated by:" not in fa
     # fa page links back to the other editions, never to itself
-    assert "[English](2026-09-15-tech-digest.html)" in fa
+    assert "[English](2026-09-15-techtally.html)" in fa
     assert FA_NATIVE + "](" not in fa
 
-    zh = (SCRATCH / "2026-09-15-tech-digest-zh.md").read_text(encoding="utf-8")
+    zh = (SCRATCH / "2026-09-15-techtally-zh.md").read_text(encoding="utf-8")
     assert f"**{ZH_SOURCE}:** HackerNews" in zh
     assert f"**\u8986\u76d6:** 1 {ZH_SOURCE_WORD}" in zh
     assert f"**{ZH_TAKE_H}**" in zh and ZH_TAKE in zh  # item one translated
     assert "Summary for story two." in zh  # item two fell back to English
     assert "dir: ltr" in zh and "og_locale: zh_CN" in zh
 
-    es = (SCRATCH / "2026-09-15-tech-digest-es.md").read_text(encoding="utf-8")
+    es = (SCRATCH / "2026-09-15-techtally-es.md").read_text(encoding="utf-8")
     assert "Resumen en espanol." in es and "lang: es" in es
     print("PASS writer emits six editions: switcher, RTL fa, labels, fallbacks")
 
@@ -324,7 +325,7 @@ def test_writer_backward_compatible():
     assert "**Read this digest in:**" not in text
     assert "translations:" not in text
     assert "lang: en" in text and "dir: ltr" in text  # new front-matter, harmless
-    assert not (SCRATCH / "2026-09-15-tech-digest-fa.md").exists()
+    assert not (SCRATCH / "2026-09-15-techtally-fa.md").exists()
     assert "**Source:** HackerNews" in text
     print("PASS no languages configured -> English-only edition, as before")
 
@@ -341,8 +342,8 @@ def test_i18n_labels_and_unknown_language_fallback():
 
     item = make_item("Solo Story", "HackerNews", "Summary.", "Take.")
     path = write_digest([item], day=DAY, posts_dir=SCRATCH, languages=["xx"], i18n=I18N)
-    xx = (SCRATCH / "2026-09-15-tech-digest-xx.md").read_text(encoding="utf-8")
-    assert path.name == "2026-09-15-tech-digest.md" and "**Source:**" in xx
+    xx = (SCRATCH / "2026-09-15-techtally-xx.md").read_text(encoding="utf-8")
+    assert path.name == "2026-09-15-techtally.md" and "**Source:**" in xx
     print("PASS i18n labels merge correctly; unknown language degrades to English")
 
 
@@ -350,13 +351,13 @@ def test_rerun_is_idempotent():
     items = build_items()
     first = write_digest(items, day=DAY, posts_dir=SCRATCH, author=AUTHOR,
                          languages=TARGETS, i18n=I18N)
-    fa_first = (SCRATCH / "2026-09-15-tech-digest-fa.md").read_text(encoding="utf-8")
+    fa_first = (SCRATCH / "2026-09-15-techtally-fa.md").read_text(encoding="utf-8")
     write_digest(items, day=DAY, posts_dir=SCRATCH, author=AUTHOR,
                  languages=TARGETS, i18n=I18N)
-    fa_second = (SCRATCH / "2026-09-15-tech-digest-fa.md").read_text(encoding="utf-8")
+    fa_second = (SCRATCH / "2026-09-15-techtally-fa.md").read_text(encoding="utf-8")
     stamp = re.compile(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC")
     assert stamp.sub("STAMP", fa_first) == stamp.sub("STAMP", fa_second)
-    assert first.name == "2026-09-15-tech-digest.md"
+    assert first.name == "2026-09-15-techtally.md"
     print("PASS rerun on the same day overwrites every edition identically")
 
 

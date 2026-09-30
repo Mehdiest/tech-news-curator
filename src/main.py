@@ -252,6 +252,7 @@ async def run_publish(cfg: dict, only: str | None, limit: int, force: bool = Fal
         ),
         REPO_ROOT / "_includes",
         REPO_ROOT / "_data",
+        posts_dir,
     )
     _print_summaries(pairs)
     print(f"Digest file: {digest_path}")
@@ -260,14 +261,14 @@ async def run_publish(cfg: dict, only: str | None, limit: int, force: bool = Fal
 def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="tech-news-curator (ingestion + dedup + ranking + LLM)",
+        description="techtally (ingestion + dedup + ranking + LLM)",
     )
     parser.add_argument("--preview", action="store_true",
                         help="fetch all sources and print top N (no LLM calls)")
     parser.add_argument("--summarize", action="store_true",
                         help="fetch, rank, then summarize top N with the LLM")
     parser.add_argument("--publish", action="store_true",
-                        help="fetch, rank, summarize, and write posts/YYYY-MM-DD-tech-digest.md")
+                        help="fetch, rank, summarize, and write posts/YYYY-MM-DD-techtally.md")
     parser.add_argument("--force", action="store_true",
                         help="publish: regenerate today's digest even if it already exists")
     parser.add_argument("--limit", type=int, default=None,

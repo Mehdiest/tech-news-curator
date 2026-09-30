@@ -1,11 +1,11 @@
 ---
 layout: home
-title: "Tech Digest - Daily Tech News by Mehdi Esteghlal"
-description: "Daily tech news digest: top stories ranked across 16+ sources, summarized with expert commentary, curated by Mehdi Esteghlal. Published in English, Persian, French, German, Spanish and Chinese."
+title: "TechTally - Daily Tech News by Mehdi Esteghlal"
+description: "TechTally: the day's top tech stories, ranked every morning across 16+ sources, summarized with expert commentary, curated by Mehdi Esteghlal. Published in English, Persian, French, German, Spanish and Chinese."
 ---
 
 <section class="hero">
-  <h1>Tech Digest</h1>
+  <h1>TechTally</h1>
   <p class="tagline">
     An automated pipeline reads 16+ sources every morning - RSS feeds, Hacker News,
     and Reddit - clusters the stories everyone is covering, and ranks them by real

@@ -1,8 +1,8 @@
 """Stage 5/7 publish: write the daily Markdown digest for GitHub Pages.
 
-The English edition (posts/YYYY-MM-DD-tech-digest.md) is canonical; for every
+The English edition (posts/YYYY-MM-DD-techtally.md) is canonical; for every
 extra language configured in sources.yaml a sibling file
-(posts/YYYY-MM-DD-tech-digest-<code>.md) is rendered from the stored
+(posts/YYYY-MM-DD-techtally-<code>.md) is rendered from the stored
 translations, preserving the English author's voice. Localized labels and
 native language names come from config/i18n.yaml (UTF-8 data); unknown
 languages fall back to the English labels and text.
@@ -36,7 +36,7 @@ _EN_DEFAULTS = {
     "dir": "ltr",
     "og_locale": "en_US",
     "meta_description": (
-        "Daily tech news digest for __DATE__: the day's top stories "
+        "TechTally daily digest for __DATE__: the day's top tech stories "
         "summarized with expert commentary"
     ),
     "meta_by": ", curated by __NAME__.",
@@ -80,12 +80,24 @@ def _labels(lang: str, i18n: dict | None) -> dict:
     return merged
 
 
-def _edition_filename(day: date, lang: str, extension: str = "md") -> str:
-    """File name of one edition: en has no suffix, others get -<code>."""
-    stem = f"{day.isoformat()}-tech-digest"
-    if lang != "en":
-        stem += f"-{lang}"
-    return f"{stem}.{extension}"
+def _edition_filename(
+    day: date, lang: str, extension: str = "md", posts_dir=None,
+) -> str:
+    """File name of one edition: en has no suffix, others get -<code>.
+
+    Slug history: editions written before the TechTally rebrand use the
+    legacy -tech-digest slug and those files stay untouched on disk.
+    When posts_dir is given, the slug family that actually exists for the
+    day wins, so backfill re-renders of legacy days keep every sibling
+    and switcher link pointing at the real files. New days get -techtally.
+    """
+    suffix = "" if lang == "en" else f"-{lang}"
+    if posts_dir is not None:
+        posts_path = Path(posts_dir)
+        for base in ("techtally", "tech-digest"):
+            if (posts_path / f"{day.isoformat()}-{base}{suffix}.md").exists():
+                return f"{day.isoformat()}-{base}{suffix}.{extension}"
+    return f"{day.isoformat()}-techtally{suffix}.{extension}"
 
 
 def existing_editions(posts_dir: Path | str, day: date | None = None) -> list[Path]:
@@ -99,7 +111,12 @@ def existing_editions(posts_dir: Path | str, day: date | None = None) -> list[Pa
     posts_path = Path(posts_dir)
     if not posts_path.is_dir():
         return []
-    return sorted(posts_path.glob(f"{day.isoformat()}-tech-digest*.md"))
+    # Both slug families count: legacy -tech-digest days stay idempotent
+    # across the TechTally rebrand, new days use -techtally.
+    return sorted(
+        set(posts_path.glob(f"{day.isoformat()}-techtally*.md"))
+        | set(posts_path.glob(f"{day.isoformat()}-tech-digest*.md"))
+    )
 
 
 def write_digest(
@@ -124,16 +141,22 @@ def write_digest(
     ]
     i18n = i18n or {}
 
-    canonical = posts_path / _edition_filename(day, "en")
+    canonical = posts_path / _edition_filename(day, "en", posts_dir=posts_path)
     canonical.write_text(
-        _render(items, day, author, "en", i18n, extra_languages, posts_path.name),
+        _render(
+            items, day, author, "en", i18n, extra_languages, posts_path.name,
+            posts_dir=posts_path,
+        ),
         encoding="utf-8",
     )
     logger.info("digest written: %s (%d items)", canonical, len(items))
     for lang in extra_languages:
-        path = posts_path / _edition_filename(day, lang)
+        path = posts_path / _edition_filename(day, lang, posts_dir=posts_path)
         path.write_text(
-            _render(items, day, author, lang, i18n, extra_languages, posts_path.name),
+            _render(
+                items, day, author, lang, i18n, extra_languages, posts_path.name,
+                posts_dir=posts_path,
+            ),
             encoding="utf-8",
         )
         logger.info("translated digest written: %s", path)
@@ -154,6 +177,7 @@ def _render(
     i18n: dict,
     languages: list[str],
     dir_name: str,
+    posts_dir: Path | str | None = None,
     with_front_matter: bool = True,
 ) -> str:
     """Full document for one language: front-matter, header, items, footer."""
@@ -161,7 +185,7 @@ def _render(
     sources = sorted({item.article.source for item in items})
     header = _header(
         items, day, sources, author, lang, t, i18n, languages, dir_name,
-        with_front_matter,
+        with_front_matter, posts_dir=posts_dir,
     )
     blocks = [_item_block(index, item, lang, t) for index, item in enumerate(items, 1)]
     return header + ("\n---\n\n".join(blocks)) + "\n" + _footer(author, t)
@@ -178,6 +202,7 @@ def _header(
     languages: list[str],
     dir_name: str,
     with_front_matter: bool = True,
+    posts_dir: Path | str | None = None,
 ) -> str:
     """YAML front-matter (SEO fields + cover + lang) plus H1, byline, switcher.
 
@@ -187,7 +212,7 @@ def _header(
     """
     name = (author or {}).get("name") or ""
     linkedin = (author or {}).get("linkedin") or ""
-    title = f"Tech Digest - {day.isoformat()}" + (f" | {name}" if name else "")
+    title = f"TechTally - {day.isoformat()}" + (f" | {name}" if name else "")
     # Localized meta description (SEO): each i18n block carries its own
     # wording, so the fa/de/es/zh pages no longer ship an English snippet.
     description = (
@@ -219,23 +244,24 @@ def _header(
             f"lang: {lang}\n"
             f"dir: {t['dir']}\n"
             f"og_locale: {t['og_locale']}\n"
-            f"{_translations_front_matter(day, lang, languages, i18n, dir_name)}"
+            f"{_translations_front_matter(day, lang, languages, i18n, dir_name, posts_dir)}"
             f"{author_line}"
             f'description: "{description}"\n'
-            "generator: tech-news-curator\n"
+            "generator: techtally\n"
             "---\n\n"
         )
     return (
         front_matter
-        + f"# Tech Digest - {day.isoformat()}\n\n"
+        + f"# TechTally - {day.isoformat()}\n\n"
         f"_{intro}_\n\n"
         + _byline(name, linkedin, t)
-        + _switcher(day, lang, languages, i18n)
+        + _switcher(day, lang, languages, i18n, posts_dir)
     )
 
 
 def _translations_front_matter(
     day: date, lang: str, languages: list[str], i18n: dict, dir_name: str,
+    posts_dir: Path | str | None = None,
 ) -> str:
     """On the English edition only: sibling files for the Jekyll index page."""
     if lang != "en" or not languages:
@@ -243,12 +269,15 @@ def _translations_front_matter(
     lines = ["translations:"]
     for code in languages:
         native = _labels(code, i18n)["native_name"]
-        file_url = f"{dir_name}/{_edition_filename(day, code, 'html')}"
+        file_url = f"{dir_name}/{_edition_filename(day, code, 'html', posts_dir)}"
         lines.append(f'  - {{code: {code}, name: "{native}", file: "{file_url}"}}')
     return "\n".join(lines) + "\n"
 
 
-def _switcher(day: date, lang: str, languages: list[str], i18n: dict) -> str:
+def _switcher(
+    day: date, lang: str, languages: list[str], i18n: dict,
+    posts_dir: Path | str | None = None,
+) -> str:
     """'Read this digest in: ...' cross-links between the editions of one day."""
     codes = ["en"] + [code for code in languages if code != "en"]
     links = []
@@ -256,7 +285,7 @@ def _switcher(day: date, lang: str, languages: list[str], i18n: dict) -> str:
         if code == lang:
             continue
         native = _labels(code, i18n)["native_name"]
-        links.append(f"[{native}]({_edition_filename(day, code, 'html')})")
+        links.append(f"[{native}]({_edition_filename(day, code, 'html', posts_dir)})")
     if not links:
         return ""
     read_in = _labels(lang, i18n)["read_in"]
@@ -337,7 +366,7 @@ def _footer(author: dict | None, t: dict) -> str:
     author = author or {}
     stamp = utc_now().strftime("%Y-%m-%d %H:%M UTC")
     repo = author.get("repository") or ""
-    repo_link = f"[tech-news-curator]({repo})" if repo else "[tech-news-curator]"
+    repo_link = f"[TechTally]({repo})" if repo else "[TechTally]"
     generated = t["generated"].replace("__REPO__", repo_link).replace("__STAMP__", stamp)
     lines = [f"*{generated}*"]
     name = author.get("name")
@@ -411,6 +440,7 @@ def write_latest_include(
     baseurl: str,
     include_dir: Path | str,
     data_dir: Path | str,
+    posts_dir: Path | str | None = None,
 ) -> Path | None:
     """Write _includes/latest_digest.html + _data/latest_digest.yml.
 
@@ -421,7 +451,7 @@ def write_latest_include(
     """
     body = _render(
         items, day, author, "en", i18n, languages, dir_name,
-        with_front_matter=False,
+        posts_dir=posts_dir, with_front_matter=False,
     )
     html = _markdown_to_html(body)
     if html is None:
@@ -433,7 +463,7 @@ def write_latest_include(
     include_path.parent.mkdir(parents=True, exist_ok=True)
     include_path.write_text(
         '<article class="digest" lang="en" dir="ltr">\n'
-        f"<!-- generated by tech-news-curator on {stamp}; "
+        f"<!-- generated by techtally on {stamp}; "
         "regenerated on every publish -->\n"
         f"{html}\n"
         "</article>\n",
@@ -443,7 +473,7 @@ def write_latest_include(
     data_path.parent.mkdir(parents=True, exist_ok=True)
     data_path.write_text(
         f'date: "{day.isoformat()}"\n'
-        f'file: "{dir_name.strip("/")}/{_edition_filename(day, "en", "html")}"\n',
+        f'file: "{dir_name.strip("/")}/{_edition_filename(day, "en", "html", posts_dir)}"\n',
         encoding="utf-8",
     )
     logger.info(

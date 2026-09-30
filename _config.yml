@@ -1,6 +1,6 @@
 # Jekyll configuration for GitHub Pages - consumed by actions/jekyll-build-pages.
-title: Tech Digest by Mehdi Esteghlal
-description: Daily tech news digest - top stories ranked and summarized with expert commentary, curated by Mehdi Esteghlal.
+title: TechTally - Tech News by Mehdi Esteghlal
+description: "TechTally - the day's top tech stories, ranked and summarized with expert commentary. A daily tech tally curated by Mehdi Esteghlal."
 timezone: UTC
 
 # Curator identity - drives the byline, footer links, profile sidebar, and JSON-LD Person schema.
@@ -24,7 +24,7 @@ author:
   #   git filter-repo --path assets/img/avatar.jpg --invert-paths --force
   #   git push --force origin main
   avatar: "https://github.com/Mehdiest.png"
-repository: https://github.com/Mehdiest/tech-news-curator
+repository: https://github.com/Mehdiest/techtally
 
 markdown: kramdown
 

@@ -30,7 +30,7 @@ from src.models import Article, is_valid_image_url
 
 logger = logging.getLogger(__name__)
 
-USER_AGENT = "tech-news-curator/0.1 (+https://github.com/Mehdiest/tech-news-curator)"
+USER_AGENT = "techtally/0.1 (+https://github.com/Mehdiest/techtally)"
 
 _MAX_HTML_BYTES = 400_000  # og:image lives in <head>; no need for the whole page
 

@@ -1,4 +1,4 @@
-name: daily-tech-digest
+name: techtally-daily
 
 # Full pipeline: ingest -> dedup -> rank -> LLM -> publish -> commit -> GitHub Pages.
 # Same-day re-runs are idempotent: when today's digest already exists the
@@ -34,7 +34,7 @@ env:
   LLM_MODEL: ${{ vars.LLM_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
 
 concurrency:
-  group: daily-tech-digest
+  group: techtally-daily
   cancel-in-progress: false
 
 jobs:
@@ -109,7 +109,7 @@ jobs:
           changed="$(git status --porcelain posts/ _includes/latest_digest.html _data/latest_digest.yml)"
           if [ -n "$changed" ]; then
             git add posts/ _includes/latest_digest.html _data/latest_digest.yml
-            git commit -m "digest: daily tech digest $(date -u +%F)"
+            git commit -m "techtally: daily digest $(date -u +%F)"
             # rebase in case anything landed on main after this run's checkout
             git pull --rebase origin ${GITHUB_REF_NAME:-main}
             git push
@@ -159,8 +159,8 @@ jobs:
         # morning file already exists on disk.
         run: |
           today="$(date -u +%F)"
-          if ! ls posts/"$today"-tech-digest*.md >/dev/null 2>&1; then
+          if ! ls posts/"$today"-techtally*.md posts/"$today"-tech-digest*.md >/dev/null 2>&1; then
             echo "::error::no digest for $today - inspect the 'Build the daily digest' step log"
             exit 1
           fi
-          echo "digest for $today: $(ls posts/"$today"-tech-digest*.md | tr '\n' ' ')"
+          echo "digest for $today: $(ls posts/"$today"-techtally*.md posts/"$today"-tech-digest*.md 2>/dev/null | tr '\n' ' ')"

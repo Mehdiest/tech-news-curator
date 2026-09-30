@@ -15,7 +15,7 @@ en:
   native_name: English
   dir: ltr
   og_locale: en_US
-  meta_description: "Daily tech news digest for __DATE__: the day's top stories summarized with expert commentary"
+  meta_description: "TechTally daily digest for __DATE__: the day's top tech stories summarized with expert commentary"
   meta_by: ", curated by __NAME__."
   intro: "__N__ __NWORD__ from __S__ __SWORD__, ranked by coverage, community signal, and recency."
   read_in: "Read this digest in"
@@ -37,7 +37,7 @@ fa:
   native_name: "فارسی"
   dir: rtl
   og_locale: fa_IR
-  meta_description: "خلاصه‌ی روزانه‌ی اخبار تکنولوژی برای __DATE__: خبرهای برتر روز با خلاصه و نظر کارشناسانه"
+  meta_description: "TechTally - خلاصه‌ی روزانه‌ی اخبار تکنولوژی برای __DATE__: خبرهای برتر روز با خلاصه و نظر کارشناسانه"
   meta_by: "، گردآوری توسط __NAME__."
   intro: "__N__ __NWORD__ برتر از __S__ __SWORD__، رتبه‌بندی‌شده بر اساس پوشش رسانه‌ای، بازتاب جامعه و تازگی."
   read_in: "خواندن این شماره به"
@@ -59,7 +59,7 @@ fr:
   native_name: "Français"
   dir: ltr
   og_locale: fr_FR
-  meta_description: "Sélection quotidienne d'actualités tech pour le __DATE__ : les histoires à la une, résumées avec un avis d'expert"
+  meta_description: "TechTally - sélection quotidienne d'actualités tech pour le __DATE__ : les histoires à la une, résumées avec un avis d'expert"
   meta_by: ", par __NAME__."
   intro: "__N__ __NWORD__ à la une provenant de __S__ __SWORD__ - classement selon la couverture médiatique, l'écho communautaire et la fraîcheur."
   read_in: "Lisez cette édition en"
@@ -81,7 +81,7 @@ de:
   native_name: "Deutsch"
   dir: ltr
   og_locale: de_DE
-  meta_description: "Täglicher Tech-News-Überblick für __DATE__: die Top-Storys des Tages, zusammengefasst mit Expertenkommentar"
+  meta_description: "TechTally - täglicher Tech-News-Überblick für __DATE__: die Top-Storys des Tages, zusammengefasst mit Expertenkommentar"
   meta_by: ", kuratiert von __NAME__."
   intro: "__N__ __NWORD__ aus __S__ __SWORD__, sortiert nach Berichterstattung, Community-Signal und Aktualität."
   read_in: "Diese Ausgabe lesen auf"
@@ -103,7 +103,7 @@ es:
   native_name: "Español"
   dir: ltr
   og_locale: es_ES
-  meta_description: "Resumen diario de noticias tech para __DATE__: las historias destacadas del día con comentarios de expertos"
+  meta_description: "TechTally - resumen diario de noticias tech para __DATE__: las historias destacadas del día con comentarios de expertos"
   meta_by: ", curado por __NAME__."
   intro: "__N__ __NWORD__ de __S__ __SWORD__, según cobertura mediática, repercusión comunitaria y actualidad."
   read_in: "Lee esta edición en"
@@ -125,7 +125,7 @@ zh:
   native_name: "中文"
   dir: ltr
   og_locale: zh_CN
-  meta_description: "__DATE__ 每日科技新闻精选：当日热点新闻摘要与专家点评"
+  meta_description: "TechTally 每日科技新闻精选（__DATE__）：当日热点新闻摘要与专家点评"
   meta_by: "，编辑：__NAME__。"
   intro: "从 __S__ __SWORD__ 精选的 __N__ __NWORD__，按报道覆盖度、社区热度与时效性排序。"
   read_in: "以其他语言阅读本期"

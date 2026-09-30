@@ -8,10 +8,10 @@ author:
   name: Mehdi Esteghlal
   linkedin: "https://ir.linkedin.com/in/mehdi-esteghlal-317a67100"
   github: "https://github.com/Mehdiest"
-  repository: "https://github.com/Mehdiest/tech-news-curator"
+  repository: "https://github.com/Mehdiest/techtally"
 
 # Output editions (stage 7): the English digest is canonical; every extra
-# language code adds a translated sibling file posts/<day>-tech-digest-<code>.md
+# language code adds a translated sibling file posts/<day>-techtally-<code>.md
 # produced FROM the finished English text so the author's voice stays identical.
 # Localized labels + native language names live in config/i18n.yaml.
 languages: [fa, fr, de, es, zh]
@@ -81,7 +81,7 @@ pipeline:
   # break a publish run.
   images: true            # use pictures the sources officially provide with the
                           # story (RSS media tags, Reddit preview API)
-  enrich_images: true    # OPTIONAL fallback: fetch the publisher page and take
+  enrich_images: true     # og:image enrichment: fetch the publisher page and take
                           # its og:image. Two known risks: publisher CDNs may
                           # block hotlinking, and embedding a media outlet's
                           # picture on your own domain is copyright gray area.

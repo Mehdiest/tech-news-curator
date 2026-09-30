@@ -1,1 +1,1 @@
-"""tech-news-curator package."""
+"""techtally package."""

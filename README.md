@@ -1,4 +1,4 @@
-# Tech News Curator
+# TechTally
 
 Daily tech news digest: aggregate from multiple sources, deduplicate, rank, summarize with an LLM, and publish Markdown to GitHub Pages - all driven by GitHub Actions.
 
@@ -17,7 +17,7 @@ RSS (~16 feeds) + Hacker News API + Reddit + (later: GitHub Trending)
         v  Layer 4 - LLM (GLM for now; provider-agnostic)
         |
         v  Layer 5 - Publish (lead picture per story + summary + expert take)
-   posts/YYYY-MM-DD-tech-digest.md  ->  GitHub Pages
+   posts/YYYY-MM-DD-techtally.md  ->  GitHub Pages
         |
         v  Layer 6 - Scheduler + Site
    GitHub Actions daily cron (04:30 UTC = 08:00 Tehran)
@@ -26,14 +26,14 @@ RSS (~16 feeds) + Hacker News API + Reddit + (later: GitHub Trending)
         |
         v  Layer 7 - Translated editions (stage 7)
    the finished English text is translated per language, keeping the
-   author's voice: posts/<day>-tech-digest-{fa,fr,de,es,zh}.md
+   author's voice: posts/<day>-techtally-{fa,fr,de,es,zh}.md
    + language switcher on every page and on the landing page
 ```
 
 ## Project Layout
 
 ```text
-tech-news-curator/
+techtally/
 |-- src/
 |   |-- models.py              # Article + CuratedItem + URL/text normalization
 |   |-- ingestion/
@@ -77,7 +77,7 @@ tech-news-curator/
 - [x] Stage 2 - Dedup: exact URL + fuzzy title clustering (`src/pipeline/dedup.py`)
 - [x] Stage 3 - Ranking: coverage + signal + comments + recency + category (`src/pipeline/ranker.py`)
 - [x] Stage 4 - LLM layer: GLM provider + persona prompts + batch summarization (`src/llm/`)
-- [x] Stage 5 - Publish: `posts/YYYY-MM-DD-tech-digest.md` writer (`src/publish/markdown_writer.py`)
+- [x] Stage 5 - Publish: `posts/YYYY-MM-DD-techtally.md` writer (`src/publish/markdown_writer.py`)
 - [x] Stage 5b - Images: feed media tags + og:image enrichment + HEAD validation (`src/pipeline/images.py`)
 - [x] Stage 6 - Scheduler + Site: Actions cron -> commit posts/ -> Jekyll -> GitHub Pages, with sitemap/feed/JSON-LD/og SEO
 - [x] Stage 7 - Multilingual editions: fa/fr/de/es/zh siblings of every digest, voice-preserving translation, RTL fa, language switcher (`config/i18n.yaml`, `translate_batch`)
@@ -86,7 +86,7 @@ tech-news-curator/
 ## Quick Start
 
 ```bash
-cd tech-news-curator
+cd techtally
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env            # needed from stage 4 (LLM) onward
@@ -97,7 +97,7 @@ python -m src.main --preview
 # Stage 4 test: fetch, rank, then summarize top 3 with the LLM (needs LLM_API_KEY in .env)
 python -m src.main --summarize --limit 3
 
-# Stage 5: write posts/YYYY-MM-DD-tech-digest.md (top N from DAILY_TOP_N, default 8)
+# Stage 5: write posts/YYYY-MM-DD-techtally.md (top N from DAILY_TOP_N, default 8)
 python -m src.main --publish
 
 # Re-running the same day is a no-op (idempotent); regenerate on purpose with:
@@ -216,16 +216,16 @@ Disable pictures entirely with `pipeline.images: false`.
 
 ## Publish Format (Stage 5)
 
-`python -m src.main --publish` writes `posts/YYYY-MM-DD-tech-digest.md`:
+`python -m src.main --publish` writes `posts/YYYY-MM-DD-techtally.md`:
 
 ```markdown
 ---
-title: "Tech Digest - 2026-09-15"
+title: "TechTally - 2026-09-15"
 date: 2026-09-15
 items: 3
 sources: [HackerNews]
 cover: "https://cdn.example.com/lead.jpg"
-generator: tech-news-curator
+generator: techtally
 ---
 
 ## 1. [Story title here](https://...)
@@ -259,13 +259,18 @@ The English digest is the canonical edition. When `languages:` is set in
 writes a sibling file per language:
 
 ```text
-posts/2026-09-15-tech-digest.md       <- English (canonical)
-posts/2026-09-15-tech-digest-fa.md    <- Persian, RTL
-posts/2026-09-15-tech-digest-fr.md    <- French
-posts/2026-09-15-tech-digest-de.md    <- German
-posts/2026-09-15-tech-digest-es.md    <- Spanish
-posts/2026-09-15-tech-digest-zh.md    <- Simplified Chinese
+posts/2026-09-15-techtally.md       <- English (canonical)
+posts/2026-09-15-techtally-fa.md    <- Persian, RTL
+posts/2026-09-15-techtally-fr.md    <- French
+posts/2026-09-15-techtally-de.md    <- German
+posts/2026-09-15-techtally-es.md    <- Spanish
+posts/2026-09-15-techtally-zh.md    <- Simplified Chinese
 ```
+
+> Slug note: editions published before the TechTally rebrand keep their legacy
+> `YYYY-MM-DD-tech-digest[-<lang>].md` filenames and URLs. The writer, the
+> idempotency check, and the backfill tool all understand both slug families,
+> so legacy days stay online and linkable; new days use `-techtally`.
 
 How it works, and why the author's tone survives translation:
 
@@ -300,7 +305,7 @@ silently when `pipeline.translations: false`.
 
 The `author:` block in `config/sources.yaml` drives everything identity
 related. Every daily page carries the curator name in four places: the
-front-matter `title` (`Tech Digest - ... | Mehdi Esteghlal`) and `author`
+front-matter `title` (`TechTally - ... | Mehdi Esteghlal`) and `author`
 field, a unique per-day meta `description`, a visible byline above the fold
 linked to LinkedIn, and footer profile links (LinkedIn + GitHub + repo).
 Daily fresh posts with consistent author signals are how the curator's name
@@ -309,7 +314,7 @@ Open Graph cards, a sitemap, and an RSS feed on top of this.
 
 ## Deployment (Stage 6)
 
-The `daily-tech-digest` workflow runs the whole loop every morning
+The `techtally-daily` workflow runs the whole loop every morning
 (04:30 UTC = 08:00 Tehran, or on demand via *Run workflow*):
 
 ```text
@@ -331,7 +336,7 @@ One-time repo setup (after the first push):
    model actually in use).
 3. Pages is enabled automatically by the workflow (`configure-pages` with
    `enablement: true`); the site lands at
-   `https://<username>.github.io/tech-news-curator/`.
+   `https://<username>.github.io/techtally/`.
 
 The deployed site includes, out of the box:
 

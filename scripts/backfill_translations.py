@@ -190,7 +190,7 @@ def build_curated_items(
     """
     parsed_by_lang: dict[str, dict[int, dict]] = {}
     for lang in all_languages:
-        path = posts_dir / _edition_filename(day, lang)
+        path = posts_dir / _edition_filename(day, lang, posts_dir=posts_dir)
         if not path.exists():
             parsed_by_lang[lang] = {}
             continue
@@ -303,7 +303,8 @@ async def run(args: argparse.Namespace) -> int:
         if args.langs else all_languages
     )
     en_paths = sorted(
-        posts_dir.glob("*-tech-digest.md"), key=lambda path: path.name, reverse=True,
+        set(posts_dir.glob("*-techtally.md")) | set(posts_dir.glob("*-tech-digest.md")),
+        key=lambda path: path.name, reverse=True,
     )
     if args.days:
         en_paths = en_paths[: args.days]
@@ -362,6 +363,7 @@ async def run(args: argparse.Namespace) -> int:
                 (cfg.get("author") or {}).get("repository", ""),
             ),
             PROJECT_ROOT / "_includes", PROJECT_ROOT / "_data",
+            posts_dir,
         )
         logger.info("latest-digest include refreshed for %s", newest[0])
     print(f"\ndone: {total_missing} gap(s) processed across {len(en_paths)} day(s)")

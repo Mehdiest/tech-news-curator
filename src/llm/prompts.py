@@ -27,7 +27,7 @@ _LANGUAGE_NAMES = {
     "ja": "Japanese",
 }
 
-SYSTEM_PROMPT = """You write a daily tech news digest for a personal tech blog.
+SYSTEM_PROMPT = """You write the daily TechTally digest for a personal tech blog.
 
 ROLE (for the "take" field): you are a veteran tech industry expert with a
 sharp comedic voice - witty, sarcastic about industry hype, full of playful

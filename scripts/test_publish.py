@@ -17,7 +17,7 @@ AUTHOR = {
     "name": "Mehdi Esteghlal",
     "linkedin": "https://ir.linkedin.com/in/mehdi-esteghlal-317a67100",
     "github": "https://github.com/Mehdiest",
-    "repository": "https://github.com/Mehdiest/tech-news-curator",
+    "repository": "https://github.com/Mehdiest/techtally",
 }
 
 
@@ -56,21 +56,21 @@ def build_items():
 
 def test_write_and_template():
     path = write_digest(build_items(), day=DAY, posts_dir=SCRATCH)
-    assert path.name == "2026-09-15-tech-digest.md", path.name
+    assert path.name == "2026-09-15-techtally.md", path.name
     assert path.parent == SCRATCH
     text = path.read_text(encoding="utf-8")
 
     # front-matter, including the cover image of the first item
     assert text.startswith("---\n")
     for needle in (
-        'title: "Tech Digest - 2026-09-15"', "date: 2026-09-15", "items: 2",
-        "sources: [HackerNews, Stack Overflow Blog]", "generator: tech-news-curator",
+        'title: "TechTally - 2026-09-15"', "date: 2026-09-15", "items: 2",
+        "sources: [HackerNews, Stack Overflow Blog]", "generator: techtally",
         'cover: "https://cdn.example.com/one.jpg?w=800&h=400"',
     ):
         assert needle in text, needle
 
     # body structure: linked title, image, meta, summary, blockquoted take
-    assert "# Tech Digest - 2026-09-15" in text
+    assert "# TechTally - 2026-09-15" in text
     assert "## 1. [Story One](https://example.com/story-one)" in text
     assert "## 2. [Story Two](https://example.com/story-two)" in text
     assert "![Story One](https://cdn.example.com/one.jpg?w=800&h=400)" in text
@@ -135,10 +135,10 @@ def test_author_attribution_and_seo():
 
     # front-matter: author field, name in the page title, unique meta description
     assert 'author: "Mehdi Esteghlal"' in text
-    assert 'title: "Tech Digest - 2026-09-15 | Mehdi Esteghlal"' in text
+    assert 'title: "TechTally - 2026-09-15 | Mehdi Esteghlal"' in text
     assert (
-        'description: "Daily tech news digest for 2026-09-15: the day\'s '
-        'top stories summarized with expert commentary, curated by Mehdi Esteghlal."'
+        'description: "TechTally daily digest for 2026-09-15: the day\'s '
+        'top tech stories summarized with expert commentary, curated by Mehdi Esteghlal."'
     ) in text
 
     # visible byline near the top, linked to LinkedIn
@@ -149,7 +149,7 @@ def test_author_attribution_and_seo():
 
     # footer: repo link no longer broken + curator profile links
     assert (
-        "[tech-news-curator](https://github.com/Mehdiest/tech-news-curator)" in text
+        "[TechTally](https://github.com/Mehdiest/techtally)" in text
     )
     assert "Curated by: **Mehdi Esteghlal**" in text
     assert "[LinkedIn](https://ir.linkedin.com/in/mehdi-esteghlal-317a67100)" in text
@@ -162,8 +162,8 @@ def test_without_author_stays_clean():
         encoding="utf-8"
     )
     assert "author:" not in text and "Curated by" not in text
-    assert 'title: "Tech Digest - 2026-09-15"' in text  # no name suffix
-    assert "[tech-news-curator] on " in text  # legacy footer still fine
+    assert 'title: "TechTally - 2026-09-15"' in text  # no name suffix
+    assert "[TechTally] on " in text  # legacy footer still fine
     print("PASS no author configured -> clean output, no attribution lines")
 
 
@@ -185,8 +185,8 @@ def test_existing_editions_helper():
     assert existing_editions(SCRATCH, day=date(2026, 9, 20)) == []
     write_digest(build_items(), day=DAY, posts_dir=SCRATCH, languages=["fa"])
     names = [path.name for path in existing_editions(SCRATCH, day=DAY)]
-    assert "2026-09-15-tech-digest.md" in names
-    assert "2026-09-15-tech-digest-fa.md" in names
+    assert "2026-09-15-techtally.md" in names
+    assert "2026-09-15-techtally-fa.md" in names
     assert existing_editions(SCRATCH / "missing-dir", day=DAY) == []
     print("PASS existing_editions finds the day's files across editions only")
 

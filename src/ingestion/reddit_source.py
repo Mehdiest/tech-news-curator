@@ -13,7 +13,7 @@ from src.models import Article, strip_html
 
 logger = logging.getLogger(__name__)
 
-USER_AGENT = "tech-news-curator/0.1 (+https://github.com/Mehdiest/tech-news-curator)"
+USER_AGENT = "techtally/0.1 (+https://github.com/Mehdiest/techtally)"
 REDDIT_LISTINGS = ("top", "hot")
 
 
