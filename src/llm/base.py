@@ -19,6 +19,10 @@ logger = logging.getLogger(__name__)
 # growing delay; a pair that succeeded once is never called again.
 TRANSLATION_RETRY_ROUNDS = 2
 _TRANSLATION_RETRY_DELAY_SECONDS = 3.0
+# Languages per translation chat call. The prompt/parser are multi-target,
+# so one call can carry several languages; 4 keeps a 9-language day at
+# items x (1 + 2) requests - inside OpenRouter's 50/day free-model quota.
+TRANSLATION_CHUNK_SIZE = 4
 
 
 class LLMError(Exception):
@@ -123,62 +127,82 @@ async def translate_batch(
     concurrency: int = 3,
     max_tokens: int = 3000,
     retry_rounds: int = TRANSLATION_RETRY_ROUNDS,
+    chunk_size: int = TRANSLATION_CHUNK_SIZE,
 ) -> int:
     """Translate summarized items into extra languages, in place.
 
-    One SMALL chat call per (item, language) pair: short replies keep the
-    strict-JSON contract reliable, and a failing pair costs exactly one
-    language of one item - every other edition keeps its translation. The
-    source text is always the finished English version, so the author's
-    voice lands identically in every edition.
+    One chat call per (item, chunk of <=chunk_size languages) instead of one
+    per (item, language): build_translation_messages and parse_translation_json
+    are multi-target already, and a 9-language day used to cost
+    items x (1 summarize + 8 translations) ~ 60+ requests - over the 50/day
+    free-model quota on OpenRouter before the day's post was even half done.
+    With chunk_size=4 a 7-item day needs 7 + 2x7 = 21 requests, safely inside
+    the quota. The source text is always the finished English version, so the
+    author's voice lands identically in every edition.
 
-    Failed pairs get retry_rounds extra rounds (same bounded concurrency,
-    growing delay) so a transient model hiccup does not leave a mixed-
-    language edition: without this, one dropped reply used to strand a
-    whole item in English on an otherwise translated page. Returns how
-    many (item, language) pairs succeeded.
+    parse_translation_json tolerates per-language gaps, so a truncated reply
+    keeps the languages it did deliver; every retry round re-groups only the
+    still-missing languages into fresh chunks (growing delay), so a transient
+    model hiccup never strands a whole edition in English. Returns how many
+    (item, language) pairs succeeded.
     """
     semaphore = asyncio.Semaphore(max(1, concurrency))
-    pairs = [(item, code) for item in items for code in targets]
 
-    async def _one(item: CuratedItem, code: str) -> bool:
+    def _chunks(langs: list[str]) -> list[list[str]]:
+        return [langs[i:i + chunk_size] for i in range(0, len(langs), chunk_size)]
+
+    async def _one(item: CuratedItem, codes: list[str]) -> int:
         async with semaphore:
             entry = {
                 "title": item.article.title,
                 "summary": item.llm_summary,
                 "take": item.personal_take,
             }
+            # Longer outputs need a proportionally higher cap: each extra
+            # language adds roughly a title + summary + take to the reply.
+            call_tokens = max_tokens + 500 * (len(codes) - 1)
             try:
                 reply = await provider.chat(
-                    build_translation_messages(entry, [code]), max_tokens=max_tokens,
+                    build_translation_messages(entry, codes), max_tokens=call_tokens,
                 )
-                item.translations.update(parse_translation_json(reply, [code]))
-                return True
+                parsed = parse_translation_json(reply, codes)
+                fresh = [c for c in parsed if c not in item.translations]
+                item.translations.update(parsed)
+                return len(fresh)
             except LLMError as error:
                 logger.warning(
                     "translation %s failed for %r: %s",
-                    code, item.article.title[:50], error,
+                    "/".join(codes), item.article.title[:50], error,
                 )
             except Exception as error:  # isolation boundary, never crash the batch
                 logger.warning(
                     "translation %s crashed for %r: %r",
-                    code, item.article.title[:50], error,
+                    "/".join(codes), item.article.title[:50], error,
                 )
-            return False
+            return 0
 
+    def _pending() -> list[tuple[CuratedItem, list[str]]]:
+        return [
+            (item, codes)
+            for item in items
+            for codes in _chunks([c for c in targets if c not in item.translations])
+        ]
+
+    total_pairs = len(items) * len(targets)
     ok = 0
-    pending = pairs
     for round_index in range(max(1, retry_rounds + 1)):
+        pending = _pending()
         if not pending:
             break
         if round_index:
             logger.info(
-                "translations: retry round %d for %d failed pair(s)",
+                "translations: retry round %d for %d chunk(s)",
                 round_index, len(pending),
             )
             await asyncio.sleep(_TRANSLATION_RETRY_DELAY_SECONDS * round_index)
-        results = await asyncio.gather(*(_one(item, code) for item, code in pending))
-        ok += sum(1 for done in results if done)
-        pending = [pair for pair, done in zip(pending, results) if not done]
-    logger.info("translations: %d/%d (item, language) pairs succeeded", ok, len(pairs))
+        results = await asyncio.gather(*(_one(item, codes) for item, codes in pending))
+        ok += sum(results)
+    logger.info(
+        "translations: %d/%d (item, language) pairs succeeded", ok, total_pairs,
+    )
     return ok

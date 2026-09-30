@@ -45,6 +45,7 @@ import yaml
 from dotenv import load_dotenv
 
 from src.llm.base import (
+    TRANSLATION_CHUNK_SIZE,
     TRANSLATION_RETRY_ROUNDS,
     _TRANSLATION_RETRY_DELAY_SECONDS,
     LLMError,
@@ -250,11 +251,23 @@ def build_curated_items(
 
 async def fill_missing(
     provider, items: list[CuratedItem], targets: list[str], concurrency: int = 3,
+    chunk_size: int = TRANSLATION_CHUNK_SIZE,
 ) -> int:
-    """Translate only the missing (item, language) pairs, with retries."""
+    """Translate only the missing (item, language) pairs, with retries.
+
+    Languages are batched chunk_size per call (same quota math as the daily
+    translate_batch): repairing hi+ru+ar for one item costs ONE request, so a
+    31-item backlog needs 31 requests instead of 93 - inside OpenRouter's
+    50/day free-model quota. parse_translation_json keeps every language a
+    chunk delivered, and each retry round re-groups only what is still
+    missing, so a partial reply never wastes quota on already-filled pairs.
+    """
     semaphore = asyncio.Semaphore(max(1, concurrency))
 
-    async def _one(item: CuratedItem, code: str) -> bool:
+    def _chunks(langs: list[str]) -> list[list[str]]:
+        return [langs[i:i + chunk_size] for i in range(0, len(langs), chunk_size)]
+
+    async def _one(item: CuratedItem, codes: list[str]) -> int:
         async with semaphore:
             entry = {
                 "title": item.article.title,
@@ -263,37 +276,40 @@ async def fill_missing(
             }
             try:
                 reply = await provider.chat(
-                    build_translation_messages(entry, [code]),
-                    max_tokens=TRANSLATION_MAX_TOKENS,
+                    build_translation_messages(entry, codes),
+                    max_tokens=TRANSLATION_MAX_TOKENS + 500 * (len(codes) - 1),
                 )
-                item.translations.update(parse_translation_json(reply, [code]))
-                logger.info(
-                    "translated %r -> %s", item.article.title[:50], code,
-                )
-                return True
+                parsed = parse_translation_json(reply, codes)
+                fresh = [c for c in parsed if c not in item.translations]
+                item.translations.update(parsed)
+                for code in fresh:
+                    logger.info(
+                        "translated %r -> %s", item.article.title[:50], code,
+                    )
+                return len(fresh)
             except LLMError as error:
-                logger.warning("translation %s failed: %s", code, error)
+                logger.warning("translation %s failed: %s", "/".join(codes), error)
             except Exception as error:  # isolation boundary, never crash the batch
-                logger.warning("translation %s crashed: %r", code, error)
-            return False
+                logger.warning("translation %s crashed: %r", "/".join(codes), error)
+            return 0
 
-    pairs = [
-        (item, code) for item in items for code in targets
-        if code not in item.translations
-    ]
-    if not pairs:
-        return 0
+    def _pending() -> list[tuple[CuratedItem, list[str]]]:
+        return [
+            (item, codes)
+            for item in items
+            for codes in _chunks([c for c in targets if c not in item.translations])
+        ]
+
     ok = 0
-    pending = pairs
     for round_index in range(max(1, TRANSLATION_RETRY_ROUNDS + 1)):
+        pending = _pending()
         if not pending:
             break
         if round_index:
-            logger.info("retry round %d for %d pair(s)", round_index, len(pending))
+            logger.info("retry round %d for %d chunk(s)", round_index, len(pending))
             await asyncio.sleep(_TRANSLATION_RETRY_DELAY_SECONDS * round_index)
-        results = await asyncio.gather(*(_one(item, code) for item, code in pending))
-        ok += sum(1 for done in results if done)
-        pending = [pair for pair, done in zip(pending, results) if not done]
+        results = await asyncio.gather(*(_one(item, codes) for item, codes in pending))
+        ok += sum(results)
     return ok
 
 

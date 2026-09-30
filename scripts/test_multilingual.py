@@ -70,6 +70,16 @@ def single_reply(code: str) -> str:
     return json.dumps({code: blocks[code]}, ensure_ascii=True)
 
 
+def _combined_reply(codes: list[str]) -> str:
+    """Model-style reply carrying every requested language's block."""
+    if not codes:
+        return "{}"
+    combined: dict = {}
+    for code in codes:
+        combined.update(json.loads(single_reply(code)))
+    return json.dumps(combined, ensure_ascii=True)
+
+
 def canned_reply(langs=None, drop=None) -> str:
     """Multi-language reply used by the parse-level tests."""
     blocks = {
@@ -88,9 +98,10 @@ def canned_reply(langs=None, drop=None) -> str:
 class FakeProvider:
     """Stand-in provider: translate_batch only needs chat().
 
-    Detects the requested language from the user message ("Target languages:
-    Persian (Farsi) (fa).") and answers with that language's block; entries
-    in `missing` answer with an unusable empty object, `fail` raises.
+    Detects ALL requested languages from the user message ("Target languages:
+    Persian (Farsi) (fa), French (fr).") and answers with each requested
+    language's block in one combined JSON object; entries in `missing` are
+    left out of the reply, `fail` raises.
     """
 
     name = "fake"
@@ -105,17 +116,15 @@ class FakeProvider:
         if self.fail:
             raise LLMError("simulated outage")
         user = messages[1]["content"]
-        match = re.search(r"\(([a-z]{2})\)\.", user)
-        code = match.group(1) if match else ""
-        if code in self.missing:
-            return "{}"
-        return single_reply(code)
+        target_line = user.splitlines()[0]
+        codes = re.findall(r"\(([a-z]{2})\)", target_line)
+        return _combined_reply([c for c in codes if c not in self.missing])
 
 
 class FlakyProvider(FakeProvider):
-    """Fails each language's first attempt, then answers normally.
+    """Fails each chunk's first attempt, then answers normally.
 
-    Exercises the batch-level retry rounds: round 0 loses every pair,
+    Exercises the batch-level retry rounds: round 0 loses every chunk,
     the retry round must recover all of them.
     """
 
@@ -125,14 +134,14 @@ class FlakyProvider(FakeProvider):
 
     async def chat(self, messages, max_tokens=None):
         self.calls.append({"messages": messages, "max_tokens": max_tokens})
-        user = messages[1]["content"]
-        match = re.search(r"\(([a-z]{2})\)\.", user)
-        code = match.group(1) if match else ""
-        count = self.fail_counts.get(code, 0)
-        self.fail_counts[code] = count + 1
+        target_line = messages[1]["content"].splitlines()[0]
+        key = target_line
+        count = self.fail_counts.get(key, 0)
+        self.fail_counts[key] = count + 1
         if count < 1:
             raise LLMError("transient glitch")
-        return single_reply(code)
+        codes = re.findall(r"\(([a-z]{2})\)", target_line)
+        return _combined_reply(codes)
 
 
 def make_item(title, source, summary, take, score=42.0, topic="ai", coverage=2,
@@ -213,16 +222,24 @@ def test_build_translation_messages():
 
 
 def test_translate_batch_success():
-    items = build_items()
+    items = [
+        make_item("Story One", "HackerNews", "Summary one.", "Take one."),
+        make_item("Story Two", "Reddit", "Summary two.", "Take two."),
+    ]
     provider = FakeProvider()
     done = asyncio.run(translate_batch(provider, items, TARGETS))
-    assert done == 10  # 2 items x 5 languages, one small call each
+    assert done == 10  # 2 items x 5 languages, batched chunk_size per call
     for item in items:
         assert set(item.translations) == set(TARGETS)
         assert item.translations["fa"]["summary"] == FA_SUMMARY
-    assert len(provider.calls) == 10
-    assert provider.calls[0]["max_tokens"] == 3000  # translate_batch default
-    print("PASS translate_batch fills every language via per-pair calls")
+    # 5 targets chunk 4-per-call -> [fa,fr,de,es] + [zh] per item = 4 calls
+    assert len(provider.calls) == 4
+    assert provider.calls[0]["max_tokens"] == 3000 + 500 * 3  # scaled for chunk
+    assert provider.calls[1]["max_tokens"] == 3000  # single-language chunk
+    # already-translated pairs are never re-called (quota safety)
+    done2 = asyncio.run(translate_batch(provider, items, TARGETS))
+    assert done2 == 0 and len(provider.calls) == 4
+    print("PASS translate_batch fills every language via chunked calls")
 
 
 def test_translate_batch_isolation():
@@ -237,16 +254,15 @@ def test_translate_batch_isolation():
     assert done == 0 and fresh.translations == {}  # no crash, English retained
     print("PASS translate_batch isolates per-language gaps and full failures")
 
-
 def test_translate_batch_retries_failures():
     """Round 0 fails everywhere; the retry round must recover every pair."""
     item = make_item("Retry Story", "HackerNews", "Summary.", "Take.")
     provider = FlakyProvider()
     done = asyncio.run(translate_batch(provider, [item], TARGETS))
     assert done == 5 and set(item.translations) == set(TARGETS)
-    # each language took exactly two calls: one failed round + one success
-    assert len(provider.calls) == 10
-    print("PASS translate_batch retries failed pairs on a later round")
+    # each chunk took exactly two calls: one failed round + one success
+    assert len(provider.calls) == 4  # [fa,fr,de,es] + [zh], twice
+    print("PASS translate_batch retries failed chunks on a later round")
 
 
 def test_writer_multilingual_editions():
@@ -333,8 +349,9 @@ def test_writer_backward_compatible():
 
 def test_i18n_labels_and_unknown_language_fallback():
     _reset_scratch()
-    assert set(I18N) == {"en", "fa", "fr", "de", "es", "zh"}
+    assert set(I18N) == {"en", "fa", "fr", "de", "es", "zh", "hi", "ru", "ar"}
     assert I18N["fa"]["dir"] == "rtl" and I18N["fa"]["native_name"] == FA_NATIVE
+    assert I18N["ar"]["dir"] == "rtl" and I18N["hi"]["dir"] == "ltr"
     assert I18N["en"]["source"] == "Source"
     unknown = _labels("xx", I18N)  # falls back to the en block / defaults
     assert unknown["source"] == "Source" and unknown["dir"] == "ltr"
