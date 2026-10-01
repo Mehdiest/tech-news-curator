@@ -151,7 +151,7 @@ def test_i18n_yaml():
         "source", "topic", "coverage", "source_one", "source_many",
         "story_one", "story_many", "discuss", "summary_h", "take_h",
     }
-    assert set(i18n) == {"en", "fa", "fr", "de", "es", "zh"}
+    assert set(i18n) == {"en", "fa", "fr", "de", "es", "zh", "hi", "ru", "ar"}
     for code, block in i18n.items():
         assert required <= set(block), (code, required - set(block))
         # the removed debug-era labels must not come back
@@ -164,7 +164,7 @@ def test_i18n_yaml():
     sources = yaml.safe_load(
         (ROOT / "config" / "sources.yaml").read_text(encoding="utf-8")
     )
-    assert sources["languages"] == ["fa", "fr", "de", "es", "zh"]
+    assert sources["languages"] == ["fa", "fr", "de", "es", "zh", "hi", "ru", "ar"]
     assert sources["pipeline"]["translations"] is True
     # image policy: feed-provided pictures only; og:image scraping is opt-in;
     # Reddit-hosted images are dropped (Reddit is filtered in Iran)
@@ -174,7 +174,7 @@ def test_i18n_yaml():
     # ranks and the day publishes with no pictures at all
     assert pipeline["enrich_images"] is True
     assert "redd.it" in pipeline["image_blocklist"]
-    print("PASS i18n.yaml: six languages, complete label sets, RTL fa, config wiring")
+    print("PASS i18n.yaml: nine languages, complete label sets, RTL fa, config wiring")
 
 
 def test_llm_key_guardrails():

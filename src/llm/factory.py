@@ -5,14 +5,21 @@ import os
 from src.llm.base import LLMProvider
 from src.llm.glm_provider import GLMProvider
 
+# Every name here is an OpenAI-compatible /chat/completions endpoint served
+# by the same GLMProvider class. Aliases exist so LLM_PROVIDER can mirror
+# the gateway the user actually runs in front of a provider (e.g. the
+# 9Router local gateway) instead of crashing with 'unknown LLM_PROVIDER'.
 _PROVIDERS = {"glm": GLMProvider}
+_ALIASES = {"9router": "glm", "openai-compatible": "glm", "openai": "glm"}
 
 
 def make_provider() -> LLMProvider:
     """Build the provider named by LLM_PROVIDER using LLM_* env vars."""
-    name = os.getenv("LLM_PROVIDER", "glm").strip().lower()
+    raw = os.getenv("LLM_PROVIDER", "glm").strip().lower()
+    name = _ALIASES.get(raw, raw)
     if name not in _PROVIDERS:
-        raise ValueError(f"unknown LLM_PROVIDER '{name}'; known: {sorted(_PROVIDERS)}")
+        known = sorted(set(_PROVIDERS) | set(_ALIASES))
+        raise ValueError(f"unknown LLM_PROVIDER '{raw}'; known: {known}")
     return _PROVIDERS[name](
         api_key=os.getenv("LLM_API_KEY", ""),
         model=os.getenv("LLM_MODEL", "glm-5.3"),

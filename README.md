@@ -179,7 +179,7 @@ and stray prose are stripped).
 
 | Env var | Default | Meaning |
 |---------|---------|---------|
-| `LLM_PROVIDER` | `glm` | key into the provider registry (`src/llm/factory.py`) |
+| `LLM_PROVIDER` | `glm` | key into the provider registry (`src/llm/factory.py`); `9router`, `openai`, `openai-compatible` are accepted aliases for the same OpenAI-compatible client |
 | `LLM_API_KEY` | - | Bearer key; required |
 | `LLM_BASE_URL` | `https://api.b.ai/v1` (workflow: `https://openrouter.ai/api/v1`) | `/chat/completions` is appended |
 | `LLM_MODEL` | `glm-5.3` (workflow: `nvidia/nemotron-3-ultra-550b-a55b:free`) | model name |
@@ -190,6 +190,36 @@ and stray prose are stripped).
 
 Batch runs use bounded parallelism (3 concurrent) and one automatic retry
 with backoff on 429/5xx/timeouts; a failing article never stops the digest.
+
+### Running against a local router (9Router)
+
+The backfill can run on your own machine against a local OpenAI-compatible
+gateway such as [9Router](https://github.com/decolua/9router)
+(`http://localhost:20128/v1`). Put this in `.env` at the repo root:
+
+```env
+LLM_PROVIDER=9router
+LLM_API_KEY=<the 9Router API key generated in its dashboard>
+LLM_BASE_URL=http://localhost:20128/v1
+LLM_MODEL=<a model or combo name the router knows>
+```
+
+Then `python scripts/probe_llm.py` checks the whole chain before you burn
+quota on a backfill: it echoes the effective config, lists the models the
+key can see (`GET /models`), and fires one minimal chat call.
+
+Two different 401s come out of a local router, and the pipeline's error
+hints tell them apart:
+
+- `Invalid/Missing API key` - the router rejected YOUR key; fix `LLM_API_KEY`
+  (it must be the router's key, not the provider's).
+- `Missing Authentication header` - OpenRouter's own signature relayed
+  through the router: the request reached openrouter.ai with NO key, i.e.
+  the OpenRouter connection inside the router dashboard has no API key
+  attached. Fix it in the router's dashboard, not in this repo.
+
+Never commit `.env`; it is local-only. GitHub Actions workflows keep using
+the repo secrets (OpenRouter) and cannot reach `localhost`.
 
 ## Images (Stage 5b) - optional by design
 
