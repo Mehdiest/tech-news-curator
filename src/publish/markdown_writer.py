@@ -25,12 +25,12 @@ from src.models import CuratedItem, utc_now
 
 logger = logging.getLogger(__name__)
 
+
 # Built-in English labels: the baseline every i18n block overrides from.
 # Placeholders: __DATE__/__NAME__ in meta_description + meta_by,
 # __N__/__S__/__NWORD__/__SWORD__ in intro, __REPO__/__STAMP__ in generated.
 # __NWORD__/__SWORD__ resolve to the story_one/story_many and
-# source_one/source_many forms of the same language, so "1 story from
-# 1 source" and "8 stories from 5 sources" stay grammatical everywhere.
+# source_one/source_many forms of the same language.
 _EN_DEFAULTS = {
     "native_name": "English",
     "dir": "ltr",
@@ -63,25 +63,45 @@ _EN_DEFAULTS = {
 
 def load_i18n(path: Path | str) -> dict:
     """Read config/i18n.yaml (UTF-8); missing file means English everywhere."""
+
     path = Path(path)
+
     if not path.exists():
-        logger.warning("i18n file not found: %s - using English labels", path)
+        logger.warning(
+            "i18n file not found: %s - using English labels",
+            path,
+        )
         return {}
+
     with open(path, encoding="utf-8") as stream:
         return yaml.safe_load(stream) or {}
 
 
 def _labels(lang: str, i18n: dict | None) -> dict:
     """Merge label sources: built-in defaults <- i18n['en'] <- i18n[lang]."""
+
     merged = dict(_EN_DEFAULTS)
-    for block in ((i18n or {}).get("en"), (i18n or {}).get(lang)):
+
+    for block in (
+        (i18n or {}).get("en"),
+        (i18n or {}).get(lang),
+    ):
         if isinstance(block, dict):
-            merged.update({key: str(value) for key, value in block.items()})
+            merged.update(
+                {
+                    key: str(value)
+                    for key, value in block.items()
+                }
+            )
+
     return merged
 
 
 def _edition_filename(
-    day: date, lang: str, extension: str = "md", posts_dir=None,
+    day: date,
+    lang: str,
+    extension: str = "md",
+    posts_dir=None,
 ) -> str:
     """File name of one edition: en has no suffix, others get -<code>.
 
@@ -90,44 +110,113 @@ def _edition_filename(
     When posts_dir is given, the slug family that actually exists for the
     day wins, so backfill re-renders of legacy days keep every sibling
     and switcher link pointing at the real files. A language with no file
-    yet (hi/ru/ar on a legacy day) follows the day's English edition
-    family, so one day never mixes slug families. New days get -techtally.
+    yet follows the day's English edition family, so one day never mixes
+    slug families.
     """
+
     suffix = "" if lang == "en" else f"-{lang}"
+
     if posts_dir is not None:
         posts_path = Path(posts_dir)
+
         for base in ("techtally", "tech-digest"):
-            if (posts_path / f"{day.isoformat()}-{base}{suffix}.md").exists():
-                return f"{day.isoformat()}-{base}{suffix}.{extension}"
-        # Brand-new sibling language on an existing day (e.g. hi/ru/ar on a
-        # legacy-slug day): no -<lang> file exists yet, so fall back to the
-        # slug family the day's English edition already uses. Keeps every
-        # edition of one day in ONE family instead of mixing
-        # -tech-digest-fa with -techtally-hi in the same switcher.
+            if (
+                posts_path
+                / f"{day.isoformat()}-{base}{suffix}.md"
+            ).exists():
+                return (
+                    f"{day.isoformat()}-{base}"
+                    f"{suffix}.{extension}"
+                )
+
         if lang != "en":
             for base in ("techtally", "tech-digest"):
-                if (posts_path / f"{day.isoformat()}-{base}.md").exists():
-                    return f"{day.isoformat()}-{base}{suffix}.{extension}"
+                if (
+                    posts_path
+                    / f"{day.isoformat()}-{base}.md"
+                ).exists():
+                    return (
+                        f"{day.isoformat()}-{base}"
+                        f"{suffix}.{extension}"
+                    )
+
     return f"{day.isoformat()}-techtally{suffix}.{extension}"
 
 
-def existing_editions(posts_dir: Path | str, day: date | None = None) -> list[Path]:
-    """Digest files already on disk for the given day, across all editions.
+def existing_editions(
+    posts_dir: Path | str,
+    day: date | None = None,
+) -> list[Path]:
+    """Digest files already on disk for the given day, across all editions."""
 
-    Lets the publish stage keep a day idempotent: a re-run (schedule +
-    manual dispatch) sees the files and skips instead of overwriting the
-    day's content with freshly sampled LLM output.
-    """
     day = day or utc_now().date()
     posts_path = Path(posts_dir)
+
     if not posts_path.is_dir():
         return []
-    # Both slug families count: legacy -tech-digest days stay idempotent
-    # across the TechTally rebrand, new days use -techtally.
+
     return sorted(
-        set(posts_path.glob(f"{day.isoformat()}-techtally*.md"))
-        | set(posts_path.glob(f"{day.isoformat()}-tech-digest*.md"))
+        set(
+            posts_path.glob(
+                f"{day.isoformat()}-techtally*.md"
+            )
+        )
+        | set(
+            posts_path.glob(
+                f"{day.isoformat()}-tech-digest*.md"
+            )
+        )
     )
+
+
+def _has_complete_translation(
+    item: CuratedItem,
+    language: str,
+) -> bool:
+    """Return whether an item has all required translated fields."""
+
+    translation = (
+        item.translations or {}
+    ).get(language)
+
+    if not isinstance(translation, dict):
+        return False
+
+    return all(
+        isinstance(translation.get(field), str)
+        and translation[field].strip()
+        for field in (
+            "title",
+            "summary",
+            "take",
+        )
+    )
+
+
+def _published_languages(
+    items: list[CuratedItem],
+    languages: list[str],
+) -> list[str]:
+    """Return languages with complete translations for every item."""
+
+    published: list[str] = []
+
+    for language in dict.fromkeys(languages):
+        language = str(language).strip().lower()
+
+        if not language or language == "en":
+            continue
+
+        if all(
+            _has_complete_translation(
+                item,
+                language,
+            )
+            for item in items
+        ):
+            published.append(language)
+
+    return published
 
 
 def write_digest(
@@ -138,45 +227,140 @@ def write_digest(
     languages: list[str] | None = None,
     i18n: dict | None = None,
 ) -> Path:
-    """Write the English edition plus every translated sibling.
+    """Write the English edition plus every fully translated sibling.
 
-    Returns the canonical English file path; translated files sit next to it.
+    A translated edition is written only when every selected article has
+    complete values for title, summary, and take in that language. This
+    prevents partially translated pages from silently falling back to
+    English content.
     """
+
     if not items:
         raise ValueError("no curated items to publish")
+
     day = day or utc_now().date()
     posts_path = Path(posts_dir)
-    posts_path.mkdir(parents=True, exist_ok=True)
+    posts_path.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
     extra_languages = [
-        code for code in dict.fromkeys(languages or []) if code and code != "en"
+        str(code).strip().lower()
+        for code in dict.fromkeys(languages or [])
+        if str(code).strip()
+        and str(code).strip().lower() != "en"
     ]
+
     i18n = i18n or {}
 
-    canonical = posts_path / _edition_filename(day, "en", posts_dir=posts_path)
+    # Only fully translated languages are published.
+    published_languages = _published_languages(
+        items,
+        extra_languages,
+    )
+
+    skipped_languages = [
+        language
+        for language in extra_languages
+        if language not in published_languages
+    ]
+
+    canonical = (
+        posts_path
+        / _edition_filename(
+            day,
+            "en",
+            posts_dir=posts_path,
+        )
+    )
+
     canonical.write_text(
         _render(
-            items, day, author, "en", i18n, extra_languages, posts_path.name,
+            items,
+            day,
+            author,
+            "en",
+            i18n,
+            published_languages,
+            posts_path.name,
             posts_dir=posts_path,
         ),
         encoding="utf-8",
     )
-    logger.info("digest written: %s (%d items)", canonical, len(items))
-    for lang in extra_languages:
-        path = posts_path / _edition_filename(day, lang, posts_dir=posts_path)
+
+    logger.info(
+        "digest written: %s (%d items)",
+        canonical,
+        len(items),
+    )
+
+    for language in skipped_languages:
+        translated_count = sum(
+            _has_complete_translation(
+                item,
+                language,
+            )
+            for item in items
+        )
+
+        logger.warning(
+            "translated digest skipped for %s: "
+            "incomplete translation (%d/%d items)",
+            language,
+            translated_count,
+            len(items),
+        )
+
+    for language in published_languages:
+        path = (
+            posts_path
+            / _edition_filename(
+                day,
+                language,
+                posts_dir=posts_path,
+            )
+        )
+
         path.write_text(
             _render(
-                items, day, author, lang, i18n, extra_languages, posts_path.name,
+                items,
+                day,
+                author,
+                language,
+                i18n,
+                published_languages,
+                posts_path.name,
                 posts_dir=posts_path,
             ),
             encoding="utf-8",
         )
-        logger.info("translated digest written: %s", path)
-    if extra_languages:
+
         logger.info(
-            "editions: %d languages (%s)",
-            1 + len(extra_languages),
-            ", ".join(["en"] + extra_languages),
+            "translated digest written: %s",
+            path,
         )
+
+    if published_languages:
+        logger.info(
+            "editions: %d languages (%s); skipped=%s",
+            1 + len(published_languages),
+            ", ".join(
+                ["en"] + published_languages
+            ),
+            ", ".join(
+                skipped_languages
+            ) or "none",
+        )
+    else:
+        logger.info(
+            "editions: English only; "
+            "skipped=%s",
+            ", ".join(
+                skipped_languages
+            ) or "none",
+        )
+
     return canonical
 
 
@@ -192,14 +376,55 @@ def _render(
     with_front_matter: bool = True,
 ) -> str:
     """Full document for one language: front-matter, header, items, footer."""
-    t = _labels(lang, i18n)
-    sources = sorted({item.article.source for item in items})
-    header = _header(
-        items, day, sources, author, lang, t, i18n, languages, dir_name,
-        with_front_matter, posts_dir=posts_dir,
+
+    t = _labels(
+        lang,
+        i18n,
     )
-    blocks = [_item_block(index, item, lang, t) for index, item in enumerate(items, 1)]
-    return header + ("\n---\n\n".join(blocks)) + "\n" + _footer(author, t)
+
+    sources = sorted(
+        {
+            item.article.source
+            for item in items
+        }
+    )
+
+    header = _header(
+        items,
+        day,
+        sources,
+        author,
+        lang,
+        t,
+        i18n,
+        languages,
+        dir_name,
+        with_front_matter,
+        posts_dir=posts_dir,
+    )
+
+    blocks = [
+        _item_block(
+            index,
+            item,
+            lang,
+            t,
+        )
+        for index, item in enumerate(
+            items,
+            1,
+        )
+    ]
+
+    return (
+        header
+        + "\n---\n\n".join(blocks)
+        + "\n"
+        + _footer(
+            author,
+            t,
+        )
+    )
 
 
 def _header(
@@ -215,35 +440,98 @@ def _header(
     with_front_matter: bool = True,
     posts_dir: Path | str | None = None,
 ) -> str:
-    """YAML front-matter (SEO fields + cover + lang) plus H1, byline, switcher.
+    """YAML front-matter plus H1, byline, and language switcher."""
 
-    with_front_matter=False renders the body only (H1, intro, byline,
-    switcher) - used by the home-page include, which is plain HTML and
-    must not carry YAML front-matter.
-    """
-    name = (author or {}).get("name") or ""
-    linkedin = (author or {}).get("linkedin") or ""
-    title = f"TechTally - {day.isoformat()}" + (f" | {name}" if name else "")
-    # Localized meta description (SEO): each i18n block carries its own
-    # wording, so the fa/de/es/zh pages no longer ship an English snippet.
+    name = (
+        (author or {}).get("name")
+        or ""
+    )
+
+    linkedin = (
+        (author or {}).get("linkedin")
+        or ""
+    )
+
+    title = (
+        f"TechTally - {day.isoformat()}"
+        + (
+            f" | {name}"
+            if name
+            else ""
+        )
+    )
+
     description = (
         t["meta_description"]
-        .replace("__DATE__", day.isoformat())
-        + (t["meta_by"].replace("__NAME__", name) if name else ".")
+        .replace(
+            "__DATE__",
+            day.isoformat(),
+        )
+        + (
+            t["meta_by"].replace(
+                "__NAME__",
+                name,
+            )
+            if name
+            else "."
+        )
     )
-    author_line = f'author: "{name}"\n' if name else ""
-    cover = next((item.article.image_url for item in items if item.article.image_url), None)
-    cover_line = f'cover: "{cover}"\n' if cover else ""
-    sword = t["source_one"] if len(sources) == 1 else t["source_many"]
-    nword = t["story_one"] if len(items) == 1 else t["story_many"]
+
+    author_line = (
+        f'author: "{name}"\n'
+        if name
+        else ""
+    )
+
+    cover = next(
+        (
+            item.article.image_url
+            for item in items
+            if item.article.image_url
+        ),
+        None,
+    )
+
+    cover_line = (
+        f'cover: "{cover}"\n'
+        if cover
+        else ""
+    )
+
+    sword = (
+        t["source_one"]
+        if len(sources) == 1
+        else t["source_many"]
+    )
+
+    nword = (
+        t["story_one"]
+        if len(items) == 1
+        else t["story_many"]
+    )
+
     intro = (
         t["intro"]
-        .replace("__N__", str(len(items)))
-        .replace("__S__", str(len(sources)))
-        .replace("__SWORD__", sword)
-        .replace("__NWORD__", nword)
+        .replace(
+            "__N__",
+            str(len(items)),
+        )
+        .replace(
+            "__S__",
+            str(len(sources)),
+        )
+        .replace(
+            "__SWORD__",
+            sword,
+        )
+        .replace(
+            "__NWORD__",
+            nword,
+        )
     )
+
     front_matter = ""
+
     if with_front_matter:
         front_matter = (
             "---\n"
@@ -261,192 +549,439 @@ def _header(
             "generator: techtally\n"
             "---\n\n"
         )
+
     return (
         front_matter
         + f"# TechTally - {day.isoformat()}\n\n"
-        f"_{intro}_\n\n"
-        + _byline(name, linkedin, t)
-        + _switcher(day, lang, languages, i18n, posts_dir)
+        + f"_{intro}_\n\n"
+        + _byline(
+            name,
+            linkedin,
+            t,
+        )
+        + _switcher(
+            day,
+            lang,
+            languages,
+            i18n,
+            posts_dir,
+        )
     )
 
 
 def _translations_front_matter(
-    day: date, lang: str, languages: list[str], i18n: dict, dir_name: str,
+    day: date,
+    lang: str,
+    languages: list[str],
+    i18n: dict,
+    dir_name: str,
     posts_dir: Path | str | None = None,
 ) -> str:
-    """On the English edition only: sibling files for the Jekyll index page."""
+    """On the English edition only: published sibling files."""
+
     if lang != "en" or not languages:
         return ""
+
     lines = ["translations:"]
+
     for code in languages:
-        native = _labels(code, i18n)["native_name"]
-        file_url = f"{dir_name}/{_edition_filename(day, code, 'html', posts_dir)}"
-        lines.append(f'  - {{code: {code}, name: "{native}", file: "{file_url}"}}')
+        native = _labels(
+            code,
+            i18n,
+        )["native_name"]
+
+        file_url = (
+            f"{dir_name}/"
+            f"{_edition_filename(day, code, 'html', posts_dir)}"
+        )
+
+        lines.append(
+            f'  - {{code: {code}, name: "{native}", '
+            f'file: "{file_url}"}}'
+        )
+
     return "\n".join(lines) + "\n"
 
 
 def _switcher(
-    day: date, lang: str, languages: list[str], i18n: dict,
+    day: date,
+    lang: str,
+    languages: list[str],
+    i18n: dict,
     posts_dir: Path | str | None = None,
 ) -> str:
-    """'Read this digest in: ...' cross-links between the editions of one day.
+    """Cross-link only between editions that were actually published."""
 
-    Links are emitted as raw inline HTML (kramdown and python-markdown both
-    pass <a> tags through untouched) so each one carries the .lang-pill class
-    the stylesheet turns into a rounded chip. Older pre-pill posts simply
-    keep their plain markdown switcher - no migration needed.
-    """
-    codes = ["en"] + [code for code in languages if code != "en"]
+    codes = [
+        "en",
+        *[
+            code
+            for code in languages
+            if code != "en"
+        ],
+    ]
+
     links = []
+
     for code in codes:
         if code == lang:
             continue
-        native = _labels(code, i18n)["native_name"]
+
+        native = _labels(
+            code,
+            i18n,
+        )["native_name"]
+
         links.append(
-            f'<a class="lang-pill" href="{_edition_filename(day, code, "html", posts_dir)}">{native}</a>'
+            f'<a class="lang-pill" '
+            f'href="{_edition_filename(day, code, "html", posts_dir)}">'
+            f"{native}</a>"
         )
+
     if not links:
         return ""
-    read_in = _labels(lang, i18n)["read_in"]
-    return f"**{read_in}:** " + " ".join(links) + "\n\n"
+
+    read_in = _labels(
+        lang,
+        i18n,
+    )["read_in"]
+
+    return (
+        f"**{read_in}:** "
+        + " ".join(links)
+        + "\n\n"
+    )
 
 
-def _byline(name: str, linkedin: str, t: dict) -> str:
-    """Visible curator line near the top of the page (strong SEO placement)."""
+def _byline(
+    name: str,
+    linkedin: str,
+    t: dict,
+) -> str:
+    """Visible curator line near the top of the page."""
+
     if not name:
         return ""
+
     if linkedin:
-        return f"_{t['curated_by']} [{name}]({linkedin})_\n\n"
-    return f"_{t['curated_by']} {name}_\n\n"
+        return (
+            f"_{t['curated_by']} "
+            f"[{name}]({linkedin})_\n\n"
+        )
+
+    return (
+        f"_{t['curated_by']} "
+        f"{name}_\n\n"
+    )
 
 
-def _item_block(index: int, item: CuratedItem, lang: str, t: dict) -> str:
-    """One numbered story: linked title, lead image, meta line, summary, take."""
+def _item_block(
+    index: int,
+    item: CuratedItem,
+    lang: str,
+    t: dict,
+) -> str:
+    """Render one numbered story."""
+
     article = item.article
-    translation = (item.translations or {}).get(lang) or {}
-    title = translation.get("title") or article.title
-    summary = translation.get("summary") or item.llm_summary
-    take = translation.get("take") or item.personal_take
-    topic = article.meta.get("category", "general")
-    coverage = article.meta.get("coverage", 1)
-    coverage_word = t["source_one"] if coverage == 1 else t["source_many"]
-    # Reader-friendly escape hatch for login-walled story URLs (tweets, etc.)
-    # and a general link to the community thread; hidden when it duplicates
-    # the story URL itself. The raw rank score stays out of the page: a bare
-    # number like 43.2 means nothing to visitors (it remains in --preview).
-    discussion = str(article.meta.get("discussion_url") or "")
+
+    if lang == "en":
+        title = article.title
+        summary = item.llm_summary
+        take = item.personal_take
+    else:
+        # write_digest() guarantees that a published language has a
+        # complete translation for every item. Keep this guard here as
+        # defense-in-depth in case _render() is called directly.
+        if not _has_complete_translation(
+            item,
+            lang,
+        ):
+            raise ValueError(
+                f"incomplete {lang} translation "
+                f"for article {index}"
+            )
+
+        translation = (
+            item.translations or {}
+        ).get(lang)
+
+        title = translation["title"]
+        summary = translation["summary"]
+        take = translation["take"]
+
+    topic = article.meta.get(
+        "category",
+        "general",
+    )
+
+    coverage = article.meta.get(
+        "coverage",
+        1,
+    )
+
+    coverage_word = (
+        t["source_one"]
+        if coverage == 1
+        else t["source_many"]
+    )
+
+    # Reader-friendly escape hatch for login-walled story URLs and a
+    # general link to the community thread.
+    discussion = str(
+        article.meta.get(
+            "discussion_url"
+        )
+        or ""
+    )
+
     discuss_link = ""
-    if discussion and discussion.rstrip("/") != article.url.rstrip("/"):
-        discuss_link = f"  |  [{t['discuss']}]({discussion})"
+
+    if (
+        discussion
+        and discussion.rstrip("/")
+        != article.url.rstrip("/")
+    ):
+        discuss_link = (
+            f"  |  "
+            f"[{t['discuss']}]"
+            f"({discussion})"
+        )
+
     parts = [
-        f"## {index}. [{title}]({article.url})\n\n",
-        _image_markdown(article, title),
-        f"**{t['source']}:** {article.source}  |  **{t['topic']}:** {topic}  |  "
-        f"**{t['coverage']}:** {coverage} {coverage_word}"
-        f"{discuss_link}\n\n"
-        f"**{t['summary_h']}**\n\n"
-        f"{summary}\n\n"
-        f"**{t['take_h']}**\n\n"
+        (
+            f"## {index}. "
+            f"[{title}]({article.url})\n\n"
+        ),
+        _image_markdown(
+            article,
+            title,
+        ),
+        (
+            f"**{t['source']}:** "
+            f"{article.source}  |  "
+            f"**{t['topic']}:** "
+            f"{topic}  |  "
+            f"**{t['coverage']}:** "
+            f"{coverage} {coverage_word}"
+            f"{discuss_link}\n\n"
+        ),
+        f"**{t['summary_h']}**\n\n",
+        f"{summary}\n\n",
+        f"**{t['take_h']}**\n\n",
         f"{_blockquote(take)}\n",
     ]
+
     return "".join(parts)
 
 
-def _image_markdown(article, alt_title: str | None = None) -> str:
-    """Markdown image for the story lead, or an empty string when it has none."""
+def _image_markdown(
+    article,
+    alt_title: str | None = None,
+) -> str:
+    """Markdown image for the story lead."""
+
     url = article.image_url
+
     if not url:
         return ""
-    alt = _safe_alt(alt_title or article.title)
-    destination = _safe_destination(url)
-    return f"![{alt}]({destination})\n\n"
+
+    alt = _safe_alt(
+        alt_title or article.title
+    )
+
+    destination = _safe_destination(
+        url
+    )
+
+    return (
+        f"![{alt}]({destination})\n\n"
+    )
 
 
-def _safe_alt(title: str) -> str:
-    """Keep the title from breaking the ![alt] brackets."""
-    return title.replace("[", "(").replace("]", ")").replace('"', "'")
+def _safe_alt(
+    title: str,
+) -> str:
+    """Keep the title from breaking the image alt-text brackets."""
+
+    return (
+        title
+        .replace("[", "(")
+        .replace("]", ")")
+        .replace('"', "'")
+    )
 
 
-def _safe_destination(url: str) -> str:
-    """Escape spaces and parenthesized paths so the markdown link never breaks."""
-    url = url.replace(" ", "%20")
+def _safe_destination(
+    url: str,
+) -> str:
+    """Escape spaces and parenthesized paths in Markdown URLs."""
+
+    url = url.replace(
+        " ",
+        "%20",
+    )
+
     if "(" in url or ")" in url:
         url = f"<{url}>"
+
     return url
 
 
-def _blockquote(text: str) -> str:
-    """Render the take as a markdown blockquote so it visually pops."""
-    return "\n".join(f"> {line}".rstrip() for line in text.splitlines())
+def _blockquote(
+    text: str,
+) -> str:
+    """Render the take as a Markdown blockquote."""
+
+    return "\n".join(
+        f"> {line}".rstrip()
+        for line in text.splitlines()
+    )
 
 
-def _footer(author: dict | None, t: dict) -> str:
-    """Generation stamp plus curator attribution with profile links."""
+def _footer(
+    author: dict | None,
+    t: dict,
+) -> str:
+    """Generation stamp plus curator attribution."""
+
     author = author or {}
-    stamp = utc_now().strftime("%Y-%m-%d %H:%M UTC")
-    repo = author.get("repository") or ""
-    repo_link = f"[TechTally]({repo})" if repo else "[TechTally]"
-    generated = t["generated"].replace("__REPO__", repo_link).replace("__STAMP__", stamp)
-    lines = [f"*{generated}*"]
+
+    stamp = utc_now().strftime(
+        "%Y-%m-%d %H:%M UTC"
+    )
+
+    repo = author.get(
+        "repository"
+    ) or ""
+
+    repo_link = (
+        f"[TechTally]({repo})"
+        if repo
+        else "[TechTally]"
+    )
+
+    generated = (
+        t["generated"]
+        .replace(
+            "__REPO__",
+            repo_link,
+        )
+        .replace(
+            "__STAMP__",
+            stamp,
+        )
+    )
+
+    lines = [
+        f"*{generated}*"
+    ]
+
     name = author.get("name")
+
     if name:
         profile_links = " | ".join(
             f"[{label}]({author[key]})"
-            for label, key in (("LinkedIn", "linkedin"), ("GitHub", "github"))
+            for label, key in (
+                ("LinkedIn", "linkedin"),
+                ("GitHub", "github"),
+            )
             if author.get(key)
         )
-        attribution = f"**{name}**" + (f" | {profile_links}" if profile_links else "")
-        lines.append(f"{t['footer_by']} {attribution}")
-    return "---\n\n" + "\n\n".join(lines) + "\n"
+
+        attribution = (
+            f"**{name}**"
+            + (
+                f" | {profile_links}"
+                if profile_links
+                else ""
+            )
+        )
+
+        lines.append(
+            f"{t['footer_by']} "
+            f"{attribution}"
+        )
+
+    return (
+        "---\n\n"
+        + "\n\n".join(lines)
+        + "\n"
+    )
 
 
 # --- Home-page include (stage 5c) -------------------------------------------
-#
-# The home page shows the newest English edition INLINE (visitors read the
-# day's digest the moment they land, instead of clicking a link first).
-# Jekyll cannot reliably render one page's markdown inside another page, so
+
+# The home page shows the newest English edition INLINE.
+# Jekyll cannot reliably render one page's Markdown inside another page, so
 # the pipeline converts the edition itself and drops it into
-# _includes/latest_digest.html (+ _data/latest_digest.yml, the shown day).
-# Relative links inside the include are rewritten to baseurl-absolute so
-# they work from the home URL, not just from /posts/.
+# _includes/latest_digest.html (+ _data/latest_digest.yml).
 
-_HREF_RE = re.compile(r'href="(?!https?://|#|/|data:|mailto:)([^"]+)"')
+_HREF_RE = re.compile(
+    r'href="(?!https?://|#|/|data:|mailto:)([^"]+)"'
+)
 
 
-def read_baseurl(config_yml: Path | str, repository: str = "") -> str:
-    """Best-effort site baseurl for the include's baseurl-absolute links.
+def read_baseurl(
+    config_yml: Path | str,
+    repository: str = "",
+) -> str:
+    """Best-effort site baseurl for the homepage include."""
 
-    Order: an explicit baseurl in Jekyll's config wins. Otherwise it is
-    derived from the repository URL: GitHub Pages project sites serve
-    under /<repo>/ (the Pages build injects that baseurl even when the
-    config omits it), while a user site (<user>.github.io) serves from
-    the root.
-    """
     try:
-        with open(config_yml, encoding="utf-8") as stream:
-            data = yaml.safe_load(stream) or {}
-        explicit = str(data.get("baseurl") or "").rstrip("/")
+        with open(
+            config_yml,
+            encoding="utf-8",
+        ) as stream:
+            data = yaml.safe_load(
+                stream
+            ) or {}
+
+        explicit = str(
+            data.get("baseurl")
+            or ""
+        ).rstrip("/")
+
         if explicit:
             return explicit
+
     except OSError:
         pass
-    match = re.search(r"github\.com/[^/]+/([^/?#]+)/?$", (repository or "").rstrip("/"))
+
+    match = re.search(
+        r"github\.com/[^/]+/([^/?#]+)/?$",
+        (repository or "").rstrip("/"),
+    )
+
     if match:
         name = match.group(1)
-        return "" if name.endswith(".github.io") else f"/{name}"
+
+        return (
+            ""
+            if name.endswith(".github.io")
+            else f"/{name}"
+        )
+
     return ""
 
 
-def _markdown_to_html(text: str) -> str | None:
-    """Markdown -> HTML via python-markdown; None when the package is absent."""
+def _markdown_to_html(
+    text: str,
+) -> str | None:
+    """Convert Markdown to HTML when python-markdown is available."""
+
     try:
         import markdown
     except ImportError:
         logger.warning(
-            "package 'markdown' not installed - latest-digest include skipped"
+            "package 'markdown' not installed - "
+            "latest-digest include skipped"
         )
         return None
-    return markdown.markdown(text)
+
+    return markdown.markdown(
+        text
+    )
 
 
 def write_latest_include(
@@ -461,43 +996,98 @@ def write_latest_include(
     data_dir: Path | str,
     posts_dir: Path | str | None = None,
 ) -> Path | None:
-    """Write _includes/latest_digest.html + _data/latest_digest.yml.
+    """Write _includes/latest_digest.html + _data/latest_digest.yml."""
 
-    The include is the English edition rendered as standalone HTML; the
-    data file records which day it shows so the home template can keep
-    that one edition out of the archive list. Returns the include path,
-    or None when the optional 'markdown' package is missing.
-    """
-    body = _render(
-        items, day, author, "en", i18n, languages, dir_name,
-        posts_dir=posts_dir, with_front_matter=False,
+    # The homepage include is English only, but the switcher must still
+    # reference only translated editions that actually exist.
+    published_languages = _published_languages(
+        items,
+        languages,
     )
-    html = _markdown_to_html(body)
+
+    body = _render(
+        items,
+        day,
+        author,
+        "en",
+        i18n,
+        published_languages,
+        dir_name,
+        posts_dir=posts_dir,
+        with_front_matter=False,
+    )
+
+    html = _markdown_to_html(
+        body
+    )
+
     if html is None:
         return None
-    prefix = (baseurl or "").rstrip("/") + f"/{dir_name.strip('/')}/"
-    html = _HREF_RE.sub(lambda match: f'href="{prefix}{match.group(1)}"', html)
+
+    prefix = (
+        (baseurl or "").rstrip("/")
+        + f"/{dir_name.strip('/')}/"
+    )
+
+    html = _HREF_RE.sub(
+        lambda match: (
+            f'href="{prefix}'
+            f'{match.group(1)}"'
+        ),
+        html,
+    )
+
     # Offscreen publisher images must not block the homepage render.
-    html = html.replace("<img ", '<img loading="lazy" decoding="async" ')
-    stamp = utc_now().strftime("%Y-%m-%d %H:%M UTC")
-    include_path = Path(include_dir) / "latest_digest.html"
-    include_path.parent.mkdir(parents=True, exist_ok=True)
+    html = html.replace(
+        "<img ",
+        '<img loading="lazy" decoding="async" ',
+    )
+
+    stamp = utc_now().strftime(
+        "%Y-%m-%d %H:%M UTC"
+    )
+
+    include_path = (
+        Path(include_dir)
+        / "latest_digest.html"
+    )
+
+    include_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
     include_path.write_text(
-        '<article class="digest" lang="en" dir="ltr">\n'
-        f"<!-- generated by techtally on {stamp}; "
-        "regenerated on every publish -->\n"
+        '<article class="digest" '
+        'lang="en" dir="ltr">\n'
+        f"<!-- generated by techtally on "
+        f"{stamp}; regenerated on every publish -->\n"
         f"{html}\n"
         "</article>\n",
         encoding="utf-8",
     )
-    data_path = Path(data_dir) / "latest_digest.yml"
-    data_path.parent.mkdir(parents=True, exist_ok=True)
+
+    data_path = (
+        Path(data_dir)
+        / "latest_digest.yml"
+    )
+
+    data_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
     data_path.write_text(
         f'date: "{day.isoformat()}"\n'
-        f'file: "{dir_name.strip("/")}/{_edition_filename(day, "en", "html", posts_dir)}"\n',
+        f'file: "{dir_name.strip("/")}/'
+        f'{_edition_filename(day, "en", "html", posts_dir)}"\n',
         encoding="utf-8",
     )
+
     logger.info(
-        "latest-digest include written: %s (+ %s)", include_path, data_path,
+        "latest-digest include written: %s (+ %s)",
+        include_path,
+        data_path,
     )
+
     return include_path

@@ -1,55 +1,25 @@
-"""Google Gemini provider using the Gemini REST generateContent API."""
+"""Google Gemini provider using the generateContent REST API."""
 
 from __future__ import annotations
 
 import asyncio
 import json
 import logging
-import re
 
 import aiohttp
 
 from src.llm.base import LLMError, Summary, parse_summary_json
 from src.llm.prompts import build_messages
+from src.models import Article
 
 logger = logging.getLogger(__name__)
 
-_RETRY_STATUS = {408, 429, 500, 502, 503, 504}
+_RETRY_STATUS = {408, 500, 502, 503, 504}
 _RETRY_DELAY_SECONDS = 2.0
-
-_ASSIGNMENT_PREFIX = re.compile(
-    r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*="
-)
-
-
-def _validate_api_key(api_key: str) -> str:
-    """Validate and clean a manually supplied Gemini API key."""
-    key = api_key.strip().strip('"').strip("'")
-
-    if not key:
-        raise ValueError("api_key is empty - set GEMINI_API_KEY")
-
-    if key.lower().startswith("bearer "):
-        raise ValueError(
-            "api_key has a 'Bearer ' prefix - paste ONLY the raw key value"
-        )
-
-    if "GEMINI_API_KEY" in key or _ASSIGNMENT_PREFIX.match(key):
-        raise ValueError(
-            "api_key is malformed - paste ONLY the raw Gemini API key"
-        )
-
-    if any(ch.isspace() for ch in key):
-        raise ValueError(
-            "api_key contains internal whitespace - paste the raw key "
-            "as one contiguous string"
-        )
-
-    return key
 
 
 class GeminiProvider:
-    """Call Google's Gemini generateContent API."""
+    """Call Google's Gemini generateContent endpoint."""
 
     name = "gemini"
 
@@ -57,39 +27,58 @@ class GeminiProvider:
         self,
         api_key: str,
         model: str = "gemini-3.8-flash",
-        base_url: str = "https://generativelanguage.googleapis.com/v1beta",
+        base_url: str = (
+            "https://generativelanguage.googleapis.com/v1beta"
+        ),
         temperature: float = 0.7,
-        max_tokens: int = 700,
+        max_tokens: int = 12000,
         timeout: int = 60,
         language: str = "en",
-        max_attempts: int = 2,
+        max_attempts: int = 1,
     ):
-        self.api_key = _validate_api_key(api_key)
+        self.api_key = api_key.strip()
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.timeout = timeout
+
+        # Keep the language attribute for compatibility with the provider
+        # interface used by the existing pipeline.
         self.language = language
+
+        # Quota failures must not be retried. One daily batch request should
+        # remain one request even when the free-tier quota is exhausted.
         self.max_attempts = max(1, max_attempts)
 
-    async def summarize(self, article) -> Summary:
+        if not self.api_key:
+            raise ValueError(
+                "api_key is empty - set GEMINI_API_KEY"
+            )
+
+    async def summarize(
+        self,
+        article: Article,
+    ) -> Summary:
         """Generate one structured digest summary for an article."""
-        reply_text = await self.chat(
-            build_messages(article, self.language)
+
+        reply = await self.chat(
+            build_messages(
+                article,
+                self.language,
+            )
         )
-        summary = parse_summary_json(reply_text)
-        logger.debug("gemini ok: %s", article.title[:60])
-        return summary
+
+        return parse_summary_json(reply)
 
     async def chat(
         self,
         messages: list[dict],
         max_tokens: int | None = None,
     ) -> str:
-        """Generate structured text from Gemini."""
-        contents = []
+        """Generate structured JSON text from Gemini."""
 
+        contents: list[dict] = []
         system_instruction = None
 
         for message in messages:
@@ -98,53 +87,73 @@ class GeminiProvider:
 
             if role == "system":
                 system_instruction = {
-                    "parts": [{"text": content}]
+                    "parts": [
+                        {"text": content},
+                    ],
                 }
                 continue
 
-            gemini_role = "model" if role == "assistant" else "user"
-
             contents.append(
                 {
-                    "role": gemini_role,
-                    "parts": [{"text": content}],
+                    "role": (
+                        "model"
+                        if role == "assistant"
+                        else "user"
+                    ),
+                    "parts": [
+                        {"text": content},
+                    ],
                 }
             )
 
         payload = {
             "contents": contents,
             "generationConfig": {
+                "temperature": self.temperature,
                 "responseMimeType": "application/json",
-                "maxOutputTokens": max_tokens or self.max_tokens,
+                "maxOutputTokens": (
+                    max_tokens
+                    if max_tokens is not None
+                    else self.max_tokens
+                ),
             },
         }
 
         if system_instruction:
             payload["systemInstruction"] = system_instruction
 
-        return await self._generate_with_retry(payload)
-
-    async def _generate_with_retry(self, payload: dict) -> str:
-        """Retry transient Gemini failures with short backoff."""
         for attempt in range(1, self.max_attempts + 1):
             try:
-                return await self._post_once(payload)
+                return await self._post(payload)
+
             except LLMError as error:
-                if attempt == self.max_attempts or not error.transient:
+                if (
+                    attempt >= self.max_attempts
+                    or not error.transient
+                ):
                     raise
 
                 logger.warning(
-                    "gemini transient error (%d/%d): %s",
+                    "Gemini transient error (%d/%d): %s",
                     attempt,
                     self.max_attempts,
                     error,
                 )
-                await asyncio.sleep(_RETRY_DELAY_SECONDS * attempt)
 
-        raise LLMError("unreachable retry state")
+                await asyncio.sleep(
+                    _RETRY_DELAY_SECONDS * attempt
+                )
 
-    async def _post_once(self, payload: dict) -> str:
-        """Perform one Gemini generateContent request."""
+        raise LLMError(
+            "unreachable Gemini retry state"
+        )
+
+    async def _post(
+        self,
+        payload: dict,
+    ) -> str:
+        """Send one generateContent request and extract generated text."""
+
         url = (
             f"{self.base_url}/models/"
             f"{self.model}:generateContent"
@@ -155,11 +164,13 @@ class GeminiProvider:
             "x-goog-api-key": self.api_key,
         }
 
-        client_timeout = aiohttp.ClientTimeout(total=self.timeout)
+        timeout = aiohttp.ClientTimeout(
+            total=self.timeout,
+        )
 
         try:
             async with aiohttp.ClientSession(
-                timeout=client_timeout
+                timeout=timeout,
             ) as session:
                 async with session.post(
                     url,
@@ -170,52 +181,65 @@ class GeminiProvider:
 
                     if response.status >= 400:
                         raise LLMError(
-                            f"HTTP {response.status}: {body[:500]}",
-                            transient=response.status in _RETRY_STATUS,
+                            (
+                                f"HTTP {response.status}: "
+                                f"{body[:800]}"
+                            ),
+                            transient=(
+                                response.status
+                                in _RETRY_STATUS
+                            ),
                         )
 
-        except aiohttp.ClientError as error:
+        except asyncio.TimeoutError as error:
             raise LLMError(
-                f"network error: {error!r}",
+                "Gemini request timed out",
                 transient=True,
             ) from error
 
-        return _extract_content(body)
+        except aiohttp.ClientError as error:
+            raise LLMError(
+                f"Gemini network error: {error!r}",
+                transient=True,
+            ) from error
 
+        try:
+            data = json.loads(body)
 
-def _extract_content(body: str) -> str:
-    """Extract generated text from a Gemini response."""
-    try:
-        data = json.loads(body)
+        except json.JSONDecodeError as error:
+            raise LLMError(
+                f"invalid Gemini JSON response: {body[:300]}"
+            ) from error
 
         candidates = data.get("candidates") or []
+
         if not candidates:
             raise LLMError(
                 f"Gemini returned no candidates: {body[:500]}"
             )
 
-        parts = (
-            candidates[0]
-            .get("content", {})
-            .get("parts", [])
-        )
+        candidate = candidates[0]
+        content = candidate.get("content") or {}
+        parts = content.get("parts") or []
 
-        text_parts = [
-            part.get("text", "")
+        result = "".join(
+            str(part.get("text", ""))
             for part in parts
-            if isinstance(part, dict) and part.get("text")
-        ]
-
-        result = "".join(text_parts).strip()
+            if isinstance(part, dict)
+            and part.get("text")
+        ).strip()
 
         if not result:
+            finish_reason = candidate.get(
+                "finishReason",
+                "UNKNOWN",
+            )
+
             raise LLMError(
-                f"Gemini returned an empty response: {body[:500]}"
+                (
+                    "Gemini returned an empty response. "
+                    f"Finish reason: {finish_reason}"
+                )
             )
 
         return result
-
-    except json.JSONDecodeError as error:
-        raise LLMError(
-            f"invalid JSON response from Gemini: {body[:300]}"
-        ) from error

@@ -1,34 +1,23 @@
-"""Abstract LLM interface - swap providers without touching the rest of the pipeline."""
+"""Shared LLM contracts, parsers, and low-request batch operations."""
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 from dataclasses import dataclass
 from typing import Protocol
 
-from src.llm.prompts import build_translation_messages
+from src.llm.prompts import (
+    build_batch_summary_messages,
+    build_batch_translation_messages,
+)
 from src.models import Article, CuratedItem
 
 logger = logging.getLogger(__name__)
 
-# Batch-level retry policy for translations: LLM sampling is random, so a
-# pair that failed once (bad JSON, hiccup, rate limit) often succeeds on a
-# later round. Failed pairs are retried retry_rounds extra times with a
-# growing delay; a pair that succeeded once is never called again.
-TRANSLATION_RETRY_ROUNDS = 2
-_TRANSLATION_RETRY_DELAY_SECONDS = 3.0
-# Languages per translation request. Keeping the chunks small limits response
-# size while still reducing the number of API calls substantially.
-TRANSLATION_CHUNK_SIZE = 4
-
 
 class LLMError(Exception):
-    """Any provider failure: HTTP, network, or malformed reply.
-
-    transient=True hints that an immediate retry may succeed (429/5xx/timeout).
-    """
+    """Provider failure: HTTP, network, quota, or malformed model output."""
 
     def __init__(self, message: str, transient: bool = False):
         super().__init__(message)
@@ -39,165 +28,346 @@ class LLMError(Exception):
 class Summary:
     """Standard output of every provider."""
 
-    llm_summary: str    # 2-4 sentence factual summary
-    personal_take: str  # short comedic expert commentary
+    llm_summary: str
+    personal_take: str
 
 
 class LLMProvider(Protocol):
-    """Contract: summarize(article) -> Summary, plus generic chat()."""
+    """Provider contract used by the pipeline."""
+
+    name: str
+    model: str
 
     async def summarize(self, article: Article) -> Summary:
         ...
 
-    async def chat(self, messages: list[dict], max_tokens: int | None = None) -> str:
-        """One OpenAI-style completion; used by translate_batch."""
+    async def chat(
+        self,
+        messages: list[dict],
+        max_tokens: int | None = None,
+    ) -> str:
         ...
 
 
-def parse_summary_json(text: str) -> Summary:
-    """Parse the model reply into a Summary; tolerates fences and stray prose."""
-    start, end = text.find("{"), text.rfind("}")
+def _json_object(text: str) -> dict:
+    """Extract the outer JSON object from a model response."""
+
+    cleaned = text.strip()
+
+    if cleaned.startswith("```"):
+        lines = cleaned.splitlines()
+
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+
+        cleaned = "\n".join(lines).strip()
+
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+
     if start == -1 or end <= start:
-        raise LLMError(f"no JSON object in reply: {text[:120]!r}")
+        raise LLMError(
+            f"no JSON object in reply: {text[:160]!r}"
+        )
+
     try:
-        data = json.loads(text[start: end + 1])
+        data = json.loads(cleaned[start:end + 1])
     except json.JSONDecodeError as error:
-        raise LLMError(f"invalid JSON from model: {error}") from error
+        raise LLMError(
+            f"invalid JSON from model: {error}"
+        ) from error
+
+    if not isinstance(data, dict):
+        raise LLMError("model JSON root must be an object")
+
+    return data
+
+
+def parse_summary_json(text: str) -> Summary:
+    """Parse one summary response."""
+
+    data = _json_object(text)
+
     summary = str(data.get("summary", "")).strip()
     take = str(data.get("take", "")).strip()
+
     if not summary or not take:
-        raise LLMError(f"missing summary/take fields in: {text[:120]!r}")
-    return Summary(llm_summary=summary, personal_take=take)
+        raise LLMError(
+            f"missing summary/take fields in: {text[:160]!r}"
+        )
+
+    return Summary(
+        llm_summary=summary,
+        personal_take=take,
+    )
 
 
-def parse_translation_json(text: str, targets: list[str]) -> dict[str, dict[str, str]]:
-    """Parse a multi-language reply; tolerates fences and per-language gaps.
+def parse_summary_batch_json(
+    text: str,
+    expected: int,
+) -> dict[int, Summary]:
+    """Parse a batch summary response keyed by article index."""
 
-    A language whose block is missing or incomplete is simply absent from the
-    result (the writer falls back to English for it); a reply with no usable
-    language at all raises LLMError so the caller can retry or isolate.
-    """
-    start, end = text.find("{"), text.rfind("}")
-    if start == -1 or end <= start:
-        raise LLMError(f"no JSON object in reply: {text[:120]!r}")
-    try:
-        data = json.loads(text[start: end + 1])
-    except json.JSONDecodeError as error:
-        raise LLMError(f"invalid JSON from model: {error}") from error
+    data = _json_object(text)
+    rows = data.get("items")
+
+    if not isinstance(rows, list):
+        raise LLMError(
+            "batch summary response has no items array"
+        )
+
+    parsed: dict[int, Summary] = {}
+
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+
+        try:
+            index = int(row.get("index"))
+        except (TypeError, ValueError):
+            continue
+
+        if not 1 <= index <= expected:
+            continue
+
+        summary = str(row.get("summary", "")).strip()
+        take = str(row.get("take", "")).strip()
+
+        if summary and take:
+            parsed[index] = Summary(
+                llm_summary=summary,
+                personal_take=take,
+            )
+
+    if not parsed:
+        raise LLMError(
+            "batch summary response contained no usable items"
+        )
+
+    return parsed
+
+
+def parse_translation_json(
+    text: str,
+    targets: list[str],
+) -> dict[str, dict[str, str]]:
+    """Parse a single-item translation response."""
+
+    data = _json_object(text)
     translations: dict[str, dict[str, str]] = {}
+
     for code in targets:
-        block = data.get(code) if isinstance(data, dict) else None
+        block = data.get(code)
+
         if not isinstance(block, dict):
             continue
+
         title = str(block.get("title", "")).strip()
         summary = str(block.get("summary", "")).strip()
         take = str(block.get("take", "")).strip()
-        if summary and take:
-            translations[code] = {"title": title, "summary": summary, "take": take}
+
+        if title and summary and take:
+            translations[code] = {
+                "title": title,
+                "summary": summary,
+                "take": take,
+            }
+
     if not translations:
-        raise LLMError(f"no usable translation in reply: {text[:120]!r}")
+        raise LLMError(
+            "no usable translation in reply"
+        )
+
     return translations
 
 
+def parse_translation_batch_json(
+    text: str,
+    targets: list[str],
+    expected: int,
+) -> dict[int, dict[str, dict[str, str]]]:
+    """Parse all translated items from one batch response."""
+
+    data = _json_object(text)
+    rows = data.get("items")
+
+    if not isinstance(rows, list):
+        raise LLMError(
+            "batch translation response has no items array"
+        )
+
+    parsed: dict[int, dict[str, dict[str, str]]] = {}
+
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+
+        try:
+            index = int(row.get("index"))
+        except (TypeError, ValueError):
+            continue
+
+        if not 1 <= index <= expected:
+            continue
+
+        blocks = row.get("translations")
+
+        if not isinstance(blocks, dict):
+            continue
+
+        item_translations: dict[str, dict[str, str]] = {}
+
+        for code in targets:
+            block = blocks.get(code)
+
+            if not isinstance(block, dict):
+                continue
+
+            title = str(block.get("title", "")).strip()
+            summary = str(block.get("summary", "")).strip()
+            take = str(block.get("take", "")).strip()
+
+            if title and summary and take:
+                item_translations[code] = {
+                    "title": title,
+                    "summary": summary,
+                    "take": take,
+                }
+
+        if item_translations:
+            parsed[index] = item_translations
+
+    if not parsed:
+        raise LLMError(
+            "batch translation response contained no usable items"
+        )
+
+    return parsed
+
+
 async def summarize_batch(
-    provider: LLMProvider, articles: list[Article], concurrency: int = 3,
+    provider: LLMProvider,
+    articles: list[Article],
+    concurrency: int = 1,
 ) -> list[tuple[Article, Summary | None]]:
-    """Summarize with bounded parallelism; a failing article becomes None."""
-    semaphore = asyncio.Semaphore(max(1, concurrency))
+    """Summarize all selected articles in one provider request."""
 
-    async def _one(article: Article) -> tuple[Article, Summary | None]:
-        async with semaphore:
-            try:
-                return article, await provider.summarize(article)
-            except LLMError as error:
-                logger.warning("llm failed for %r: %s", article.title[:60], error)
-                return article, None
-            except Exception as error:  # isolation boundary, never crash the batch
-                logger.warning("llm crashed for %r: %r", article.title[:60], error)
-                return article, None
+    if not articles:
+        return []
 
-    return list(await asyncio.gather(*(_one(article) for article in articles)))
+    try:
+        reply = await provider.chat(
+            build_batch_summary_messages(articles),
+            max_tokens=max(700, 900 * len(articles)),
+        )
+
+        parsed = parse_summary_batch_json(
+            reply,
+            len(articles),
+        )
+
+    except Exception as error:
+        logger.warning(
+            "batch summarization failed: %s",
+            error,
+        )
+        return [
+            (article, None)
+            for article in articles
+        ]
+
+    result: list[tuple[Article, Summary | None]] = []
+
+    for index, article in enumerate(articles, 1):
+        summary = parsed.get(index)
+
+        if summary is None:
+            logger.warning(
+                "batch summary missing for %r",
+                article.title[:60],
+            )
+
+        result.append(
+            (article, summary)
+        )
+
+    logger.info(
+        "summaries: %d/%d articles completed in one request",
+        sum(summary is not None for _, summary in result),
+        len(articles),
+    )
+
+    return result
 
 
 async def translate_batch(
     provider: LLMProvider,
     items: list[CuratedItem],
     targets: list[str],
-    concurrency: int = 3,
-    max_tokens: int = 3000,
-    retry_rounds: int = TRANSLATION_RETRY_ROUNDS,
-    chunk_size: int = TRANSLATION_CHUNK_SIZE,
+    concurrency: int = 1,
+    max_tokens: int = 12000,
+    retry_rounds: int = 0,
+    chunk_size: int = 0,
 ) -> int:
-    """Translate summarized items into extra languages, in place.
+    """Translate all selected items and languages in one provider request."""
 
-    One chat call per (item, chunk of <=chunk_size languages) instead of one
-    per (item, language). The source text is always the finished English
-    version, so the
-    author's voice lands identically in every edition.
+    targets = [
+        code.strip().lower()
+        for code in dict.fromkeys(targets)
+        if code and code.strip().lower() != "en"
+    ]
 
-    parse_translation_json tolerates per-language gaps, so a truncated reply
-    keeps the languages it did deliver; every retry round re-groups only the
-    still-missing languages into fresh chunks (growing delay), so a transient
-    model hiccup never strands a whole edition in English. Returns how many
-    (item, language) pairs succeeded.
-    """
-    semaphore = asyncio.Semaphore(max(1, concurrency))
+    if not items or not targets:
+        return 0
 
-    def _chunks(langs: list[str]) -> list[list[str]]:
-        return [langs[i:i + chunk_size] for i in range(0, len(langs), chunk_size)]
+    payload = [
+        {
+            "index": index,
+            "title": item.article.title,
+            "summary": item.llm_summary,
+            "take": item.personal_take,
+        }
+        for index, item in enumerate(items, 1)
+    ]
 
-    async def _one(item: CuratedItem, codes: list[str]) -> int:
-        async with semaphore:
-            entry = {
-                "title": item.article.title,
-                "summary": item.llm_summary,
-                "take": item.personal_take,
-            }
-            # Longer outputs need a proportionally higher cap: each extra
-            # language adds roughly a title + summary + take to the reply.
-            call_tokens = max_tokens + 500 * (len(codes) - 1)
-            try:
-                reply = await provider.chat(
-                    build_translation_messages(entry, codes), max_tokens=call_tokens,
-                )
-                parsed = parse_translation_json(reply, codes)
-                fresh = [c for c in parsed if c not in item.translations]
-                item.translations.update(parsed)
-                return len(fresh)
-            except LLMError as error:
-                logger.warning(
-                    "translation %s failed for %r: %s",
-                    "/".join(codes), item.article.title[:50], error,
-                )
-            except Exception as error:  # isolation boundary, never crash the batch
-                logger.warning(
-                    "translation %s crashed for %r: %r",
-                    "/".join(codes), item.article.title[:50], error,
-                )
-            return 0
+    try:
+        reply = await provider.chat(
+            build_batch_translation_messages(
+                payload,
+                targets,
+            ),
+            max_tokens=max_tokens,
+        )
 
-    def _pending() -> list[tuple[CuratedItem, list[str]]]:
-        return [
-            (item, codes)
-            for item in items
-            for codes in _chunks([c for c in targets if c not in item.translations])
-        ]
+        parsed = parse_translation_batch_json(
+            reply,
+            targets,
+            len(items),
+        )
+
+    except Exception as error:
+        logger.error(
+            "batch translations failed: %s",
+            error,
+        )
+        return 0
+
+    successful_pairs = 0
+
+    for index, translations in parsed.items():
+        item = items[index - 1]
+        item.translations.update(translations)
+        successful_pairs += len(translations)
 
     total_pairs = len(items) * len(targets)
-    ok = 0
-    for round_index in range(max(1, retry_rounds + 1)):
-        pending = _pending()
-        if not pending:
-            break
-        if round_index:
-            logger.info(
-                "translations: retry round %d for %d chunk(s)",
-                round_index, len(pending),
-            )
-            await asyncio.sleep(_TRANSLATION_RETRY_DELAY_SECONDS * round_index)
-        results = await asyncio.gather(*(_one(item, codes) for item, codes in pending))
-        ok += sum(results)
+
     logger.info(
-        "translations: %d/%d (item, language) pairs succeeded", ok, total_pairs,
+        "translations: %d/%d pairs succeeded in one request",
+        successful_pairs,
+        total_pairs,
     )
-    return ok
+
+    return successful_pairs

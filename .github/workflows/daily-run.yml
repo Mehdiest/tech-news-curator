@@ -1,211 +1,124 @@
-name: techtally-daily
+name: Daily TechTally Digest
 
-# Full pipeline: ingest -> dedup -> rank -> LLM -> publish -> commit -> GitHub Pages.
-# Same-day re-runs are idempotent: when today's digest already exists the
-# publish step is a no-op (the LLM is non-deterministic, so a second run
-# would otherwise overwrite the day's post with different text). Manual
-# dispatches can set `force` to regenerate anyway.
-#
-# TWO cron schedules on purpose: GitHub Actions cron is notoriously lossy at
-# popular wall-clock times (runs get silently skipped under load). The second
-# slot is a same-day safety net - thanks to idempotency it either publishes
-# the missed digest or no-ops. Off-round minutes reduce contention further.
 on:
   schedule:
-    - cron: "37 4 * * *"   # primary: 08:07 Asia/Tehran
-    - cron: "43 7 * * *"   # safety net: 11:13 Asia/Tehran, no-ops if the morning run landed
+    - cron: "0 7 * * *"
   workflow_dispatch:
-    inputs:
-      force:
-        description: "Regenerate today's digest even if it already exists"
-        type: boolean
-        default: false
 
 permissions:
   contents: write
   pages: write
   id-token: write
-  actions: write
-
-# Single source of truth for the model.
-# Gemini 3.8 Flash is the default for new Gemini API projects.
-env:
-  LLM_MODEL: ${{ vars.LLM_MODEL || 'gemini-3.8-flash' }}
 
 concurrency:
-  group: techtally-daily
+  group: "pages"
   cancel-in-progress: false
 
 jobs:
-  publish-and-deploy:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
 
+    env:
+      LLM_MODEL: ${{ vars.LLM_MODEL || 'gemini-3.8-flash' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate Gemini configuration
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GEMINI_API_KEY:-}" ]; then
+            echo "::error::GEMINI_API_KEY secret is empty."
+            exit 1
+          fi
+
+          if [[ ! "$GEMINI_API_KEY" =~ ^AIza ]]; then
+            echo "::error::GEMINI_API_KEY does not look like a Gemini API key."
+            exit 1
+          fi
+
+          echo "Gemini API key is configured."
+
+      - name: Create environment file
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo "LLM_PROVIDER=gemini"
+            echo "LLM_API_KEY=${GEMINI_API_KEY}"
+            echo "LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta"
+            echo "LLM_MODEL=${LLM_MODEL}"
+            echo "LLM_TEMPERATURE=0.7"
+            echo "LLM_MAX_TOKENS=12000"
+            echo "LLM_TIMEOUT=60"
+            echo "DIGEST_LANGUAGE=en"
+          } > .env
+
+      - name: Run TechTally
+        run: |
+          python -m src.main
+
+      - name: Verify generated digest
+        run: |
+          set -euo pipefail
+
+          if ! find . -type f -name '*.md' \
+            -not -path './.git/*' \
+            | grep -q .; then
+            echo "::error::No Markdown digest was generated."
+            exit 1
+          fi
+
+          echo "Digest generation completed."
+
+      - name: Commit generated digest
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No digest changes to commit."
+            exit 0
+          fi
+
+          git commit -m "techtally: daily digest $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # Full history so the commit step can safely `git pull --rebase` if
-      # something landed on main between checkout and push.
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: requirements.txt
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      # Secrets never enter the repository.
-      # The .env file is generated only during the workflow run.
-      - name: Write .env from secrets
-        run: |
-          {
-            echo "LLM_PROVIDER=gemini"
-            echo "LLM_API_KEY=${{ secrets.GEMINI_API_KEY }}"
-            echo "LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta"
-            echo "LLM_MODEL=${{ env.LLM_MODEL }}"
-            echo "DIGEST_LANGUAGE=en"
-          } > .env
-
-      # Fail fast on a malformed secret before ingesting hundreds of articles.
-      # The key itself is never printed to the logs.
-      - name: Validate LLM configuration
-        run: |
-          python - <<'PY'
-          import os
-          import re
-
-          key = (
-              os.environ.get("GEMINI_API_KEY", "")
-              .strip()
-              .strip('"')
-              .strip("'")
-          )
-
-          if not key:
-              raise SystemExit("GEMINI_API_KEY is empty")
-
-          if key.lower().startswith("bearer "):
-              raise SystemExit(
-                  "GEMINI_API_KEY must not include the 'Bearer ' prefix"
-              )
-
-          if "GEMINI_API_KEY" in key or re.match(
-              r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=",
-              key,
-          ):
-              raise SystemExit(
-                  "GEMINI_API_KEY looks like a pasted env line - "
-                  "store ONLY the raw key value"
-              )
-
-          if any(ch.isspace() for ch in key):
-              raise SystemExit(
-                  "GEMINI_API_KEY contains internal whitespace"
-              )
-
-          print(
-              "GEMINI_API_KEY format looks valid; model =",
-              os.environ.get("LLM_MODEL", "?"),
-          )
-          PY
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
-      - name: Build the daily digest
-        run: |
-          python -m src.main --publish ${{ github.event_name == 'workflow_dispatch' && inputs.force && '--force' || '' }}
-
-      - name: Commit the digest
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          changed="$(
-            git status --porcelain \
-              posts/ \
-              _includes/latest_digest.html \
-              _data/latest_digest.yml
-          )"
-
-          if [ -n "$changed" ]; then
-            git add \
-              posts/ \
-              _includes/latest_digest.html \
-              _data/latest_digest.yml
-
-            git commit -m "techtally: daily digest $(date -u +%F)"
-
-            # Rebase in case anything landed on main after this run's checkout.
-            git pull --rebase origin ${GITHUB_REF_NAME:-main}
-            git push
-          else
-            echo "no new digest to commit"
-          fi
-
-      # First-ever enablement is one-time manual:
-      # Settings -> Pages -> Source: GitHub Actions.
-      # Afterwards this step finds the existing site on every run.
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
-      - name: Build the Jekyll site
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./
-          destination: ./_site
-
-      - name: Remove stale github-pages artifacts from earlier attempts
-        # Re-running a failed job can leave the previous upload behind.
-        # deploy-pages then aborts with "Multiple artifacts named github-pages".
-        run: |
-          for id in $(gh api \
-            "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
-            --jq '.artifacts[] | select(.name == "github-pages") | .id'); do
-
-            gh api -X DELETE \
-              "repos/${{ github.repository }}/actions/artifacts/$id"
-
-            echo "deleted stale artifact $id"
-          done
-        env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Upload the site artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./_site
-
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: Verify a digest exists for today
-        # The publish step can exit successfully even when the LLM produced
-        # no summaries. This guard prevents such runs from appearing green.
-        #
-        # nullglob + a bash array is intentional. It avoids the failure caused
-        # by a missing slug family leaving a literal glob for `ls` to process.
-        run: |
-          today="$(date -u +%F)"
-
-          shopt -s nullglob
-          files=(
-            posts/"$today"-techtally*.md
-            posts/"$today"-tech-digest*.md
-          )
-          shopt -u nullglob
-
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "::error::no digest for $today - inspect the 'Build the daily digest' step log"
-            exit 1
-          fi
-
-          echo "digest for $today: ${files[*]}"
