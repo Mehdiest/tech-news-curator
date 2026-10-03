@@ -163,12 +163,12 @@ returns the per-component breakdown printed by `--preview` (`parts:` line).
 
 ## LLM Layer (Stage 4)
 
-One chat completion per article against any OpenAI-compatible endpoint,
-non-streaming. The code default is `https://api.b.ai/v1` with model
-`glm-5.3`; the deployed daily workflow instead uses OpenRouter
-(`https://openrouter.ai/api/v1`) with the free
-`nvidia/nemotron-3-ultra-550b-a55b:free` - override with the `LLM_MODEL`
-repo variable. The model must answer with strict JSON
+One chat completion per article against the configured provider. The default
+provider is Google Gemini via its native `generateContent` REST API, using
+`gemini-2.5-flash`. Gemini supports structured JSON output and its current
+free standard tier is sufficient for this pipeline's request volume. GLM
+remains available as a provider-compatible fallback. The model must answer
+with strict JSON
 `{"summary": ..., "take": ...}`; replies are tolerantly parsed (fences
 and stray prose are stripped).
 
@@ -179,10 +179,10 @@ and stray prose are stripped).
 
 | Env var | Default | Meaning |
 |---------|---------|---------|
-| `LLM_PROVIDER` | `glm` | key into the provider registry (`src/llm/factory.py`); `9router`, `openai`, `openai-compatible` are accepted aliases for the same OpenAI-compatible client |
-| `LLM_API_KEY` | - | Bearer key; required |
-| `LLM_BASE_URL` | `https://api.b.ai/v1` (workflow: `https://openrouter.ai/api/v1`) | `/chat/completions` is appended |
-| `LLM_MODEL` | `glm-5.3` (workflow: `nvidia/nemotron-3-ultra-550b-a55b:free`) | model name |
+| `LLM_PROVIDER` | `gemini` | key into the provider registry (`src/llm/factory.py`); `glm`, `9router`, `openai`, `openai-compatible` remain available |
+| `LLM_API_KEY` | - | Provider API key; required |
+| `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta` | Gemini `generateContent` base URL; GLM uses its OpenAI-compatible base URL |
+| `LLM_MODEL` | `gemini-2.5-flash` | model name |
 | `LLM_TEMPERATURE` | `0.7` | sampling temperature |
 | `LLM_MAX_TOKENS` | `700` | reply cap |
 | `LLM_TIMEOUT` | `60` | per-request seconds |
@@ -362,11 +362,10 @@ calls the publish step with `--force` when you really want a regen.
 
 One-time repo setup (after the first push):
 
-1. Settings > Secrets and variables > Actions > **New secret**: `LLM_API_KEY`.
-2. Optional *variable* `LLM_MODEL` (defaults to the free OpenRouter
-   `nvidia/nemotron-3-ultra-550b-a55b:free`; the workflow and its
-   validation step read the same job-level env, so logs always name the
-   model actually in use).
+1. Settings > Secrets and variables > Actions > **New secret**: `GEMINI_API_KEY`.
+2. Optional *variable* `LLM_MODEL` (defaults to `gemini-2.5-flash`; the
+   workflow and its validation step read the same job-level env, so logs
+   always name the model actually in use).
 3. Pages is enabled automatically by the workflow (`configure-pages` with
    `enablement: true`); the site lands at
    `https://<username>.github.io/techtally/`.

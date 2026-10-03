@@ -20,8 +20,9 @@ logger = logging.getLogger(__name__)
 TRANSLATION_RETRY_ROUNDS = 2
 _TRANSLATION_RETRY_DELAY_SECONDS = 3.0
 # Languages per translation chat call. The prompt/parser are multi-target,
-# so one call can carry several languages; 4 keeps a 9-language day at
-# items x (1 + 2) requests - inside OpenRouter's 50/day free-model quota.
+# so one call can carry several languages; 4 keeps an 8-language day at
+# items x (1 + 2) requests, leaving a wide margin under Gemini's current
+# free request quota.
 TRANSLATION_CHUNK_SIZE = 4
 
 
@@ -134,8 +135,9 @@ async def translate_batch(
     One chat call per (item, chunk of <=chunk_size languages) instead of one
     per (item, language): build_translation_messages and parse_translation_json
     are multi-target already, and a 9-language day used to cost
-    items x (1 summarize + 8 translations) ~ 60+ requests - over the 50/day
-    free-model quota on OpenRouter before the day's post was even half done.
+    items x (1 summarize + 8 translations) ~ 72 requests - unnecessarily high
+    for a free-tier API. With chunk_size=4 an 8-language day needs only
+    8 + 2x8 = 24 requests before retries.
     With chunk_size=4 a 7-item day needs 7 + 2x7 = 21 requests, safely inside
     the quota. The source text is always the finished English version, so the
     author's voice lands identically in every edition.

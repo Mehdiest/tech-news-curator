@@ -31,7 +31,7 @@ permissions:
 # step read this, so the log can never name a different model than the one
 # the run actually uses (they used to drift).
 env:
-  LLM_MODEL: ${{ vars.LLM_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
+  LLM_MODEL: ${{ vars.LLM_MODEL || 'gemini-2.5-flash' }}
 
 concurrency:
   group: techtally-daily
@@ -67,9 +67,9 @@ jobs:
       - name: Write .env from secrets
         run: |
           {
-            echo "LLM_PROVIDER=glm"
-            echo "LLM_API_KEY=${{ secrets.LLM_API_KEY }}"
-            echo "LLM_BASE_URL=https://openrouter.ai/api/v1"
+            echo "LLM_PROVIDER=gemini"
+            echo "LLM_API_KEY=${{ secrets.GEMINI_API_KEY }}"
+            echo "LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta"
             echo "LLM_MODEL=${{ env.LLM_MODEL }}"
             echo "DIGEST_LANGUAGE=en"
           } > .env
@@ -95,7 +95,7 @@ jobs:
           print("LLM_API_KEY format looks valid; model =", os.environ.get("LLM_MODEL", "?"))
           PY
         env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           # LLM_MODEL is inherited from the job-level env
 
       - name: Build the daily digest

@@ -13,7 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.llm.base import LLMError, Summary, parse_summary_json, summarize_batch
 from src.llm.factory import make_provider
-from src.llm.glm_provider import GLMProvider, _extract_content
+from src.llm.gemini_provider import GeminiProvider, _extract_content as _gemini_extract_content
+from src.llm.glm_provider import GLMProvider, _extract_content as _glm_extract_content
 from src.llm.prompts import build_messages, language_name
 from src.models import Article
 
@@ -66,16 +67,22 @@ def test_prompts():
 
 
 def test_extract_content():
-    body = '{"choices": [{"message": {"content": "hello"}}]}'
-    assert _extract_content(body) == "hello"
-    assert _extract_content('{"choices": [{"message": {"content": null}}]}') == ""
-    for bad in ("not json", '{"choices": []}', '{"other": 1}'):
-        try:
-            _extract_content(bad)
-        except LLMError:
-            continue
-        raise AssertionError(f"expected LLMError for {bad!r}")
-    print("PASS _extract_content shape handling")
+    glm_body = '{"choices": [{"message": {"content": "hello"}}]}'
+    assert _glm_extract_content(glm_body) == "hello"
+    gemini_body = '{"candidates": [{"content": {"parts": [{"text": "hello"}]}}]}'
+    assert _gemini_extract_content(gemini_body) == "hello"
+    for extractor, bad in ((
+        _glm_extract_content, ("not json", '{"choices": []}', '{"other": 1}'),
+    ), (
+        _gemini_extract_content, ("not json", '{"candidates": []}', '{"other": 1}'),
+    )):
+        for body in bad:
+            try:
+                extractor(body)
+            except LLMError:
+                continue
+            raise AssertionError(f"expected LLMError for {body!r}")
+    print("PASS provider response extraction (GLM + Gemini)")
 
 
 def test_provider_init():
@@ -92,17 +99,18 @@ def test_provider_init():
 
 def test_factory():
     os.environ.update({
-        "LLM_PROVIDER": "glm", "LLM_API_KEY": "k",
-        "LLM_BASE_URL": "https://api.b.ai/v1", "LLM_MODEL": "glm-5.3",
+        "LLM_PROVIDER": "gemini", "LLM_API_KEY": "k",
+        "LLM_BASE_URL": "https://generativelanguage.googleapis.com/v1beta",
+        "LLM_MODEL": "gemini-2.5-flash",
     })
     provider = make_provider()
-    assert isinstance(provider, GLMProvider) and provider.api_key == "k"
+    assert isinstance(provider, GeminiProvider) and provider.api_key == "k"
     os.environ["LLM_PROVIDER"] = "does-not-exist"
     try:
         make_provider()
     except ValueError:
-        os.environ["LLM_PROVIDER"] = "glm"
-        print("PASS factory (env-driven build, unknown provider rejected)")
+        os.environ["LLM_PROVIDER"] = "gemini"
+        print("PASS factory (Gemini default, unknown provider rejected)")
         return
     raise AssertionError("unknown provider must raise ValueError")
 
