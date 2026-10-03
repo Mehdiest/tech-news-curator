@@ -48,11 +48,6 @@ jobs:
             exit 1
           fi
 
-          if [[ ! "$GEMINI_API_KEY" =~ ^AIza ]]; then
-            echo "::error::GEMINI_API_KEY does not look like a Gemini API key."
-            exit 1
-          fi
-
           echo "Gemini API key is configured."
 
       - name: Create environment file
@@ -74,7 +69,7 @@ jobs:
 
       - name: Run TechTally
         run: |
-          python -m src.main
+          python -m src.main --publish
 
       - name: Verify generated digest
         run: |
@@ -122,3 +117,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+```
