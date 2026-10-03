@@ -1,3 +1,4 @@
+```yaml
 name: Daily TechTally Digest
 
 on:
@@ -32,7 +33,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -71,18 +72,40 @@ jobs:
         run: |
           python -m src.main --publish
 
-      - name: Verify generated digest
+      - name: Verify generated content
         run: |
           set -euo pipefail
 
-          if ! find . -type f -name '*.md' \
-            -not -path './.git/*' \
-            | grep -q .; then
+          if ! find posts -type f -name '*.md' | grep -q .; then
             echo "::error::No Markdown digest was generated."
             exit 1
           fi
 
           echo "Digest generation completed."
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Install Jekyll
+        run: |
+          gem install jekyll
+
+      - name: Build Jekyll site
+        run: |
+          set -euo pipefail
+
+          rm -rf _site
+          jekyll build --trace
+
+          if [ ! -f "_site/index.html" ]; then
+            echo "::error::Jekyll build did not produce _site/index.html."
+            exit 1
+          fi
+
+          echo "Jekyll site built successfully."
 
       - name: Commit generated digest
         run: |
@@ -91,7 +114,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add .
+          git add posts _data _includes
 
           if git diff --cached --quiet; then
             echo "No digest changes to commit."
@@ -104,11 +127,12 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -117,4 +141,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
+```
