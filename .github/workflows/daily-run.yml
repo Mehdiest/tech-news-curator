@@ -22,16 +22,15 @@ on:
         default: false
 
 permissions:
-  contents: write   # push the daily digest commit
-  pages: write      # deploy the site
-  id-token: write   # OIDC for deploy-pages
-  actions: write    # delete stale github-pages artifacts on re-runs
+  contents: write
+  pages: write
+  id-token: write
+  actions: write
 
-# Single source of truth for the model: both the .env step and the validate
-# step read this, so the log can never name a different model than the one
-# the run actually uses (they used to drift).
+# Single source of truth for the model.
+# Gemini 3.8 Flash is the default for new Gemini API projects.
 env:
-  LLM_MODEL: ${{ vars.LLM_MODEL || 'gemini-2.5-flash' }}
+  LLM_MODEL: ${{ vars.LLM_MODEL || 'gemini-3.8-flash' }}
 
 concurrency:
   group: techtally-daily
@@ -41,13 +40,14 @@ jobs:
   publish-and-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       # Full history so the commit step can safely `git pull --rebase` if
-      # something landed on main between checkout and push (the safety-net
-      # cron run vs a manually triggered run, for example).
+      # something landed on main between checkout and push.
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -61,9 +61,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Secrets never enter the repo: .env is generated at runtime and gitignored.
-      # The model comes from the job-level env (vars.LLM_MODEL with a Gemini
-      # default), identical to what the validate step prints.
+      # Secrets never enter the repository.
+      # The .env file is generated only during the workflow run.
       - name: Write .env from secrets
         run: |
           {
@@ -74,52 +73,85 @@ jobs:
             echo "DIGEST_LANGUAGE=en"
           } > .env
 
-      # Fail fast on a malformed secret BEFORE ingesting hundreds of articles:
-      # with a bad key every summarize fails in isolation and the only signal
-      # used to be a red "no digest" guard at the very end of the run. Only
-      # verdicts are printed - the key value itself never reaches the logs.
+      # Fail fast on a malformed secret before ingesting hundreds of articles.
+      # The key itself is never printed to the logs.
       - name: Validate LLM configuration
         run: |
           python - <<'PY'
-          import os, re
+          import os
+          import re
 
-          key = os.environ.get("LLM_API_KEY", "").strip().strip('"').strip("'")
+          key = (
+              os.environ.get("GEMINI_API_KEY", "")
+              .strip()
+              .strip('"')
+              .strip("'")
+          )
+
           if not key:
               raise SystemExit("GEMINI_API_KEY is empty")
+
           if key.lower().startswith("bearer "):
-              raise SystemExit("GEMINI_API_KEY must not include the 'Bearer ' prefix")
-          if "LLM_API_KEY" in key or re.match(r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=", key):
-              raise SystemExit("GEMINI_API_KEY looks like a pasted env line - store ONLY the raw key value")
+              raise SystemExit(
+                  "GEMINI_API_KEY must not include the 'Bearer ' prefix"
+              )
+
+          if "GEMINI_API_KEY" in key or re.match(
+              r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=",
+              key,
+          ):
+              raise SystemExit(
+                  "GEMINI_API_KEY looks like a pasted env line - "
+                  "store ONLY the raw key value"
+              )
+
           if any(ch.isspace() for ch in key):
-              raise SystemExit("GEMINI_API_KEY contains internal whitespace")
-          print("GEMINI_API_KEY format looks valid; model =", os.environ.get("LLM_MODEL", "?"))
+              raise SystemExit(
+                  "GEMINI_API_KEY contains internal whitespace"
+              )
+
+          print(
+              "GEMINI_API_KEY format looks valid; model =",
+              os.environ.get("LLM_MODEL", "?"),
+          )
           PY
         env:
-          LLM_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          # LLM_MODEL is inherited from the job-level env
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Build the daily digest
-        # skips by itself when today's editions exist; --force only on demand
-        run: python -m src.main --publish ${{ github.event_name == 'workflow_dispatch' && inputs.force && '--force' || '' }}
+        run: |
+          python -m src.main --publish ${{ github.event_name == 'workflow_dispatch' && inputs.force && '--force' || '' }}
 
       - name: Commit the digest
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          changed="$(git status --porcelain posts/ _includes/latest_digest.html _data/latest_digest.yml)"
+
+          changed="$(
+            git status --porcelain \
+              posts/ \
+              _includes/latest_digest.html \
+              _data/latest_digest.yml
+          )"
+
           if [ -n "$changed" ]; then
-            git add posts/ _includes/latest_digest.html _data/latest_digest.yml
+            git add \
+              posts/ \
+              _includes/latest_digest.html \
+              _data/latest_digest.yml
+
             git commit -m "techtally: daily digest $(date -u +%F)"
-            # rebase in case anything landed on main after this run's checkout
+
+            # Rebase in case anything landed on main after this run's checkout.
             git pull --rebase origin ${GITHUB_REF_NAME:-main}
             git push
           else
             echo "no new digest to commit"
           fi
 
-      # First-ever enablement is one-time manual (repo must exist as a Pages
-      # site: Settings -> Pages -> Source: GitHub Actions); afterwards this
-      # step just finds the existing site on every run.
+      # First-ever enablement is one-time manual:
+      # Settings -> Pages -> Source: GitHub Actions.
+      # Afterwards this step finds the existing site on every run.
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
@@ -132,12 +164,16 @@ jobs:
           destination: ./_site
 
       - name: Remove stale github-pages artifacts from earlier attempts
-        # Re-running a failed job keeps the previous attempt's upload, and
-        # deploy-pages aborts with "Multiple artifacts named github-pages".
-        # Delete them so every attempt ends with exactly one artifact.
+        # Re-running a failed job can leave the previous upload behind.
+        # deploy-pages then aborts with "Multiple artifacts named github-pages".
         run: |
-          for id in $(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" --jq '.artifacts[] | select(.name == "github-pages") | .id'); do
-            gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
+          for id in $(gh api \
+            "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
+            --jq '.artifacts[] | select(.name == "github-pages") | .id'); do
+
+            gh api -X DELETE \
+              "repos/${{ github.repository }}/actions/artifacts/$id"
+
             echo "deleted stale artifact $id"
           done
         env:
@@ -152,24 +188,24 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Verify a digest exists for today
-        # The publish step exits 0 even when the LLM yields nothing: every
-        # summarize/translate failure is isolated, and "no successfully
-        # summarized items" just logs an error. That made no-digest days look
-        # like green runs. Same-day no-op re-runs still pass here - the
-        # morning file already exists on disk.
+        # The publish step can exit successfully even when the LLM produced
+        # no summaries. This guard prevents such runs from appearing green.
         #
-        # Checked with nullglob + a bash array, NOT `ls glob1 glob2`: when one
-        # slug family is absent (every pre-rebrand day uses -tech-digest),
-        # bash leaves that glob literal, ls cannot access it and exits 2 even
-        # though the other family matched - which failed this guard on every
-        # legacy-slug day.
+        # nullglob + a bash array is intentional. It avoids the failure caused
+        # by a missing slug family leaving a literal glob for `ls` to process.
         run: |
           today="$(date -u +%F)"
+
           shopt -s nullglob
-          files=(posts/"$today"-techtally*.md posts/"$today"-tech-digest*.md)
+          files=(
+            posts/"$today"-techtally*.md
+            posts/"$today"-tech-digest*.md
+          )
           shopt -u nullglob
+
           if [ ${#files[@]} -eq 0 ]; then
             echo "::error::no digest for $today - inspect the 'Build the daily digest' step log"
             exit 1
           fi
+
           echo "digest for $today: ${files[*]}"
