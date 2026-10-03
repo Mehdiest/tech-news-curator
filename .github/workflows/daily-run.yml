@@ -91,6 +91,7 @@ jobs:
       - name: Install Jekyll
         run: |
           gem install jekyll
+          gem install jekyll-sitemap
 
       - name: Build Jekyll site
         run: |
