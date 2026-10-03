@@ -163,63 +163,29 @@ returns the per-component breakdown printed by `--preview` (`parts:` line).
 
 ## LLM Layer (Stage 4)
 
-One chat completion per article against the configured provider. The default
-provider is Google Gemini via its native `generateContent` REST API, using
-`gemini-2.5-flash`. Gemini supports structured JSON output and its current
-free standard tier is sufficient for this pipeline's request volume. GLM
-remains available as a provider-compatible fallback. The model must answer
-with strict JSON
-`{"summary": ..., "take": ...}`; replies are tolerantly parsed (fences
-and stray prose are stripped).
+The digest uses Google Gemini by default through the native `generateContent`
+REST API. The default model is `gemini-2.5-flash`; the provider returns strict
+JSON and the parser tolerates fenced or prose-wrapped replies. GLM remains
+available as an OpenAI-compatible fallback.
 
-- **summary**: 2-4 factual sentences - what happened, who, why it matters.
-- **take**: comedic veteran-tech-expert commentary - jokes, analogies, hot
-  takes aimed at companies and hype (never at people), ending with one
-  grounded insight.
+- **summary**: 2-4 factual sentences - what happened, who, and why it matters.
+- **take**: comedic veteran-tech-expert commentary - jokes and analogies aimed
+  at companies and hype, ending with one grounded insight.
 
 | Env var | Default | Meaning |
 |---------|---------|---------|
-| `LLM_PROVIDER` | `gemini` | key into the provider registry (`src/llm/factory.py`); `glm`, `9router`, `openai`, `openai-compatible` remain available |
-| `LLM_API_KEY` | - | Provider API key; required |
-| `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta` | Gemini `generateContent` base URL; GLM uses its OpenAI-compatible base URL |
+| `LLM_PROVIDER` | `gemini` | provider registry key (`gemini` or `glm`) |
+| `LLM_API_KEY` | - | provider API key; required |
+| `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta` | Gemini REST API base URL |
 | `LLM_MODEL` | `gemini-2.5-flash` | model name |
 | `LLM_TEMPERATURE` | `0.7` | sampling temperature |
 | `LLM_MAX_TOKENS` | `700` | reply cap |
 | `LLM_TIMEOUT` | `60` | per-request seconds |
 | `DIGEST_LANGUAGE` | `en` | output language of summary + take |
 
-Batch runs use bounded parallelism (3 concurrent) and one automatic retry
-with backoff on 429/5xx/timeouts; a failing article never stops the digest.
-
-### Running against a local router (9Router)
-
-The backfill can run on your own machine against a local OpenAI-compatible
-gateway such as [9Router](https://github.com/decolua/9router)
-(`http://localhost:20128/v1`). Put this in `.env` at the repo root:
-
-```env
-LLM_PROVIDER=9router
-LLM_API_KEY=<the 9Router API key generated in its dashboard>
-LLM_BASE_URL=http://localhost:20128/v1
-LLM_MODEL=<a model or combo name the router knows>
-```
-
-Then `python scripts/probe_llm.py` checks the whole chain before you burn
-quota on a backfill: it echoes the effective config, lists the models the
-key can see (`GET /models`), and fires one minimal chat call.
-
-Two different 401s come out of a local router, and the pipeline's error
-hints tell them apart:
-
-- `Invalid/Missing API key` - the router rejected YOUR key; fix `LLM_API_KEY`
-  (it must be the router's key, not the provider's).
-- `Missing Authentication header` - OpenRouter's own signature relayed
-  through the router: the request reached openrouter.ai with NO key, i.e.
-  the OpenRouter connection inside the router dashboard has no API key
-  attached. Fix it in the router's dashboard, not in this repo.
-
-Never commit `.env`; it is local-only. GitHub Actions workflows keep using
-the repo secrets (OpenRouter) and cannot reach `localhost`.
+Batch runs use bounded parallelism (3 concurrent) and transient retry handling
+for provider failures. Translation calls group languages into small chunks and
+retry only the still-missing `(item, language)` pairs.
 
 ## Images (Stage 5b) - optional by design
 
@@ -362,10 +328,10 @@ calls the publish step with `--force` when you really want a regen.
 
 One-time repo setup (after the first push):
 
-1. Settings > Secrets and variables > Actions > **New secret**: `GEMINI_API_KEY`.
-2. Optional *variable* `LLM_MODEL` (defaults to `gemini-2.5-flash`; the
-   workflow and its validation step read the same job-level env, so logs
-   always name the model actually in use).
+1. Settings > Secrets and variables > Actions > **New repository secret**: `GEMINI_API_KEY`.
+2. Optional *variable* `LLM_MODEL` (defaults to `gemini-2.5-flash`; the workflow
+   and validation step read the same job-level env, so logs name the model
+   actually in use).
 3. Pages is enabled automatically by the workflow (`configure-pages` with
    `enablement: true`); the site lands at
    `https://<username>.github.io/techtally/`.

@@ -55,7 +55,7 @@ def test_workflow():
     dispatch = wf[True]["workflow_dispatch"]
     assert dispatch["inputs"]["force"]["type"] == "boolean"
     assert dispatch["inputs"]["force"]["default"] is False
-    assert any("secrets.LLM_API_KEY" in r for r in runs), "API key must come from secrets"
+    assert any("secrets.GEMINI_API_KEY" in r for r in runs), "Gemini API key must come from secrets"
     assert any("git status --porcelain posts/" in r for r in runs)
     # the commit step rebases before pushing (checkout uses full history)
     assert any("git pull --rebase" in r for r in runs)
@@ -73,16 +73,16 @@ def test_workflow():
     # aborts on >1), so stale ones are deleted before each upload
     assert any('select(.name == "github-pages")' in r for r in runs)
     # the free-tier default keeps the scheduled run working with zero balance
-    assert "nemotron" in wf["env"]["LLM_MODEL"], "free OpenRouter default expected"
+    assert "gemini-2.5-flash" in wf["env"]["LLM_MODEL"], "Gemini default expected"
     # preflight: a malformed secret must fail the run BEFORE ingestion, not
     # only via the end-of-run digest guard; verdicts only, key never logged
     names = [step.get("name", "") for step in steps]
     assert "Validate LLM configuration" in names
     validate_step = next(s for s in steps if s.get("name") == "Validate LLM configuration")
-    assert "secrets.LLM_API_KEY" in str(validate_step.get("env", {}))
+    assert "secrets.GEMINI_API_KEY" in str(validate_step.get("env", {}))
     validate = validate_step.get("run", "")
     for needle in (
-        "LLM_API_KEY is empty", "'Bearer ' prefix",
+        "GEMINI_API_KEY is empty", "'Bearer ' prefix",
         "pasted env line", "internal whitespace",
     ):
         assert needle in validate, needle
@@ -174,25 +174,27 @@ def test_i18n_yaml():
     # ranks and the day publishes with no pictures at all
     assert pipeline["enrich_images"] is True
     assert "redd.it" in pipeline["image_blocklist"]
-    print("PASS i18n.yaml: nine languages, complete label sets, RTL fa, config wiring")
+    print("PASS i18n.yaml: eight translated languages, complete label sets, RTL fa/ar, config wiring")
 
 
 def test_llm_key_guardrails():
     """The 401 'Invalid api_key format' preflight must live in the provider."""
-    src = (ROOT / "src" / "llm" / "glm_provider.py").read_text(encoding="utf-8")
+    src = (ROOT / "src" / "llm" / "gemini_provider.py").read_text(encoding="utf-8")
     assert "def _validate_api_key" in src
-    assert "_validate_api_key(api_key)" in src  # actually called in __init__
-    assert "bearer" in src.lower()  # 'Bearer ' prefix rejection
+    assert "_validate_api_key(api_key)" in src
+    assert "bearer" in src.lower()
     assert "LLM_API_KEY" in src and "isspace" in src
     factory = (ROOT / "src" / "llm" / "factory.py").read_text(encoding="utf-8")
-    assert 'os.getenv("LLM_API_KEY", "")' in factory  # empty key still surfaces
-    print("PASS glm_provider: api-key preflight (edge cleaning + Bearer/assignment/whitespace rejection)")
+    assert 'os.getenv("LLM_API_KEY", "")' in factory
+    assert '"gemini": GeminiProvider' in factory
+    print("PASS Gemini provider: API-key preflight and factory wiring")
 
 
 def test_ascii_sources():
     """Source files stay pure ASCII English (i18n.yaml + posts/ are exempt)."""
     for rel in (
-        "src/llm/glm_provider.py", "src/llm/factory.py", "src/llm/base.py",
+        "src/llm/glm_provider.py", "src/llm/gemini_provider.py",
+        "src/llm/factory.py", "src/llm/base.py",
         ".github/workflows/daily-run.yml", "scripts/test_site.py",
         "_includes/sidebar.html", "_layouts/default.html", "_config.yml",
     ):

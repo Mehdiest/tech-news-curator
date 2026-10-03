@@ -22,21 +22,6 @@ _RETRY_DELAY_SECONDS = 2.0
 _ASSIGNMENT_PREFIX = re.compile(r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=")
 
 
-def _mask_key(api_key: str) -> str:
-    """First/last fingerprint of a key safe for logs and hints."""
-    if len(api_key) <= 10:
-        return f"{api_key[:2]}...{api_key[-2:]}"
-    return f"{api_key[:6]}...{api_key[-4:]}"
-
-
-def _is_local_url(url: str) -> bool:
-    """True for loopback endpoints served by a local router/gateway."""
-    return any(
-        marker in url
-        for marker in ("//localhost", "//127.0.0.1", "//[::1]", "//0.0.0.0", "://host.docker.internal")
-    )
-
-
 def _validate_api_key(api_key: str) -> str:
     """Clean edge noise from a hand-pasted key; reject structural paste errors.
 
@@ -130,31 +115,6 @@ class GLMProvider:
                 await asyncio.sleep(_RETRY_DELAY_SECONDS * attempt)
         raise LLMError("unreachable retry state")
 
-    def _auth_hint(self, status: int) -> str:
-        """Disambiguate 401/403: the key is always attached client-side, so
-        the failure is either the endpoint rejecting the key or - for a local
-        router such as 9Router/one-api - an UPSTREAM auth failure relayed
-        verbatim. OpenRouter's relayed signature is 'Missing Authentication
-        header' (numeric code, no 'type' field); the router's own rejections
-        read 'Missing API key' / 'Invalid API key'. Saying so in the error
-        saves a whole debugging session."""
-        if status not in (401, 403):
-            return ""
-        key_fingerprint = f"Bearer {_mask_key(self.api_key)}"
-        if _is_local_url(self.url):
-            return (
-                f" | hint: the key WAS sent ({key_fingerprint}) to {self.url}. "
-                "Local router? Then: 'Invalid/Missing API key' in the body = fix "
-                "LLM_API_KEY (the router's own key); 'Missing Authentication "
-                "header' (OpenRouter) = the provider connection inside the "
-                "router dashboard has no API key attached"
-            )
-        return (
-            f" | hint: the key WAS sent ({key_fingerprint}) to {self.url} and "
-            "was rejected - re-copy the RAW key from the provider console "
-            "(no 'Bearer ' prefix, no quotes, no spaces)"
-        )
-
     async def _post_once(self, payload: dict) -> str:
         """Single HTTP call; converts every failure into LLMError."""
         headers = {
@@ -168,7 +128,7 @@ class GLMProvider:
                     body = await response.text()
                     if response.status >= 400:
                         raise LLMError(
-                            f"HTTP {response.status}: {body[:200]}{self._auth_hint(response.status)}",
+                            f"HTTP {response.status}: {body[:200]}",
                             transient=response.status in _RETRY_STATUS,
                         )
         except aiohttp.ClientError as error:

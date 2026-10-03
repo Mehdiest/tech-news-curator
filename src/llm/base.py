@@ -19,10 +19,8 @@ logger = logging.getLogger(__name__)
 # growing delay; a pair that succeeded once is never called again.
 TRANSLATION_RETRY_ROUNDS = 2
 _TRANSLATION_RETRY_DELAY_SECONDS = 3.0
-# Languages per translation chat call. The prompt/parser are multi-target,
-# so one call can carry several languages; 4 keeps an 8-language day at
-# items x (1 + 2) requests, leaving a wide margin under Gemini's current
-# free request quota.
+# Languages per translation request. Keeping the chunks small limits response
+# size while still reducing the number of API calls substantially.
 TRANSLATION_CHUNK_SIZE = 4
 
 
@@ -133,13 +131,8 @@ async def translate_batch(
     """Translate summarized items into extra languages, in place.
 
     One chat call per (item, chunk of <=chunk_size languages) instead of one
-    per (item, language): build_translation_messages and parse_translation_json
-    are multi-target already, and a 9-language day used to cost
-    items x (1 summarize + 8 translations) ~ 72 requests - unnecessarily high
-    for a free-tier API. With chunk_size=4 an 8-language day needs only
-    8 + 2x8 = 24 requests before retries.
-    With chunk_size=4 a 7-item day needs 7 + 2x7 = 21 requests, safely inside
-    the quota. The source text is always the finished English version, so the
+    per (item, language). The source text is always the finished English
+    version, so the
     author's voice lands identically in every edition.
 
     parse_translation_json tolerates per-language gaps, so a truncated reply

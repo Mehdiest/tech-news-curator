@@ -62,8 +62,8 @@ jobs:
         run: pip install -r requirements.txt
 
       # Secrets never enter the repo: .env is generated at runtime and gitignored.
-      # The model comes from the job-level env (vars.LLM_MODEL with a free
-      # OpenRouter default), identical to what the validate step prints.
+      # The model comes from the job-level env (vars.LLM_MODEL with a Gemini
+      # default), identical to what the validate step prints.
       - name: Write .env from secrets
         run: |
           {
@@ -85,14 +85,14 @@ jobs:
 
           key = os.environ.get("LLM_API_KEY", "").strip().strip('"').strip("'")
           if not key:
-              raise SystemExit("LLM_API_KEY is empty")
+              raise SystemExit("GEMINI_API_KEY is empty")
           if key.lower().startswith("bearer "):
-              raise SystemExit("LLM_API_KEY must not include the 'Bearer ' prefix")
+              raise SystemExit("GEMINI_API_KEY must not include the 'Bearer ' prefix")
           if "LLM_API_KEY" in key or re.match(r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=", key):
-              raise SystemExit("LLM_API_KEY looks like a pasted env line - store ONLY the raw key value")
+              raise SystemExit("GEMINI_API_KEY looks like a pasted env line - store ONLY the raw key value")
           if any(ch.isspace() for ch in key):
-              raise SystemExit("LLM_API_KEY contains internal whitespace")
-          print("LLM_API_KEY format looks valid; model =", os.environ.get("LLM_MODEL", "?"))
+              raise SystemExit("GEMINI_API_KEY contains internal whitespace")
+          print("GEMINI_API_KEY format looks valid; model =", os.environ.get("LLM_MODEL", "?"))
           PY
         env:
           LLM_API_KEY: ${{ secrets.GEMINI_API_KEY }}

@@ -1,4 +1,4 @@
-"""Google Gemini provider using the Gemini REST API."""
+"""Google Gemini provider using the Gemini generateContent REST API."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import asyncio
 import json
 import logging
 import re
+from urllib.parse import quote
 
 import aiohttp
 
@@ -21,21 +22,24 @@ _ASSIGNMENT_PREFIX = re.compile(r"^(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=")
 
 
 def _validate_api_key(api_key: str) -> str:
-    """Clean edge noise from a hand-pasted Gemini API key."""
+    """Clean edge noise from a pasted Gemini key and reject malformed values."""
     key = api_key.strip().strip('"').strip("'")
     if not key:
         raise ValueError("api_key is empty - set LLM_API_KEY")
     if key.lower().startswith("bearer "):
-        raise ValueError("Gemini API key must be the raw key, without 'Bearer '")
-    if "LLM_API_KEY" in key or _ASSIGNMENT_PREFIX.match(key):
-        raise ValueError("LLM_API_KEY must contain only the raw API key value")
+        raise ValueError("api_key has a 'Bearer ' prefix - paste ONLY the raw key value")
+    if _ASSIGNMENT_PREFIX.match(key):
+        raise ValueError(
+            "api_key is malformed - paste ONLY the raw key value, without an "
+            "environment-variable assignment"
+        )
     if any(ch.isspace() for ch in key):
-        raise ValueError("LLM_API_KEY contains internal whitespace")
+        raise ValueError("api_key contains internal whitespace - paste the raw key value")
     return key
 
 
 class GeminiProvider:
-    """Call Google's Gemini generateContent REST endpoint."""
+    """Call a Gemini model through its REST generateContent endpoint."""
 
     name = "gemini"
 
@@ -51,8 +55,9 @@ class GeminiProvider:
         max_attempts: int = 2,
     ):
         self.api_key = _validate_api_key(api_key)
-        self.model = model
-        self.url = f"{base_url.rstrip('/')}/models/{model}:generateContent"
+        self.model = model.strip() or "gemini-2.5-flash"
+        self.base_url = base_url.rstrip("/")
+        self.url = f"{self.base_url}/models/{quote(self.model, safe='')}:generateContent"
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.timeout = timeout
@@ -60,26 +65,30 @@ class GeminiProvider:
         self.max_attempts = max(1, max_attempts)
 
     async def summarize(self, article: Article) -> Summary:
-        """Generate one structured English digest summary."""
+        """Generate one structured digest summary for an article."""
         reply_text = await self.chat(build_messages(article, self.language))
         summary = parse_summary_json(reply_text)
-        logger.debug("gemini ok: %s", article.title[:60])
+        logger.debug("llm ok: %s", article.title[:60])
         return summary
 
     async def chat(self, messages: list[dict], max_tokens: int | None = None) -> str:
-        """Convert OpenAI-style messages to Gemini generateContent format."""
-        system_parts = []
-        contents = []
+        """Send OpenAI-style chat messages through Gemini's REST API."""
+        system_parts: list[dict[str, str]] = []
+        contents: list[dict] = []
+
         for message in messages:
-            role = message.get("role", "user")
+            role = str(message.get("role", "user")).lower()
             content = str(message.get("content", ""))
+            if not content:
+                continue
             if role == "system":
-                system_parts.append(content)
-            else:
-                contents.append({
-                    "role": "model" if role == "assistant" else "user",
-                    "parts": [{"text": content}],
-                })
+                system_parts.append({"text": content})
+                continue
+            gemini_role = "model" if role == "assistant" else "user"
+            contents.append({"role": gemini_role, "parts": [{"text": content}]})
+
+        if not contents:
+            raise LLMError("Gemini request has no user content")
 
         payload = {
             "contents": contents,
@@ -90,13 +99,12 @@ class GeminiProvider:
             },
         }
         if system_parts:
-            payload["systemInstruction"] = {
-                "parts": [{"text": "\n\n".join(system_parts)}],
-            }
-        return await self._generate_with_retry(payload)
+            payload["systemInstruction"] = {"parts": system_parts}
 
-    async def _generate_with_retry(self, payload: dict) -> str:
-        """Retry transient HTTP and network failures with a short backoff."""
+        return await self._chat_with_retry(payload)
+
+    async def _chat_with_retry(self, payload: dict) -> str:
+        """Retry transient HTTP and network failures with short backoff."""
         for attempt in range(1, self.max_attempts + 1):
             try:
                 return await self._post_once(payload)
@@ -113,15 +121,15 @@ class GeminiProvider:
         raise LLMError("unreachable retry state")
 
     async def _post_once(self, payload: dict) -> str:
-        """Make one Gemini API request and extract its first text part."""
-        headers = {
-            "x-goog-api-key": self.api_key,
-            "Content-Type": "application/json",
-        }
+        """Make one Gemini request and normalize provider errors."""
+        headers = {"Content-Type": "application/json"}
+        params = {"key": self.api_key}
         client_timeout = aiohttp.ClientTimeout(total=self.timeout)
         try:
             async with aiohttp.ClientSession(timeout=client_timeout) as session:
-                async with session.post(self.url, json=payload, headers=headers) as response:
+                async with session.post(
+                    self.url, json=payload, headers=headers, params=params
+                ) as response:
                     body = await response.text()
                     if response.status >= 400:
                         raise LLMError(
@@ -134,14 +142,14 @@ class GeminiProvider:
 
 
 def _extract_content(body: str) -> str:
-    """Extract candidates[0].content.parts[0].text from a Gemini reply."""
+    """Extract the first text candidate from a Gemini response."""
     try:
         data = json.loads(body)
-        candidates = data.get("candidates") or []
+        candidates = data["candidates"]
         parts = candidates[0]["content"]["parts"]
         text = "".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
         if not text:
-            raise KeyError("empty text")
+            raise KeyError("text")
         return text
     except (json.JSONDecodeError, KeyError, IndexError, TypeError) as error:
         raise LLMError(f"unexpected Gemini response shape: {body[:300]} ({error})") from error

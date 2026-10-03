@@ -5,7 +5,7 @@ name: backfill-translations
 # and rewrites the affected days with the current renderer. Idempotent by
 # design - pairs that are already translated are never re-translated.
 #
-# Requires the same LLM_API_KEY secret as the daily workflow. A --dry-run
+# Requires the same GEMINI_API_KEY secret as the daily workflow. A --dry-run
 # dispatch reports the gaps in the log without calling the LLM or writing.
 #
 # The repaired days are ALSO deployed to GitHub Pages right here. With the
@@ -40,7 +40,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  LLM_MODEL: ${{ vars.LLM_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
+  LLM_MODEL: ${{ vars.LLM_MODEL || 'gemini-2.5-flash' }}
 
 jobs:
   backfill:
@@ -66,9 +66,9 @@ jobs:
       - name: Write .env from secrets
         run: |
           {
-            echo "LLM_PROVIDER=glm"
-            echo "LLM_API_KEY=${{ secrets.LLM_API_KEY }}"
-            echo "LLM_BASE_URL=https://openrouter.ai/api/v1"
+            echo "LLM_PROVIDER=gemini"
+            echo "LLM_API_KEY=${{ secrets.GEMINI_API_KEY }}"
+            echo "LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta"
             echo "LLM_MODEL=${{ env.LLM_MODEL }}"
             echo "DIGEST_LANGUAGE=en"
           } > .env
